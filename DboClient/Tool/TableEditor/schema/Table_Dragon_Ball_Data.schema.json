@@ -1,0 +1,105 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Altar_Group",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Ball_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Ball_1_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Ball_2_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Ball_3_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Ball_4_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Ball_5_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Ball_6_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Ball_7_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Ball_Drop_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Ball_Junk_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Start_Dialog",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "End_Dialog",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Timeover_End_Dialog",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Hurry_Dialog",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Timeover_Dialog",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "No_Repeat_Dialog",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Inventory_Full_Dialog",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Skill_Overlap_Dialog",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Skill_Shortage_Of_LV_Dialog",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Dragon_NPC_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Default_Summon_Chat",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Appear_Dir_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Appear_Dir_Z",
+                       "type":  "float"
+                   }
+               ]
+}

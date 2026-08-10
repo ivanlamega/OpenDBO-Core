@@ -1,0 +1,21 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Tblidx", "type": "dword" },
+    { "name": "Name", "type": "dword" },
+    { "name": "Contents_Type", "type": "byte" },
+    { "name": "Direct_Type", "type": "byte" },
+    { "name": "Bone_Name", "type": "wide" },
+    { "name": "Effect_Name", "type": "wide" },
+    { "name": "Effect_Sound", "type": "wide" },
+    { "name": "System_Effect_Tblidx1", "type": "dword" },
+    { "name": "System_Effect_Tblidx2", "type": "dword" },
+    { "name": "System_Effect_Tblidx3", "type": "dword" },
+    { "name": "System_Effect_Type1", "type": "byte" },
+    { "name": "System_Effect_Type2", "type": "byte" },
+    { "name": "System_Effect_Type3", "type": "byte" },
+    { "name": "System_Effect_Value1", "type": "byte" },
+    { "name": "System_Effect_Value2", "type": "byte" },
+    { "name": "System_Effect_Value3", "type": "byte" }
+  ]
+}

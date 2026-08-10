@@ -1,0 +1,12 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Tblidx", "type": "dword" },
+    { "name": "Validity_Able", "type": "bool" },
+    { "name": "Semi_Set_Option", "type": "dword" },
+    { "name": "Full_Set_Option", "type": "dword" },
+    { "name": "Item_Tblidx_1", "type": "dword" },
+    { "name": "Item_Tblidx_2", "type": "dword" },
+    { "name": "Item_Tblidx_3", "type": "dword" }
+  ]
+}

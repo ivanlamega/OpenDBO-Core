@@ -1,0 +1,8 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Chatting_Filter_Tblidx", "type": "dword" },
+    { "name": "Slang_Text", "type": "wide" },
+    { "name": "Filtering_Text_Index", "type": "dword" }
+  ]
+}

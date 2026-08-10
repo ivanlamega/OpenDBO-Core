@@ -1,0 +1,113 @@
+{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Def_Reward_EXP",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Def_Reward_Zeny",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Def_Reward_Type_0",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Def_Reward_Idx_0",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Def_Reward_Val_0",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Def_Reward_Type_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Def_Reward_Idx_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Def_Reward_Val_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Def_Reward_Type_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Def_Reward_Idx_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Def_Reward_Val_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Def_Reward_Type_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Def_Reward_Idx_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Def_Reward_Val_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Sel_Reward_Type_0",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Sel_Reward_Idx_0",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Sel_Reward_Val_0",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Sel_Reward_Type_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Sel_Reward_Idx_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Sel_Reward_Val_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Sel_Reward_Type_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Sel_Reward_Idx_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Sel_Reward_Val_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Sel_Reward_Type_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Sel_Reward_Idx_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Sel_Reward_Val_3",
+                       "type":  "dword"
+                   }
+               ]
+}

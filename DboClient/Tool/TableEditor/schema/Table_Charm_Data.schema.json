@@ -1,0 +1,15 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Tblidx", "type": "dword" },
+    { "name": "Drop_Rate", "type": "word" },
+    { "name": "EXP", "type": "word" },
+    { "name": "RP_Sharing", "type": "word" },
+    { "name": "Cool_Time", "type": "word" },
+    { "name": "Keep_Time", "type": "word" },
+    { "name": "Need_Zenny", "type": "dword" },
+    { "name": "Dice_Min", "type": "byte" },
+    { "name": "Dice_Max", "type": "byte" },
+    { "name": "Charm_Type_Bit_Flag", "type": "byte" }
+  ]
+}

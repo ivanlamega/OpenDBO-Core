@@ -1,0 +1,197 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Race",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Gender",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Class",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Prior_Class_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Class_Bit_Flag",
+                       "type":  "hex"
+                   },
+                   {
+                       "name":  "Model_Child",
+                       "type":  "ansi"
+                   },
+                   {
+                       "name":  "Model_Adult",
+                       "type":  "ansi"
+                   },
+                   {
+                       "name":  "Basic_LP",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Basic_EP",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_RP",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Physical_Offence",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Physical_Defence",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Energy_Offence",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Energy_Defence",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Str",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Con",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Foc",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Dex",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Sol",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Eng",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Level_Up_LP",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Level_Up_EP",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Level_Up_RP",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Level_Up_Physical_Offence",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Level_Up_Physical_Defence",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Level_Up_Energy_Offence",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Level_Up_Energy_Defence",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Level_Up_Str",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Level_Up_Con",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Level_Up_Foc",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Level_Up_Dex",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Level_Up_Sol",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Level_Up_Eng",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Scale",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Child_Run_Speed_Origin",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Child_Run_Speed",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Adult_Run_Speed_Origin",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Adult_Run_Speed",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Attack_Speed_Rate",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Attack_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Attack_Range",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Basic_Attack_Rate",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Dodge_Rate",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Block_Rate",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Curse_Success_Rate",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Curse_Tolerance_Rate",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Aggro_Point",
+                       "type":  "word"
+                   }
+               ]
+}

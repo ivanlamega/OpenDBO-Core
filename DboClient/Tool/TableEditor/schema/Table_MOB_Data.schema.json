@@ -1,0 +1,489 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Validity_Able",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Name",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Name_Text",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Model",
+                       "type":  "ansi"
+                   },
+                   {
+                       "name":  "Level",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Mob_Group",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Mob_Kind",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Exp",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Grade",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Battle_Attribute",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Mob_type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Ai_Bit_Flag",
+                       "type":  "hex"
+                   },
+                   {
+                       "name":  "Basic_LP",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "LP_Regeneration",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_EP",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "EP_Regeneration",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Attack_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Basic_Physical_Offence",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Energy_Offence",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Physical_Defence",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Energy_Defence",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Str",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Con",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Foc",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Dex",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Sol",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Eng",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Scale",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Walk_Speed_Origin",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Walk_Speed",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Run_Speed_Origin",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Run_Speed",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Radius_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Radius_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Attack_Speed_Rate",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Attack_Cool_Time",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Attack_Range",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Basic_Attack_Rate",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Dodge_Rate",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Block_Rate",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Curse_Success_Rate",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Curse_Tolerance_Rate",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Stomachache_Defence",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Poison_Defence",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Bleed_Defence",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Burn_Defence",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Sight_Range",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Scan_Range",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Attack_Animation_Quantity",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Drop_Zenny",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Drop_Zenny_Rate",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Visible_Sight_Range",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Fly_Height",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Camera_Bone_Name",
+                       "type":  "ansi"
+                   },
+                   {
+                       "name":  "ILLust",
+                       "type":  "ansi"
+                   },
+                   {
+                       "name":  "Size",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Spawn_Animation",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Dialog_Group",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "TMQ_Point",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Drop_Quest_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "idxBigBag1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "byDropRate1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "byTryCount1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "idxBigBag2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "byDropRate2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "byTryCount2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "idxBigBag3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "byDropRate3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "byTryCount3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Alliance_Idx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Aggro_Max_Count",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Basic_Aggro_Point",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Sight_Angle",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Attribute_Bit_Flag",
+                       "type":  "hex"
+                   },
+                   {
+                       "name":  "Immunity_Bit_Flag",
+                       "type":  "hex"
+                   },
+                   {
+                       "name":  "IsDragonballDrop",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Class",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "UseRace",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "RewardExpRate",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "RewardZennyRate",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "FormulaOffset",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "SettingRate_LP",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "SettingRate_LPRegen",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "SettingRate_PhyOffence",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "SettingRate_EngOffence",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "SettingRate_PhyDefence",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "SettingRate_EngDefence",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "SettingRate_AttackRate",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "SettingRate_DodgeRate",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "SettingPhyOffenceRate",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "SettingEngOffenceRate",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "SettingRate_Defence_Role",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Use_Skill_Time_1",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Use_Skill_Tblidx_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Use_Skill_Basis_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Use_Skill_LP_1",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Use_Skill_Time_2",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Use_Skill_Tblidx_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Use_Skill_Basis_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Use_Skill_LP_2",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Use_Skill_Time_3",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Use_Skill_Tblidx_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Use_Skill_Basis_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Use_Skill_LP_3",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Use_Skill_Time_4",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Use_Skill_Tblidx_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Use_Skill_Basis_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Use_Skill_LP_4",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Use_Skill_Time_5",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Use_Skill_Tblidx_5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Use_Skill_Basis_5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Use_Skill_LP_5",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Use_Skill_Time_6",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Use_Skill_Tblidx_6",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Use_Skill_Basis_6",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Use_Skill_LP_6",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Use_Skill_Time_7",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Use_Skill_Tblidx_7",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Use_Skill_Basis_7",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Use_Skill_LP_7",
+                       "type":  "word"
+                   }
+               ]
+}

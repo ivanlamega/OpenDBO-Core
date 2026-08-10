@@ -1,0 +1,289 @@
+{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Name",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Dynamic_Able",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Dynamic_Create_Count",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Field_Door_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Field_Destory_Time",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Mob_Spawn_Table_Name",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "NPC_Spawn_Table_Name",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Object_Spawn_Table_Name",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Field_Start_Loc_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Field_Start_Loc_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Field_End_Loc_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Field_End_Loc_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Battle_Start_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Battle_Start_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Battle_End_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Battle_End_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "OutSide_Battle_Start_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "OutSide_Battle_Start_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "OutSide_Battle_End_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "OutSide_Battle_End_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Spectator_Start_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Spectator_Start_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Spectator_End_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Spectator_End_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Default_Loc_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Default_Loc_Y",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Default_Loc_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Default_Dir_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Default_Dri_Y",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Default_Dir_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Start1_Point_Loc_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Start1_Point_Loc_Y",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Start1_Point_Loc_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Start1_Point_Dir_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Start1_Point_Dir_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Start2_Point_Loc_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Start2_Point_Loc_Y",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Start2_Point_Loc_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Start2_Point_Dir_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Start2_Point_Dir_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Standard_Loc_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Standard_Loc_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Split_Size",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Night_Able",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Static_Time",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "funcflag",
+                       "type":  "hex"
+                   },
+                   {
+                       "name":  "World_Rule_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "World_Rule_Index",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "OutField_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Out_Field_Loc_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Out_Field_Loc_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Out_Field_Dir_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "ResourceFolder",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "BGM_Rest_Time",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "World_Resource_ID",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "FreeCamera_Height",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Enter_Resource_Flash",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Leave_Resource_Flash",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "WPS_Link_Index",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Start_Point_Range",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "dragonball_have_rate_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "dragonball_have_rate_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "dragonball_have_rate_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "dragonball_have_rate_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "dragonball_have_rate_5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "dragonball_drop_rate_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "dragonball_drop_rate_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "dragonball_drop_rate_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "dragonball_drop_rate_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "dragonball_drop_rate_5",
+                       "type":  "byte"
+                   }
+               ]
+}

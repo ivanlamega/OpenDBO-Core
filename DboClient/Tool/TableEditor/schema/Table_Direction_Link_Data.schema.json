@@ -1,0 +1,11 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Tblidx", "type": "dword" },
+    { "name": "Function_Name", "type": "ansi" },
+    { "name": "Note", "type": "ansi" },
+    { "name": "Type", "type": "byte" },
+    { "name": "Animation_ID", "type": "dword" },
+    { "name": "Direction_Func_Flag", "type": "hex" }
+  ]
+}

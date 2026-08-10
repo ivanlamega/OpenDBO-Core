@@ -1,0 +1,105 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Name",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Level_Min",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Level_Max",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Admission_Bit_Flag",
+                       "type":  "hex"
+                   },
+                   {
+                       "name":  "Admission_Num_Min",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Admission_Num_Max",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Condition_Tblidx1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_Tblidx2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_Tblidx3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_Tblidx4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_Tblidx5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_Tblidx6",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_Tblidx7",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_Tblidx8",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_Tblidx9",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_Tblidx10",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Mission_Tblidx1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Mission_Tblidx2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Mission_Tblidx3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Mission_Tblidx4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Mission_Tblidx5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Prologue_Cinematic_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Prologue_Text",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "World_Tblidx",
+                       "type":  "dword"
+                   }
+               ]
+}

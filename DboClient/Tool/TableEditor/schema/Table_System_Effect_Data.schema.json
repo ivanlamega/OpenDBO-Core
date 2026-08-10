@@ -1,0 +1,57 @@
+{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Name",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Effect_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Active_Effect_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Effect_Info_Text",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Keep_Effect_Name",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Target_Effect_Position",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Success_Effect_Name",
+                       "type":  "ansi"
+                   },
+                   {
+                       "name":  "Success_Projectile_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Success_Effect_Position",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Success_End_Effect_Name",
+                       "type":  "ansi"
+                   },
+                   {
+                       "name":  "End_Effect_Position",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Keep_Animation_Index",
+                       "type":  "word"
+                   }
+               ]
+}

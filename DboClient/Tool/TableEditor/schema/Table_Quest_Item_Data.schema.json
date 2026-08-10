@@ -1,0 +1,25 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Item_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Name",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Icon_Name",
+                       "type":  "ansi"
+                   },
+                   {
+                       "name":  "Note",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Function_Bit_Flag",
+                       "type":  "hex"
+                   }
+               ]
+}

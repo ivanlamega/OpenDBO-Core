@@ -1,0 +1,14 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Tblidx", "type": "dword" },
+    { "name": "Type", "type": "byte" },
+    { "name": "WidthPosition", "type": "byte" },
+    { "name": "HeightPosition", "type": "byte" },
+    { "name": "WidthSize", "type": "word" },
+    { "name": "HeightSize", "type": "word" },
+    { "name": "Resource", "type": "ansi" },
+    { "name": "Note", "type": "ansi" },
+    { "name": "Auto_Show", "type": "bool" }
+  ]
+}

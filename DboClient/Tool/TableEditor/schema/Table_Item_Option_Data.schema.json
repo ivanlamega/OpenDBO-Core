@@ -1,0 +1,121 @@
+{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Option_Name",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Validity_Able",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Option_Rank",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Item_Group",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Max_Quality",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Quality",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Quality_Index",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Cost",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Level",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "System_Effect_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Type_1",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Value_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "System_Effect_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Type_2",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Value_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "System_Effect_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Type_3",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Value_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "System_Effect_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Type_4",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Value_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Active_Effect",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Active_Rate",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Note",
+                       "type":  "ansi"
+                   },
+                   {
+                       "name":  "Scouter_Info_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Scouter_Info_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Scouter_Info_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Scouter_Info_4",
+                       "type":  "byte"
+                   }
+               ]
+}
