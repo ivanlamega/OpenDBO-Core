@@ -1,0 +1,13 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Tblidx", "type": "dword" },
+    { "name": "Dialog_Group", "type": "dword" },
+    { "name": "Dialog_Type", "type": "ansi" },
+    { "name": "Rate", "type": "byte" },
+    { "name": "Text_Index", "type": "dword" },
+    { "name": "Ballon_Type", "type": "byte" },
+    { "name": "Display_Time", "type": "dword" },
+    { "name": "Note", "type": "ansi" }
+  ]
+}

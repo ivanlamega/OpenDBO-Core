@@ -1,0 +1,65 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Name_Text",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Landmark_Name",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Landmark_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Validity_Able",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Landmark_BitFlag",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Landmark_Display_BitFlag",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Landmark_Loc_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Landmark_Loc_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Link_Map_Idx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zone_Map_Idx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Link_Warfog_Idx",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Icon_Name",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Icon_Size",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Note",
+                       "type":  "dword"
+                   }
+               ]
+}

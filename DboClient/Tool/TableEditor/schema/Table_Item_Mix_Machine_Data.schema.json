@@ -1,0 +1,45 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Validity_Able",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Name",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Machine_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Function_Bit_Flag",
+                       "type":  "hex"
+                   },
+                   {
+                       "name":  "Mix_Zenny_Discount_Rate",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dynamic_Object_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Built_In_Recipe_Tblidx_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Built_In_Recipe_Tblidx_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Built_In_Recipe_Tblidx_3",
+                       "type":  "dword"
+                   }
+               ]
+}

@@ -1,0 +1,17 @@
+{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Category",
+                       "type":  "ansi"
+                   },
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Text",
+                       "type":  "wide"
+                   }
+               ]
+}

@@ -1,0 +1,265 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Pattern_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_6",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_7",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_8",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_9",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_10",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_11",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_12",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_13",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_14",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_15",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_16",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_17",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_18",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_19",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_20",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_21",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_22",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_23",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_24",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_25",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_26",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_27",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_28",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_29",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_30",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_31",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_32",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_33",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_34",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_35",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_36",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_37",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_38",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_39",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_40",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_41",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_42",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_43",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_44",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_45",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_46",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_47",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_48",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_49",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_50",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_51",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_52",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_53",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_54",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_55",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_56",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_57",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_58",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_59",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_60",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_61",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_62",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_63",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pattern_64",
+                       "type":  "byte"
+                   }
+               ]
+}

@@ -1,0 +1,93 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Validity_Able",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Name",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Recipe_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Mix_Level",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Mix_Zenny",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Create_Item_Tblidx_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Create_Item_Tblidx_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Create_Item_Tblidx_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Create_Item_Rate_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Create_Item_Rate_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Create_Item_Rate_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Material_Tblidx_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Material_Tblidx_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Material_Tblidx_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Material_Tblidx_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Material_Tblidx_5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Material_Quantity_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Material_Quantity_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Material_Quantity_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Material_Quantity_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Material_Quantity_5",
+                       "type":  "byte"
+                   }
+               ]
+}

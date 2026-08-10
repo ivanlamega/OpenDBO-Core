@@ -1,0 +1,289 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Race",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Class",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "World_Id",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Tutorial_World_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Spawn_Loc_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Spawn_Loc_Y",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Spawn_Loc_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Spawn_Dir_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Spawn_Dir_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Bind_Loc_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Bind_Loc_Y",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Bind_Loc_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Bind_Dir_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Bind_Dir_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Map_Name_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "QItem_Tblidx_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "QPosition_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "QStack_Quantity_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Item_Tblidx_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_6",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_7",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_8",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_9",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_10",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Position_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Position_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Position_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Position_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Position_5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Position_6",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Position_7",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Position_8",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Position_9",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Position_10",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Stack_Quantity_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Stack_Quantity_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Stack_Quantity_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Stack_Quantity_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Stack_Quantity_5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Stack_Quantity_6",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Stack_Quantity_7",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Stack_Quantity_8",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Stack_Quantity_9",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Stack_Quantity_10",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Skill_Tblidx_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Skill_Tblidx_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Skill_Tblidx_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Skill_Tblidx_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Skill_Tblidx_5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Skill_Tblidx_6",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Skill_Tblidx_7",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Quick_Tblidx1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Quick_Tblidx2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Quick_Tblidx3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Quick_Tblidx4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Quick_Tblidx5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Quick_Type1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Quick_Type2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Quick_Type3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Quick_Type4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Quick_Type5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Quick_Position1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Quick_Position2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Quick_Position3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Quick_Position4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Quick_Position5",
+                       "type":  "byte"
+                   }
+               ]
+}

@@ -1,0 +1,21 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Value",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Action",
+                       "type":  "byte"
+                   }
+               ]
+}

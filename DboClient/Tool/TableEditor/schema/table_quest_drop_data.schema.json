@@ -1,0 +1,49 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Quest_Drop_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Quest_Item_Index1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Quest_Item_Index2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Quest_Item_Index3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Quest_Item_Index4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Quest_Item_Index5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Drop_Rate_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Drop_Rate_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Drop_Rate_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Drop_Rate_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Drop_Rate_5",
+                       "type":  "dword"
+                   }
+               ]
+}

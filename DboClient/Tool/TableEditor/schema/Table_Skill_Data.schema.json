@@ -1,0 +1,293 @@
+{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Skill_Name",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Name_Text",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Validity_Able",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "PC_Class_Bit_Flag",
+                       "type":  "hex"
+                   },
+                   {
+                       "name":  "Skill_Class",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Skill_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Skill_Active_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Buff_Group",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Slot_Index",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Skill_Grade",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Function_Bit_Flag",
+                       "type":  "hex"
+                   },
+                   {
+                       "name":  "Appoint_Target",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Apply_Target",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Apply_Target_Max",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Apply_Range",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Apply_Area_Size_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Apply_Area_Size_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Skill_Effect_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Skill_Effect_Type_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Skill_Effect_Value_1",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Skill_Effect_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Skill_Effect_Type_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Skill_Effect_Value_2",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "RP_Effect_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "RP_Effect_Value_1",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "RP_Effect_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "RP_Effect_Value_2",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "RP_Effect_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "RP_Effect_Value_3",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "RP_Effect_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "RP_Effect_Value_4",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "RP_Effect_5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "RP_Effect_Value_5",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "RP_Effect_6",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "RP_Effect_Value_6",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Require_Train_Level",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Require_Zenny",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Next_Skill_Train_Exp",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Require_SP",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Self_Train",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Require_Skill_Tblidx_Min_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Require_Skill_Tblidx_Max_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Require_Skill_Tblidx_Min_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Require_Skill_Tblidx_Max_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Root_Skill",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Require_Epuip_Slot_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Require_Item_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Icon_Name",
+                       "type":  "ansi"
+                   },
+                   {
+                       "name":  "Require_LP",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Require_EP",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Require_RP_Ball",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Casting_Time",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Cool_Time",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Keep_Time",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Keep_Effect",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Use_Range_Min",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Use_Range_Max",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Note",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Next_Skill_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Default_Display_Off",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Animation_Time",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Casting_Animation_Start",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Casting_Animation_Loop",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Action_Animation_Index",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Action_Loop_Animation_Index",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Action_End_Animation_Index",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Dash_Able",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Transform_Use_Info_Bit_Flag",
+                       "type":  "hex"
+                   },
+                   {
+                       "name":  "Success_Rate",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "PC_Class_Change",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Use_Type",
+                       "type":  "byte"
+                   }
+               ]
+}

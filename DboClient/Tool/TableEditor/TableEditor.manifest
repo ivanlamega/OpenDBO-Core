@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <!--
+    Nothing in this app previously declared a DPI-awareness level, so
+    Windows fell back to DPI-Unaware and scaled the whole window as a
+    stretched bitmap on anything above 100% scaling, reading as blurry
+    and dated no matter how modern the actual drawing code is.
+    Per-Monitor V2 draws at native resolution on every monitor and repaints
+    on a DPI change instead.
+  -->
+  <!--
+    No legacy <dpiAware> element here: this project's default linker
+    settings already merge in the MSVC toolset's own DPIAWARE.MANIFEST
+    (System-Aware fallback for pre-1607 Windows) alongside this file, so
+    declaring dpiAware again here would duplicate that element in the
+    merged manifest and fail Windows' strict SxS parser at launch. This
+    file only adds the Windows 10 1607+ Per-Monitor V2 opt-in.
+  -->
+  <asmv3:application xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
+    <asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">
+      <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2</dpiAwareness>
+    </asmv3:windowsSettings>
+  </asmv3:application>
+</assembly>

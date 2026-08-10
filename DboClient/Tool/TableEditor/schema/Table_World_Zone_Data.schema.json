@@ -1,0 +1,29 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Function_Bit_Flag",
+                       "type":  "hex"
+                   },
+                   {
+                       "name":  "World",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Name",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Name_Text",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Forbidden_Vehicle",
+                       "type":  "bool"
+                   }
+               ]
+}

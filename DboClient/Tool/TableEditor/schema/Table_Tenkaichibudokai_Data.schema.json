@@ -1,0 +1,53 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Name",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Value1",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Value2",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Value3",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Value4",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Value5",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Value6",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Value7",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Value8",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Value9",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Value10",
+                       "type":  "wide"
+                   }
+               ]
+}

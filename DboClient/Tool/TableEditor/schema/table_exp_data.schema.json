@@ -1,0 +1,14 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Level", "type": "dword" },
+    { "name": "EXP", "type": "dword" },
+    { "name": "Need_EXP", "type": "dword" },
+    { "name": "Normal_Race", "type": "word" },
+    { "name": "Super_Race", "type": "word" },
+    { "name": "Mob_Exp", "type": "dword" },
+    { "name": "Phy_Defence_Ref", "type": "dword" },
+    { "name": "Eng_Defence_Ref", "type": "dword" },
+    { "name": "Mob_Zenny", "type": "dword" }
+  ]
+}

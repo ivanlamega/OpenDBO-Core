@@ -1,0 +1,309 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Difficultyflag",
+                       "type":  "hex"
+                   },
+                   {
+                       "name":  "StartTime",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Start_Character_Direction",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Start_Object_Index",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Start_Trigger_Id",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Leave_Trigger_Id",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Arrive_Character_Direction",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Leave_Character_Direction",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Arrive_Object_Index",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Arrive_Trigger_Id",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Leave_Object_Index",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "DayRecord_MailIndex",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "BestRecord_MailIndex",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Reset_Time",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Prologue_Direction",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Open_Cine",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Note",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Stage_BGM1",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Stage_BGM2",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Last_BGM",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Name_Normal",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Name_Hard",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Start_Trigger_Direction_State1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Start_Trigger_Direction_State2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Start_Trigger_Direction_State3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Start_Trigger_Direction_State4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Start_Trigger_Direction_State5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Start_Trigger_Direction_State6",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Start_Trigger_Direction_State7",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Start_Trigger_Direction_State8",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Start_Trigger_Direction_State9",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Start_Trigger_Direction_State10",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "QuestStringTblidx_Easy",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "WorldTblidx_Easy",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "ScriptTblidx_Easy",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "LimitTime_Easy",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "MinMemberCount_Easy",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "MaxMemberCount_Easy",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "MinMemberLevel_Easy",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "MaxMemberLevel_Easy",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "NeedZenny_Easy",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "NeedItem_Easy",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "NeedLimitCount_Easy",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "World_Count_Easy",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "DayRecord_Reward_Easy",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "BestRecord_Reward_Easy",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "QuestStringTblidx_Normal",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "WorldTblidx_Normal",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "ScriptTblidx_Normal",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "LimitTime_Normal",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "MinMemberCount_Normal",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "MaxMemberCount_Normal",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "MinMemberLevel_Normal",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "MaxMemberLevel_Normal",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "NeedZenny_Normal",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "NeedItem_Normal",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "NeedLimitCount_Normal",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "World_Count_Normal",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "DayRecord_Reward_Normal",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "BestRecord_Reward_Normal",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "QuestStringTblidx_Hard",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "WorldTblidx_Hard",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "ScriptTblidx_Hard",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "LimitTime_Hard",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "MinMemberCount_Hard",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "MaxMemberCount_Hard",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "MinMemberLevel_Hard",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "MaxMemberLevel_Hard",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "NeedZenny_Hard",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "NeedItem_Hard",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "NeedLimitCount_Hard",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "World_Count_Hard",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "DayRecord_Reward_Hard",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "BestRecord_Reward_Hard",
+                       "type":  "dword"
+                   }
+               ]
+}

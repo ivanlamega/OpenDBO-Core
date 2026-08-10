@@ -1,0 +1,661 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Type",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Number",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Time",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_6",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_6",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_6",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_6",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_6",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_6",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_6",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_6",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_7",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_7",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_7",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_7",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_7",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_7",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_7",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_7",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_8",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_8",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_8",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_8",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_8",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_8",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_8",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_8",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_9",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_9",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_9",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_9",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_9",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_9",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_9",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_9",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_10",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_10",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_10",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_10",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_10",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_10",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_10",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_10",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_11",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_11",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_11",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_11",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_11",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_11",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_11",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_11",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_12",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_12",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_12",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_12",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_12",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_12",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_12",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_12",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_13",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_13",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_13",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_13",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_13",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_13",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_13",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_13",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_14",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_14",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_14",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_14",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_14",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_14",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_14",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_14",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_15",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_15",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_15",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_15",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_15",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_15",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_15",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_15",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_16",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_16",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_16",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_16",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_16",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_16",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_16",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_16",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_17",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_17",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_17",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_17",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_17",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_17",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_17",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_17",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_18",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_18",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_18",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_18",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_18",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_18",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_18",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_18",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_19",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_19",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_19",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_19",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_19",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_19",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_19",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_19",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIShowHideDirection_20",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OwnerType_20",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Owner_20",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Condition_20",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Direction_20",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Dialog_20",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "UiType_20",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "UIDirection_20",
+                       "type":  "byte"
+                   }
+               ]
+}

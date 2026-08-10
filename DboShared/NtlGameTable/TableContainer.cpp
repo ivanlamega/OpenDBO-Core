@@ -4,7 +4,7 @@
 //
 //	Begin		:	2007-01-31
 //
-//	Copyright	:	¨Ï NTL-Inc Co., Ltd
+//	Copyright	:	ï¿½ï¿½ NTL-Inc Co., Ltd
 //
 //	Author		:	
 //
@@ -1751,6 +1751,14 @@ bool CTableContainer::SaveToFile(CNtlBitFlagManager& rTableFlag, CTableFileNameL
 	{
 		DBO_EXPORT_TABLE(m_pMobServerTable, serializer, pFileNameList->GetFileNameW(TABLE_MOB_SERVER), bNeedToEncrypt);
 	}
+	if (false != rTableFlag.IsSet(TABLE_EVENT_SYSTEM))
+	{
+		DBO_EXPORT_TABLE(m_pEventSystemTable, serializer, pFileNameList->GetFileNameW(TABLE_EVENT_SYSTEM), bNeedToEncrypt);
+	}
+	if (false != rTableFlag.IsSet(TABLE_DYNAMIC_FIELD_SYSTEM))
+	{
+		DBO_EXPORT_TABLE(m_pDynamicFieldSystemTable, serializer, pFileNameList->GetFileNameW(TABLE_DYNAMIC_FIELD_SYSTEM), bNeedToEncrypt);
+	}
 	//--------------------------------------------------------------------------------
 	
 	
@@ -1952,7 +1960,7 @@ bool CTableContainer::SaveToFile(CNtlBitFlagManager& rTableFlag, CTableFileNameL
 	//--------------------------------------------------------------------------------
 	// GraphicData
 	//--------------------------------------------------------------------------------
-	// ±×·¡ÇÈ µ¥ÀÌÅ¸´Â TableContainer·Î exportÇÏÁö ¾Ê½À´Ï´Ù.
+	// ï¿½×·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Å¸ï¿½ï¿½ TableContainerï¿½ï¿½ exportï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.
 	// Graphic data is not supposed to be exported via TableContainer.
 	// by YOSHIKI(2007-04-05)
 
@@ -2024,6 +2032,10 @@ bool CTableContainer::SaveToFile(CNtlBitFlagManager& rTableFlag, CTableFileNameL
 	if (false != rTableFlag.IsSet(TABLE_HLS_SLOT_MACHINE))
 	{
 		DBO_EXPORT_TABLE( m_pSlotMachineTable, serializer, pFileNameList->GetFileNameW(TABLE_HLS_SLOT_MACHINE), bNeedToEncrypt);
+	}
+	if (false != rTableFlag.IsSet(TABLE_HLS_SLOT_MACHINE_ITEM))
+	{
+		DBO_EXPORT_TABLE( m_pHlsSlotMachineItemTable, serializer, pFileNameList->GetFileNameW(TABLE_HLS_SLOT_MACHINE_ITEM), bNeedToEncrypt);
 	}
 	return true;
 }

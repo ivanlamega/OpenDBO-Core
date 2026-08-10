@@ -13,6 +13,10 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\schema">
+      <UniqueIdentifier>{B3E5F5F1-9C6A-4E9B-8A1A-2B7B6C6C9A11}</UniqueIdentifier>
+      <Extensions>json</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TableEditor.h">
@@ -54,7 +58,25 @@
     <ClInclude Include="Util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ItemPreviewWnd.h">
+    <ClInclude Include="XmlExport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TableSchema.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgressDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Theme.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FlatButton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TabStrip.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -89,14 +111,252 @@
     <ClCompile Include="Util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ItemPreviewWnd.cpp">
+    <ClCompile Include="XmlExport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TableSchema.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FlatButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TabStrip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="schema\Table_Item_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Newbie_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_mascot_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Mascot_Grade_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Mascot_Status_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_CharTitle_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_chatting_filter_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Item_Enchant_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Merchant_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\TD_Formula.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Item_Mix_Exp_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Chat_Command_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Vehicle_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Dungeon_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_DB_Reward_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_exp_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Charm_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Action_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Help_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Guide_Hint_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Dynamic_Object_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Use_Item_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Set_Item_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Quest_Reward_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Quest_Reward_Select_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_npc_data_server.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_World_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_System_Effect_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Item_Option_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Skill_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_hls_item_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_status_transform_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_quest_probability_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_world_play_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_slot_machine_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_slot_machine_item_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_item_upgrade_newrate_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_item_bag_list_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_item_group_list_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_mob_data_server.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_db_returnpoint.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_event_system_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_event_system_dynamic_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Text_All_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_NPC_Speech_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_HTB_Set_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Direction_Link_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Dojo_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Mob_Move_Pattern_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Landmark_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Aircostume_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Quest_Text_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_TMQ_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Tenkaichibudokai_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_RankBattle_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Script_Link_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Quest_Narration_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Quest_Item_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_item_disassemble_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Portal_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Item_Recipe_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Item_Mix_Machine_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Dragon_Ball_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_World_Zone_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_common_config_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_dwc_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_Worldmap_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_PC_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_MOB_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\Table_NPC_Data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_dwc_mission_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
+    <None Include="schema\table_quest_drop_data.schema.json">
+      <Filter>Resource Files\schema</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TableEditor.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="TableEditor.manifest">
+      <Filter>Resource Files</Filter>
+    </Manifest>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\file_view.ico">
