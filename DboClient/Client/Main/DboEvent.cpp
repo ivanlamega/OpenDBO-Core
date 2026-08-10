@@ -262,6 +262,12 @@ RWS::CEventId g_EventHLShopEventItemAddNfy;
 RWS::CEventId g_EventHLShopEventItemDelNfy;
 RWS::CEventId g_EventHLShopEventItemGiftRes;
 
+RWS::CEventId g_EventHLShopEventWaguInfo;
+RWS::CEventId g_EventWaguMachineInfo;
+RWS::CEventId g_EventHlsCoinUpdateInfo;
+RWS::CEventId g_EventWaguExcuteRes;
+RWS::CEventId g_EventWaguWinnerInfoRes;
+
 RWS::CEventId g_EventOpenBagGui;				///< BagGui open시 발생
 RWS::CEventId g_EventOpenScouterBackgroundGui;	///< ScouterBackgroundGui open시 발생(use scouter)
 RWS::CEventId g_EventBroadCastNfy;

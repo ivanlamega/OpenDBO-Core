@@ -6,7 +6,7 @@
 #define NTL_SHOUT_MESSAGE_RANGE_IN_METER		(320.0f)
 
 
-// Ä³¸¯ÅÍ ´ëÈ­Ã¢ Å¸ÀÔ
+// Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È­Ã¢ Å¸ï¿½ï¿½
 enum eCHAR_DIALOG_TYPE
 {
 	CHAR_DIALOG_SAY,
@@ -93,7 +93,7 @@ struct sMSG_BROADCAST_DATA
 		struct sMSG_WAGUWAGU_1ST
 		{
 			WCHAR wszName[NTL_MAX_SIZE_CHAR_NAME + 1];
-			WCHAR wszItemName[20 + 1];
+			TBLIDX itemTblidx;
 		};
 		struct sMSG_FINISH_CCBD_LAST_STAGE
 		{

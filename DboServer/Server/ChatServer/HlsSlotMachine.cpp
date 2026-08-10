@@ -11,9 +11,6 @@
 
 CHlsSlotMachine::CHlsSlotMachine()
 {
-	//init winners
-	memset(m_aWinnerIndex, 0, sizeof(m_aWinnerIndex));
-
 	Init();
 }
 
@@ -138,29 +135,28 @@ void CHlsSlotMachine::GetSlotItems(TBLIDX slotIdx, std::vector<sHLS_SLOT_ITEM*>*
 
 void CHlsSlotMachine::AddWinner(TBLIDX slotId, TBLIDX itemTblidx, CPlayer * pPlayer)
 {
-	m_aWinnerIndex[slotId - 1] += 1;
+	QWORD& winnerIndex = m_mapWinnerIndex[slotId];
+	winnerIndex += 1;
 
 	sHLS_SLOT_WINNER_INFO* pWinner = new sHLS_SLOT_WINNER_INFO;
 	pWinner->nExtractTime = time(NULL);
 	NTL_SAFE_WCSCPY(pWinner->wszPlayer, pPlayer->GetCharName());
 	pWinner->wWinCount = pPlayer->GetSlotMachineCount();
-	pWinner->winnerIndex = m_aWinnerIndex[slotId - 1];
+	pWinner->winnerIndex = winnerIndex;
 
-	m_slotWinnerInfo[slotId - 1].push_back(pWinner);
+	std::list<sHLS_SLOT_WINNER_INFO*>& winnerList = m_mapSlotWinnerInfo[slotId];
+	winnerList.push_back(pWinner);
 
-	if (m_slotWinnerInfo[slotId - 1].size() > 3)
+	if (winnerList.size() > 3)
 	{
-		sHLS_SLOT_WINNER_INFO* pInfo = m_slotWinnerInfo[slotId - 1].front();
+		sHLS_SLOT_WINNER_INFO* pInfo = winnerList.front();
 		SAFE_DELETE(pInfo);
-		m_slotWinnerInfo[slotId - 1].pop_front();
+		winnerList.pop_front();
 	}
 }
 
 void CHlsSlotMachine::GetWinnerInfo(WORD wSlot, CPlayer * pPlayer)
 {
-	if (wSlot > 1)
-		return;
-
 	CNtlPacket packet(sizeof(sTU_HLS_SLOT_MACHINE_WINNER_INFO_RES));
 	sTU_HLS_SLOT_MACHINE_WINNER_INFO_RES* res = (sTU_HLS_SLOT_MACHINE_WINNER_INFO_RES*)packet.GetPacketData();
 	res->wOpCode = TU_HLS_SLOT_MACHINE_WINNER_INFO_RES;
@@ -168,17 +164,21 @@ void CHlsSlotMachine::GetWinnerInfo(WORD wSlot, CPlayer * pPlayer)
 	res->wMachineIndex = wSlot;
 	res->byInfoCount = 0;
 
-	for (std::list<sHLS_SLOT_WINNER_INFO*>::iterator it = m_slotWinnerInfo[wSlot - 1].begin(); it != m_slotWinnerInfo[wSlot - 1].end(); it++)
+	std::map<TBLIDX, std::list<sHLS_SLOT_WINNER_INFO*>>::iterator itWinnerList = m_mapSlotWinnerInfo.find((TBLIDX)wSlot);
+	if (itWinnerList != m_mapSlotWinnerInfo.end())
 	{
-		sHLS_SLOT_WINNER_INFO* pInfo = *it;
+		for (std::list<sHLS_SLOT_WINNER_INFO*>::iterator it = itWinnerList->second.begin(); it != itWinnerList->second.end(); it++)
+		{
+			sHLS_SLOT_WINNER_INFO* pInfo = *it;
 
-		NTL_SAFE_WCSCPY(res->wszPlayer[res->byInfoCount], pInfo->wszPlayer);
-		res->wWinCount[res->byInfoCount] = pInfo->wWinCount;
-		res->nExtractTime[res->byInfoCount] = pInfo->nExtractTime;
-		res->nWinnerIndex[res->byInfoCount] = (WORD)pInfo->winnerIndex;
+			NTL_SAFE_WCSCPY(res->wszPlayer[res->byInfoCount], pInfo->wszPlayer);
+			res->wWinCount[res->byInfoCount] = pInfo->wWinCount;
+			res->nExtractTime[res->byInfoCount] = pInfo->nExtractTime;
+			res->nWinnerIndex[res->byInfoCount] = (WORD)pInfo->winnerIndex;
 
-		if (++res->byInfoCount == DBO_MAX_HLS_SLOT_MACHINES_MAX_WINNERS)
-			break;
+			if (++res->byInfoCount == DBO_MAX_HLS_SLOT_MACHINES_MAX_WINNERS)
+				break;
+		}
 	}
 
 	packet.SetPacketLen(sizeof(sTU_HLS_SLOT_MACHINE_WINNER_INFO_RES));

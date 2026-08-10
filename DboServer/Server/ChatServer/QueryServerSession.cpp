@@ -1020,16 +1020,19 @@ void CQueryServerSession::RecvHlsSlotMachineExtractRes(CNtlPacket * pPacket, CCh
 			res->bySetCount[i] = req->bySetCount[i];
 		}
 
+		bool bIsEvent = (req->byHlsMachineType == HLS_MACHINE_TYPE_EVENT);
+		DWORD dwPlayerCoin = bIsEvent ? player->GetEventMachineCoin() : player->GetWaguMachineCoin();
+
 		if (req->wResultCode == CHAT_SUCCESS)
 		{
-			if (req->wCoin > (WORD)player->GetWaguMachineCoin())
+			if (req->wCoin > (WORD)dwPlayerCoin)
 			{
 				res->wNewWaguWaguPoints = 0;
 				ERR_LOG(LOG_HACK, "SLOT-MACHINE: Player %u, Account %u used more wagu coins than available !!!", req->charId, req->accountId);
 			}
 			else
 			{
-				res->wNewWaguWaguPoints = 0; //TODO
+				res->wNewWaguWaguPoints = req->waguPoint;
 			}
 		}
 
@@ -1039,7 +1042,10 @@ void CQueryServerSession::RecvHlsSlotMachineExtractRes(CNtlPacket * pPacket, CCh
 
 		if (req->wResultCode == CHAT_SUCCESS)
 		{
-			player->SetWaguMachineCoin((WORD)player->GetWaguMachineCoin() - req->wCoin);
+			if (bIsEvent)
+				player->SetEventMachineCoin(dwPlayerCoin - req->wCoin);
+			else
+				player->SetWaguMachineCoin(dwPlayerCoin - req->wCoin);
 
 			SYSTEMTIME ti;
 			GetLocalTime(&ti);
@@ -1064,20 +1070,40 @@ void CQueryServerSession::RecvHlsSlotMachineExtractRes(CNtlPacket * pPacket, CCh
 				app->Send(g_pServerInfoManager->GetGsSession(player->GetChannel()), &packet2);
 			}
 
-			CNtlPacket packet3(sizeof(sTG_WAGUCOIN_DECREASE_NFY));
-			sTG_WAGUCOIN_DECREASE_NFY* res3 = (sTG_WAGUCOIN_DECREASE_NFY*)packet3.GetPacketData();
-			res3->wOpCode = TG_WAGUCOIN_DECREASE_NFY;
-			res3->charId = req->charId;
-			res3->wWaguWaguCoin = (WORD)player->GetWaguMachineCoin();
-			packet3.SetPacketLen(sizeof(sTG_WAGUCOIN_DECREASE_NFY));
-			app->Send(g_pServerInfoManager->GetGsSession(player->GetChannel()), &packet3);
+			if (bIsEvent)
+			{
+				CNtlPacket packet3(sizeof(sTG_EVENTCOIN_DECREASE_NFY));
+				sTG_EVENTCOIN_DECREASE_NFY* res3 = (sTG_EVENTCOIN_DECREASE_NFY*)packet3.GetPacketData();
+				res3->wOpCode = TG_EVENTCOIN_DECREASE_NFY;
+				res3->charId = req->charId;
+				res3->wEventCoin = (WORD)player->GetEventMachineCoin();
+				packet3.SetPacketLen(sizeof(sTG_EVENTCOIN_DECREASE_NFY));
+				app->Send(g_pServerInfoManager->GetGsSession(player->GetChannel()), &packet3);
 
-			CNtlPacket packet4(sizeof(sTU_WAGUWAGUCOIN_UPDATE_INFO));
-			sTU_WAGUWAGUCOIN_UPDATE_INFO* res4 = (sTU_WAGUWAGUCOIN_UPDATE_INFO*)packet4.GetPacketData();
-			res4->wOpCode = TU_WAGUWAGUCOIN_UPDATE_INFO;
-			res4->wWaguWaguCoin = (WORD)player->GetWaguMachineCoin();
-			packet4.SetPacketLen(sizeof(sTU_WAGUWAGUCOIN_UPDATE_INFO));
-			player->SendPacket(&packet4);
+				CNtlPacket packet4(sizeof(sTU_EVENTCOIN_UPDATE_INFO));
+				sTU_EVENTCOIN_UPDATE_INFO* res4 = (sTU_EVENTCOIN_UPDATE_INFO*)packet4.GetPacketData();
+				res4->wOpCode = TU_EVENTCOIN_UPDATE_INFO;
+				res4->wEventCoin = (WORD)player->GetEventMachineCoin();
+				packet4.SetPacketLen(sizeof(sTU_EVENTCOIN_UPDATE_INFO));
+				player->SendPacket(&packet4);
+			}
+			else
+			{
+				CNtlPacket packet3(sizeof(sTG_WAGUCOIN_DECREASE_NFY));
+				sTG_WAGUCOIN_DECREASE_NFY* res3 = (sTG_WAGUCOIN_DECREASE_NFY*)packet3.GetPacketData();
+				res3->wOpCode = TG_WAGUCOIN_DECREASE_NFY;
+				res3->charId = req->charId;
+				res3->wWaguWaguCoin = (WORD)player->GetWaguMachineCoin();
+				packet3.SetPacketLen(sizeof(sTG_WAGUCOIN_DECREASE_NFY));
+				app->Send(g_pServerInfoManager->GetGsSession(player->GetChannel()), &packet3);
+
+				CNtlPacket packet4(sizeof(sTU_WAGUWAGUCOIN_UPDATE_INFO));
+				sTU_WAGUWAGUCOIN_UPDATE_INFO* res4 = (sTU_WAGUWAGUCOIN_UPDATE_INFO*)packet4.GetPacketData();
+				res4->wOpCode = TU_WAGUWAGUCOIN_UPDATE_INFO;
+				res4->wWaguWaguCoin = (WORD)player->GetWaguMachineCoin();
+				packet4.SetPacketLen(sizeof(sTU_WAGUWAGUCOIN_UPDATE_INFO));
+				player->SendPacket(&packet4);
+			}
 		}
 	}
 }

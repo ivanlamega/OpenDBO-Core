@@ -1151,6 +1151,9 @@
     <ClCompile Include="HLShopGui.cpp">
       <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29</Filter>
     </ClCompile>
+    <ClCompile Include="WaguMachineInfo.cpp">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29</Filter>
+    </ClCompile>
     <ClCompile Include="HLSSideIconGui.cpp">
       <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
     </ClCompile>
@@ -2084,6 +2087,9 @@
       <Filter>Gui\Component\Game\ItemBindSealingGui</Filter>
     </ClInclude>
     <ClInclude Include="HLShopGui.h">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29</Filter>
+    </ClInclude>
+    <ClInclude Include="WaguMachineInfo.h">
       <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29</Filter>
     </ClInclude>
     <ClInclude Include="HLSSideIconGui.h">

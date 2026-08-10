@@ -32,6 +32,9 @@ CNtlSobAvatarAttr::CNtlSobAvatarAttr()
     // PC방 관련
     m_dwNetPy = 0;
 	m_dwHlsCash = 0;
+	m_dwWaguCoin = 0;
+	m_dwEventCoin = 0;
+	m_dwWaguPoint = 0;
 
 	///
 	

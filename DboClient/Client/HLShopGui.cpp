@@ -32,6 +32,11 @@
 
 // table
 #include "HLSItemTable.h"
+#include "SlotMachineTable.h"
+#include "ItemTable.h"
+
+// sound
+#include "GUISoundDefine.h"
 
 
 #define HLS_ITEMS_PER_PAGE 10
@@ -59,17 +64,24 @@ CHLShopGui::CHLShopGui(const RwChar * pName)
 	m_pbtnProductPrevList(NULL),
 	m_pstbPage(NULL),
 	m_pbtnProductNextList(NULL),
-	m_pbtnProductLastList(NULL)
+	m_pbtnProductLastList(NULL),
+	m_pWaguFlash(NULL)
 {
 	m_nCurrentCategory = -1;
 	m_nCurrentPage = 1;
 	m_nMaxPage = 1;
+
+	memset(&m_WaguInfo, 0, sizeof(m_WaguInfo));
 
 	for (int i = 0; i < eHLS_CATEGORY_NUM; i++)
 	{
 		m_pBtnCategory[i] = NULL;
 		m_vecProducts[i].clear();
 	}
+
+	m_vecProductsWagu[0].clear();
+	m_vecProductsWagu[1].clear();
+	m_vecVisibleProductsWagu.clear();
 
 	m_bSearch = false;
 	m_vecSearch.clear();
@@ -158,12 +170,18 @@ RwBool CHLShopGui::Create()
 	m_slotClickedBtnProductLastList = m_pbtnProductLastList->SigClicked().Connect(this, &CHLShopGui::OnClickedBtnProductLastList);
 
 
+	m_pWaguFlash = (gui::CFlash*)GetComponent("flsResult");
+	m_slotWaguFlashEnd = m_pWaguFlash->SigMovieEnd().Connect(this, &CHLShopGui::OnWaguFlashEnd);
+
 	//m_pdlgBanner = (gui::CDialog*)GetComponent("dlgBanner");
 	m_slotMove = m_pThis->SigMove().Connect(this, &CHLShopGui::OnMove);
 	m_slotPaint = m_pThis->SigPaint().Connect(this, &CHLShopGui::OnPaint);
 
+	GetNtlGuiManager()->AddUpdateFunc(this);
+
 	CreateCategoryButton();
 	CreateItems();
+	CreateWaguItem();
 	SelectCategory(eHLS_CATEGORY_AVATAR);
 
 	// Dialog Priority
@@ -173,6 +191,9 @@ RwBool CHLShopGui::Create()
 	LinkMsg(g_EventHLShopEventItemBuyRes);
 	LinkMsg(g_EventHLShopEventItemGiftRes);
 	LinkMsg(g_EventDialog);
+	LinkMsg(g_EventWaguMachineInfo);
+	LinkMsg(g_EventHlsCoinUpdateInfo);
+	LinkMsg(g_EventWaguExcuteRes);
 
 	Show(false);
 
@@ -188,8 +209,12 @@ void CHLShopGui::Destroy()
 	UnLinkMsg(g_EventHLShopEventItemBuyRes);
 	UnLinkMsg(g_EventHLShopEventItemGiftRes);
 	UnLinkMsg(g_EventDialog);
+	UnLinkMsg(g_EventWaguMachineInfo);
+	UnLinkMsg(g_EventHlsCoinUpdateInfo);
+	UnLinkMsg(g_EventWaguExcuteRes);
 
 	m_vecVisibleProducts.clear();
+	m_vecVisibleProductsWagu.clear();
 
 	m_bSearch = false;
 	m_vecSearch.clear();
@@ -218,10 +243,52 @@ void CHLShopGui::Destroy()
 		m_vecProducts[i].clear();
 	}
 
+	for (int i = 0; i < 2; i++)
+	{
+		for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecProductsWagu[i].begin(); it != m_vecProductsWagu[i].end(); )
+		{
+			sWAGU_PRODUCTS* pProduct = *it;
+
+			++it;
+
+			for (int j = 0; j < 10; j++)
+				pProduct->ItemSlot[j].Destroy();
+
+			delete pProduct->ppnlItemSlot;
+			delete pProduct->btnPrev;
+			delete pProduct->btnNext;
+			delete pProduct->btnBunchInfo;
+			delete pProduct->btnExcute;
+			delete pProduct->btnWaguInfo;
+			delete pProduct->stbLeftCapsule;
+			delete pProduct->stbLeftCapsuleNum;
+			delete pProduct->stbWaguTitle;
+			delete pProduct->stbChampionItem;
+			delete pProduct->stbChampionItemName;
+			delete pProduct->stbNeedWaguCoin;
+			delete pProduct->pProgressbar;
+			delete pProduct->pnlEventCoinMarkSmall;
+			delete pProduct->pnlEventMark;
+			delete pProduct->pnlWaguMachine;
+			delete pProduct->pDialog;
+			delete pProduct;
+		}
+
+		m_vecProductsWagu[i].clear();
+	}
+
+	GetNtlGuiManager()->RemoveUpdateFunc(this);
+
 	CNtlPLGui::DestroyComponents();
 	CNtlPLGui::Destroy();
 
 	NTL_RETURNVOID();
+}
+
+void CHLShopGui::Update(RwReal fElapsed)
+{
+	if (m_pWaguFlash->IsPlayMovie())
+		m_pWaguFlash->Update(fElapsed);
 }
 
 void CHLShopGui::CreateCategoryButton()
@@ -386,6 +453,297 @@ void CHLShopGui::CreateItems()
 	}
 }
 
+void CHLShopGui::CreateWaguItem()
+{
+	CTextTable* pItemTable = API_GetTableContainer()->GetTextAllTable()->GetItemTbl();
+	CTextTable* pWaguTable = API_GetTableContainer()->GetTextAllTable()->GetETCTbl();
+
+	CHLSItemTable* pHlsItemTable = API_GetTableContainer()->GetHLSItemTable();
+
+	CRectangle rect;
+
+	int ai[2];
+	int iDialogX[2]; //left/right
+	int iDialogY[2]; //top/down
+
+	for (int i = 0; i < 2; i++)
+	{
+		ai[i] = 0;
+		iDialogX[i] = 105;
+		iDialogY[i] = 50;
+	}
+
+	CSlotMachineTable* pWaguMachineTable = API_GetTableContainer()->GetSlotMachineTable();
+	for (CTable::TABLEIT it = pWaguMachineTable->Begin(); it != pWaguMachineTable->End(); it++)
+	{
+		sHLS_SLOT_MACHINE_TBLDAT* pWaguItem = (sHLS_SLOT_MACHINE_TBLDAT*)it->second;
+
+		if (!pWaguItem->bOnOff)
+			continue;
+
+		if (pWaguItem->byType >= 2)
+			continue;
+
+		sWAGU_PRODUCTS* pProduct = new sWAGU_PRODUCTS;
+
+		for (int i = 0; i < 10; i++)
+		{
+			pProduct->ItemTblidx[i] = pWaguItem->aItemTblidx[i];
+			pProduct->Stack[i] = pWaguItem->byStack[i];
+		}
+
+		if ((ai[pWaguItem->byType] % 2) == 0)
+			iDialogX[pWaguItem->byType] = 105;
+		else
+			iDialogX[pWaguItem->byType] = 105 + 233;
+
+		if (ai[pWaguItem->byType] == HLS_ITEMS_PER_PAGE)
+		{
+			ai[pWaguItem->byType] = 0;
+			iDialogY[pWaguItem->byType] = 50;
+		}
+
+		pProduct->CurMachineIndex = pWaguItem->tblidx;
+		pProduct->CurMachineType = pWaguItem->byType;
+		pProduct->CurNeedCoin = pWaguItem->byCoin;
+		pProduct->CurShowItem = 0;
+
+		// item dialog
+		rect.SetRectWH(iDialogX[pWaguItem->byType], iDialogY[pWaguItem->byType], 229, 224);
+		pProduct->pDialog = NTL_NEW gui::CPanel(rect, m_pThis, GetNtlGuiManager()->GetSurfaceManager());
+
+		pProduct->nDialogX = iDialogX[pWaguItem->byType];
+		pProduct->nDialogY = iDialogY[pWaguItem->byType];
+
+		// item slot
+		rect.SetRectWH(142, 75, NTL_ITEM_ICON_SIZE, NTL_ITEM_ICON_SIZE);
+		pProduct->ppnlItemSlot = NTL_NEW gui::CPanel(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager());
+		pProduct->slotMouseEnterItem = pProduct->ppnlItemSlot->SigMouseEnter().Connect(this, &CHLShopGui::OnMouseEnterWaguItem);
+		pProduct->slotMouseLeaveItem = pProduct->ppnlItemSlot->SigMouseLeave().Connect(this, &CHLShopGui::OnMouseLeaveWaguItem);
+
+		for (int i = 0; i < 10; i++)
+		{
+			sHLS_ITEM_TBLDAT* pHlsItem = (sHLS_ITEM_TBLDAT*)pHlsItemTable->FindData(pWaguItem->aItemTblidx[i]);
+
+			if (pHlsItem)
+			{
+				pProduct->ItemSlot[i].Create(pProduct->ppnlItemSlot, DIALOG_HLSHOP, REGULAR_SLOT_ITEM_TABLE, SDS_COUNT);
+				pProduct->ItemSlot[i].SetSize(NTL_ITEM_ICON_SIZE);
+				pProduct->ItemSlot[i].SetPosition_fromParent(0, 0);
+				pProduct->ItemSlot[i].SetParentPosition(pProduct->ppnlItemSlot->GetScreenRect().left, pProduct->ppnlItemSlot->GetScreenRect().top);
+
+				pProduct->ItemSlot[i].SetIcon(pHlsItem->itemTblidx, 0);
+
+				pProduct->hlsItemCount[i] = pHlsItem->byStackCount;
+			}
+			else
+			{
+				DBO_WARNING_MESSAGE("Wagu Item does not exist " << pWaguItem->aItemTblidx[i]);
+			}
+		}
+
+		// background
+		pProduct->mSurface.SetSurface(GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfWaguBack"));
+
+		// prev button
+		rect.SetRectWH(99, 80, 33, 21);
+		pProduct->btnPrev = NTL_NEW gui::CButton(rect, "",
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfLeftBtnUp"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfLeftBtnDown"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfLeftBtnDown"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfLeftBtnFocus"),
+			NTL_BUTTON_UP_COLOR, NTL_BUTTON_UP_COLOR, NTL_BUTTON_FOCUS_COLOR, NTL_BUTTON_UP_COLOR,
+			GUI_BUTTON_DOWN_COORD_X, GUI_BUTTON_DOWN_COORD_Y, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager());
+
+		pProduct->slotClickPrev = pProduct->btnPrev->SigClicked().Connect(this, &CHLShopGui::OnClickedWaguPrev);
+
+		// next button
+		rect.SetRectWH(185, 80, 33, 21);
+		pProduct->btnNext = NTL_NEW gui::CButton(rect, "",
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfRightBtnUp"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfRightBtnDown"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfRightBtnDown"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfRightBtnFocus"),
+			NTL_BUTTON_UP_COLOR, NTL_BUTTON_UP_COLOR, NTL_BUTTON_FOCUS_COLOR, NTL_BUTTON_UP_COLOR,
+			GUI_BUTTON_DOWN_COORD_X, GUI_BUTTON_DOWN_COORD_Y, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager());
+
+		pProduct->slotClickNext = pProduct->btnNext->SigClicked().Connect(this, &CHLShopGui::OnClickedWaguNext);
+
+		// bunch info button
+		rect.SetRectWH(193, 168, 29, 21);
+		pProduct->btnBunchInfo = NTL_NEW gui::CButton(rect, "",
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfBunchBtnUp"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfBunchBtnDown"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfBunchBtnDown"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfBunchBtnFocus"),
+			NTL_BUTTON_UP_COLOR, NTL_BUTTON_UP_COLOR, NTL_BUTTON_FOCUS_COLOR, NTL_BUTTON_UP_COLOR,
+			GUI_BUTTON_DOWN_COORD_X, GUI_BUTTON_DOWN_COORD_Y, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager());
+
+		pProduct->slotBunchInfo = pProduct->btnBunchInfo->SigClicked().Connect(this, &CHLShopGui::OnClickedBtnBunchInfo);
+
+		// left capsule text
+		rect.SetRectWH(10, 174, 74, 18);
+		pProduct->stbLeftCapsule = NTL_NEW gui::CStaticBox(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), COMP_TEXT_CENTER);
+		pProduct->stbLeftCapsule->CreateFontStd(DEFAULT_FONT, DEFAULT_FONT_SIZE, DEFAULT_FONT_ATTR);
+		pProduct->stbLeftCapsule->SetText(GetDisplayStringManager()->GetString("DST_WAGU_ITEM_LEFT_CAPSULE"));
+		pProduct->stbLeftCapsule->SetTextColor(RGB(153, 187, 238), true);
+		pProduct->stbLeftCapsule->Enable(false);
+
+		// left capsule count
+		rect.SetRectWH(39, 197, 50, 20);
+		pProduct->stbLeftCapsuleNum = NTL_NEW gui::CStaticBox(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), COMP_TEXT_LEFT);
+		pProduct->stbLeftCapsuleNum->CreateFontStd(DEFAULT_FONT, DEFAULT_FONT_SIZE, DEFAULT_FONT_ATTR);
+		pProduct->stbLeftCapsuleNum->SetTextColor(RGB(153, 187, 238), true);
+		pProduct->stbLeftCapsuleNum->Enable(false);
+
+		// machine title
+		rect.SetRectWH(96, 15, 125, 10);
+		pProduct->stbWaguTitle = NTL_NEW gui::CStaticBox(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), COMP_TEXT_CENTER);
+		pProduct->stbWaguTitle->CreateFontStd(DEFAULT_FONT, 100, DEFAULT_FONT_ATTR);
+		pProduct->stbWaguTitle->SetText(pWaguTable->GetText(pWaguItem->dwName).c_str());
+		pProduct->stbWaguTitle->Enable(false);
+
+		// current champion item index
+		rect.SetRectWH(123, 47, 76, 21);
+		pProduct->stbChampionItem = NTL_NEW gui::CStaticBox(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), COMP_TEXT_CENTER);
+		pProduct->stbChampionItem->CreateFontStd(DEFAULT_FONT, DEFAULT_FONT_SIZE, DEFAULT_FONT_ATTR);
+		WCHAR Buff[256];
+		swprintf_s(Buff, 256, GetDisplayStringManager()->GetString("DST_WAGU_ITEM_CHAMPION_ITEM"), 1);
+		pProduct->stbChampionItem->SetText(Buff);
+		pProduct->stbChampionItem->SetTextColor(RGB(153, 187, 238), true);
+		pProduct->stbChampionItem->Enable(false);
+
+		// current champion item name
+		rect.SetRectWH(98, 117, 119, 20);
+		pProduct->stbChampionItemName = NTL_NEW gui::CStaticBox(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), COMP_TEXT_CENTER);
+		pProduct->stbChampionItemName->CreateFontStd(DEFAULT_FONT, DEFAULT_FONT_SIZE, DEFAULT_FONT_ATTR);
+		if (pProduct->ItemSlot[0].GetItemTable())
+		{
+			std::wstring text = pItemTable->GetText(pProduct->ItemSlot[0].GetItemTable()->Name);
+			pProduct->stbChampionItemName->SetText(text.c_str());
+		}
+		pProduct->stbChampionItemName->SetTextColor(RGB(255, 0, 255), true);
+		pProduct->stbChampionItemName->Enable(false);
+
+		// coin cost
+		rect.SetRectWH(110, 143, 100, 20);
+		pProduct->stbNeedWaguCoin = NTL_NEW gui::CStaticBox(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), COMP_TEXT_LEFT);
+		pProduct->stbNeedWaguCoin->CreateFontStd(DEFAULT_FONT, DEFAULT_FONT_SIZE, DEFAULT_FONT_ATTR);
+		WCHAR Buff1[256];
+		swprintf_s(Buff1, 256, GetDisplayStringManager()->GetString("DST_WAGU_ITEM_NEED_WAGU_COIN"), pWaguItem->byCoin);
+		pProduct->stbNeedWaguCoin->SetText(Buff1);
+		pProduct->stbNeedWaguCoin->SetTextColor(RGB(255, 221, 102), true);
+		pProduct->stbNeedWaguCoin->Enable(false);
+
+		// spin button
+		rect.SetRectWH(125, 168, 67, 22);
+		pProduct->btnExcute = NTL_NEW gui::CButton(rect, GetDisplayStringManager()->GetString("DST_WAGU_ITEM_EXCUTE_BUTTON"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfWaguMachineBtnUp"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfWaguMachineBtnDown"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfWaguMachineBtnDown"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfWaguMachineBtnFoc"),
+			NTL_BUTTON_UP_COLOR, NTL_BUTTON_UP_COLOR, NTL_BUTTON_FOCUS_COLOR, NTL_BUTTON_UP_COLOR,
+			GUI_BUTTON_DOWN_COORD_X, GUI_BUTTON_DOWN_COORD_Y, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager());
+
+		pProduct->slotClickExcute = pProduct->btnExcute->SigClicked().Connect(this, &CHLShopGui::OnClickedExcute);
+
+		// winner list button
+		rect.SetRectWH(125, 191, 67, 22);
+		pProduct->btnWaguInfo = NTL_NEW gui::CButton(rect, GetDisplayStringManager()->GetString("DST_WAGU_ITEM_INFO_BUTTON"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfWaguMachineBtnUp"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfWaguMachineBtnDown"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfWaguMachineBtnDown"),
+			GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfWaguMachineBtnFoc"),
+			NTL_BUTTON_UP_COLOR, NTL_BUTTON_UP_COLOR, NTL_BUTTON_FOCUS_COLOR, NTL_BUTTON_UP_COLOR,
+			GUI_BUTTON_DOWN_COORD_X, GUI_BUTTON_DOWN_COORD_Y, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager());
+
+		pProduct->slotClickWaguInfo = pProduct->btnWaguInfo->SigClicked().Connect(this, &CHLShopGui::OnclickedBtnWaguInfo);
+
+		// event coin mark (small)
+		rect.SetRectWH(199, 144, 17, 17);
+		pProduct->pnlEventCoinMarkSmall = NTL_NEW gui::CPanel(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfEventCoinMark"));
+
+		// machine skin, keyed by tblidx % 100 (1-4)
+		switch (pWaguItem->tblidx % 100)
+		{
+			case 1:
+			{
+				rect.SetRectWH(3, 1, 90, 150);
+				pProduct->pnlWaguMachine = NTL_NEW gui::CPanel(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfBuleMachine_4"));
+
+				rect.SetRectWH(12, 164, 69, 5);
+				pProduct->pProgressbar = NTL_NEW gui::CProgressBar(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfBlueMachineProgress"));
+				pProduct->pProgressbar->SetRange(0, 100);
+				pProduct->pProgressbar->SetPos(100);
+			}
+			break;
+
+			case 2:
+			{
+				rect.SetRectWH(3, 1, 90, 150);
+				pProduct->pnlWaguMachine = NTL_NEW gui::CPanel(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfYellowMachine_4"));
+
+				rect.SetRectWH(12, 164, 69, 5);
+				pProduct->pProgressbar = NTL_NEW gui::CProgressBar(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfYellowMachineProgress"));
+				pProduct->pProgressbar->SetRange(0, 100);
+				pProduct->pProgressbar->SetPos(100);
+			}
+			break;
+
+			case 3:
+			{
+				rect.SetRectWH(3, 1, 90, 150);
+				pProduct->pnlWaguMachine = NTL_NEW gui::CPanel(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfRedMachine_4"));
+
+				rect.SetRectWH(12, 164, 69, 5);
+				pProduct->pProgressbar = NTL_NEW gui::CProgressBar(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfRedMachineProgress"));
+				pProduct->pProgressbar->SetRange(0, 100);
+				pProduct->pProgressbar->SetPos(100);
+			}
+			break;
+
+			case 4:
+			default:
+			{
+				rect.SetRectWH(3, 1, 90, 150);
+				pProduct->pnlWaguMachine = NTL_NEW gui::CPanel(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfGreenMachine_4"));
+
+				rect.SetRectWH(12, 164, 69, 5);
+				pProduct->pProgressbar = NTL_NEW gui::CProgressBar(rect, pProduct->pDialog, GetNtlGuiManager()->GetSurfaceManager(), GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfGreenMachineProgress"));
+				pProduct->pProgressbar->SetRange(0, 100);
+				pProduct->pProgressbar->SetPos(100);
+			}
+			break;
+		}
+
+		// EVENT badge overlay
+		rect.SetRectWH(2, 91, 88, 59);
+		pProduct->pnlEventMark = NTL_NEW gui::CPanel(rect, pProduct->pnlWaguMachine, GetNtlGuiManager()->GetSurfaceManager(), GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", "srfEventMark"));
+
+		if (pWaguItem->byType == HLS_MACHINE_TYPE_EVENT)
+		{
+			pProduct->pnlEventCoinMarkSmall->Show(true);
+			pProduct->pnlEventMark->Show(true);
+		}
+		else
+		{
+			pProduct->pnlEventCoinMarkSmall->Show(false);
+			pProduct->pnlEventMark->Show(false);
+		}
+
+		pProduct->pDialog->Show(false);
+
+		m_vecProductsWagu[pWaguItem->byType].push_back(pProduct);
+
+		if ((ai[pWaguItem->byType] % 2) != 0)
+		{
+			iDialogY[pWaguItem->byType] += 230;
+		}
+
+		++ai[pWaguItem->byType];
+	}
+}
+
 void CHLShopGui::SelectCategory(int iCategory)
 {
 	if (m_nCurrentCategory == iCategory)
@@ -406,29 +764,82 @@ void CHLShopGui::SelectCategory(int iCategory)
 	}
 	m_vecVisibleProducts.clear();
 
-	// show new items
-	int i = 0;
-	for (std::vector<sHLS_PRODUCTS*>::iterator it = m_vecProducts[iCategory].begin(); it != m_vecProducts[iCategory].end(); it++)
+	// hide current shown wagu machines
+	for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecVisibleProductsWagu.begin(); it != m_vecVisibleProductsWagu.end(); it++)
 	{
-		sHLS_PRODUCTS* pProduct = *it;
+		sWAGU_PRODUCTS* pProduct = *it;
 
-		pProduct->pDialog->Show(true);
+		pProduct->pDialog->Show(false);
+	}
+	m_vecVisibleProductsWagu.clear();
 
-		m_vecVisibleProducts.push_back(pProduct);
+	if (iCategory == eHLS_CATEGORY_WAGU_MACHINE)
+	{
+		// machine widgets get shown once RefreshWaguInfo receives the machine list from the server
+		GetDboGlobal()->GetChatPacketGenerator()->SendLoadWaguMachineInfoReq(HLS_MACHINE_TYPE_WAGUWAGU);
+	}
+	else if (iCategory == eHLS_CATEGORY_EVENT_MACHINE)
+	{
+		GetDboGlobal()->GetChatPacketGenerator()->SendLoadWaguMachineInfoReq(HLS_MACHINE_TYPE_EVENT);
+	}
+	else
+	{
+		// show new items
+		int i = 0;
+		for (std::vector<sHLS_PRODUCTS*>::iterator it = m_vecProducts[iCategory].begin(); it != m_vecProducts[iCategory].end(); it++)
+		{
+			sHLS_PRODUCTS* pProduct = *it;
 
-		if (++i >= HLS_ITEMS_PER_PAGE) // only show first 10 items
-			break;
+			pProduct->pDialog->Show(true);
+
+			m_vecVisibleProducts.push_back(pProduct);
+
+			if (++i >= HLS_ITEMS_PER_PAGE) // only show first 10 items
+				break;
+		}
 	}
 
 	m_nCurrentCategory = iCategory;
 	m_pBtnCategory[m_nCurrentCategory]->SetDown(true);
+	ShowCoin();
 
-	// get max pages
-	float fPages = ((float)m_vecProducts[m_nCurrentCategory].size() / (float)HLS_ITEMS_PER_PAGE) + 0.9;
-	if (fPages < 1)
-		fPages = 1;
+	if (iCategory == eHLS_CATEGORY_WAGU_MACHINE || iCategory == eHLS_CATEGORY_EVENT_MACHINE)
+	{
+		SetPage(1, 1);
+	}
+	else
+	{
+		// get max pages
+		float fPages = ((float)m_vecProducts[m_nCurrentCategory].size() / (float)HLS_ITEMS_PER_PAGE) + 0.9;
+		if (fPages < 1)
+			fPages = 1;
 
-	SetPage(1, (int)fPages);
+		SetPage(1, (int)fPages);
+	}
+}
+
+void CHLShopGui::ShowCoin()
+{
+	if (m_nCurrentCategory == eHLS_CATEGORY_EVENT_MACHINE)
+	{
+		m_pstbHaveEventCoinTitle->Show(true);
+		m_pstbHaveEventCoin->Show(true);
+		m_ppnlHaveEventCoinMark->Show(true);
+
+		m_pstbHaveWaguCoinTitle->Show(false);
+		m_pstbHaveWaguCoin->Show(false);
+		m_ppnlHaveWaguCoinMark->Show(false);
+	}
+	else
+	{
+		m_pstbHaveEventCoinTitle->Show(false);
+		m_pstbHaveEventCoin->Show(false);
+		m_ppnlHaveEventCoinMark->Show(false);
+
+		m_pstbHaveWaguCoinTitle->Show(true);
+		m_pstbHaveWaguCoin->Show(true);
+		m_ppnlHaveWaguCoinMark->Show(true);
+	}
 }
 
 void CHLShopGui::SetPage(int nCurPage, int nMaxPage)
@@ -469,6 +880,9 @@ void CHLShopGui::HandleEvents(RWS::CMsg & msg)
 				Logic_SetHlsCash(pData->dwCash);
 				m_pstbHaveCash->SetText(Logic_FormatZeni(pData->dwCash));
 
+				m_pstbHaveWaguCoin->SetText(Logic_FormatZeni(Logic_GetWaguCoin()));
+				m_pstbHaveEventCoin->SetText(Logic_FormatZeni(Logic_GetEventCoin()));
+
 				// set storage position
 				CRectangle rect = GetPosition();
 				CNtlPLGui* pPLGui = GetDialogManager()->GetDialog(DIALOG_HLSHOP_WAREHOUSE);
@@ -489,6 +903,7 @@ void CHLShopGui::HandleEvents(RWS::CMsg & msg)
 				GetDialogManager()->CloseDialog(DIALOG_HLSHOP_BUY_CONFIRM);
 				GetDialogManager()->CloseDialog(DIALOG_HLSHOP_GIFT);
 				GetDialogManager()->CloseDialog(DIALOG_HLSHOP_GIFT_CONFIRM);
+				GetDialogManager()->CloseDialog(DIALOG_HLSHOP_WAGU_INFO);
 				GetDialogManager()->CloseDialog(DIALOG_HLSHOP);
 			}
 			break;
@@ -514,6 +929,81 @@ void CHLShopGui::HandleEvents(RWS::CMsg & msg)
 		if (pData->iType == DIALOGEVENT_NPC_BYEBYE && pData->iDestDialog == DIALOG_HLSHOP)
 		{
 			OnClickedBtnClose(NULL);
+		}
+	}
+	else if (msg.Id == g_EventWaguMachineInfo)
+	{
+		SDboEventWaguMachineInfo* pEvent = (SDboEventWaguMachineInfo*)msg.pData;
+
+		RefreshWaguInfo(pEvent->byType, pEvent->wCurrentCapsule, pEvent->wMaxCapsule, pEvent->wMachineIndex);
+	}
+	else if (msg.Id == g_EventHlsCoinUpdateInfo)
+	{
+		SDboEventHlsCoinUpdate* pData = reinterpret_cast<SDboEventHlsCoinUpdate*>(msg.pData);
+
+		if (pData->Type == 0)
+			m_pstbHaveWaguCoin->SetText(Logic_FormatZeni(pData->Coin));
+		else
+			m_pstbHaveEventCoin->SetText(Logic_FormatZeni(pData->Coin));
+	}
+	else if (msg.Id == g_EventWaguExcuteRes)
+	{
+		SDboEventWaguExcuteRes* pData = reinterpret_cast<SDboEventWaguExcuteRes*>(msg.pData);
+
+		CHLSItemTable* pHlsItemTable = API_GetTableContainer()->GetHLSItemTable();
+		for (int i = 0; i < pData->byReallyExtractCount; i++)
+		{
+			sHLS_ITEM_TBLDAT* pHlsItem = (sHLS_ITEM_TBLDAT*)pHlsItemTable->FindData(pData->ItemTblidx[i]);
+			if (pHlsItem)
+			{
+				m_WaguInfo.byRanking[i] = pData->byRanking[i];
+				m_WaguInfo.ItemTblidx[i] = pHlsItem->itemTblidx;
+				m_WaguInfo.bySetCount[i] = pData->bySetCount[i];
+				m_WaguInfo.byStackCount[i] = pData->byStackCount[i];
+			}
+		}
+		m_WaguInfo.byReallyExtractCount = pData->byReallyExtractCount;
+		m_WaguInfo.wMachineIndex = pData->wMachineIndex;
+		m_WaguInfo.wNewWaguWaguPoints = pData->wNewWaguWaguPoints;
+
+		if ((m_WaguInfo.wMachineIndex - 100) < 100)
+		{
+			GetDboGlobal()->GetChatPacketGenerator()->SendLoadWaguMachineInfoReq(HLS_MACHINE_TYPE_WAGUWAGU);
+			m_WaguInfo.isEventType = false;
+		}
+		else
+		{
+			GetDboGlobal()->GetChatPacketGenerator()->SendLoadWaguMachineInfoReq(HLS_MACHINE_TYPE_EVENT);
+			m_WaguInfo.isEventType = true;
+		}
+
+		m_pWaguFlash->Raise();
+		switch (pData->wMachineIndex % 100)
+		{
+			case 1: m_pWaguFlash->Load("Hls_SlotMachine1.swf"); m_pWaguFlash->PlayMovie(TRUE); break;
+			case 2: m_pWaguFlash->Load("Hls_SlotMachine2.swf"); m_pWaguFlash->PlayMovie(TRUE); break;
+			case 3: m_pWaguFlash->Load("Hls_SlotMachine3.swf"); m_pWaguFlash->PlayMovie(TRUE); break;
+			case 4: m_pWaguFlash->Load("Hls_SlotMachine4.swf"); m_pWaguFlash->PlayMovie(TRUE); break;
+		}
+
+		sNtlSoundPlayParameta tSoundParam;
+		tSoundParam.iChannelGroup = CHANNEL_GROUP_UI_SOUND;
+		tSoundParam.pcFileName = GSD_WAGU_DRAW;
+		GetSoundManager()->Play(&tSoundParam);
+
+		// disable all machine buttons until the flash finishes
+		for (int i = 0; i < 2; i++)
+		{
+			for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecProductsWagu[i].begin(); it != m_vecProductsWagu[i].end(); it++)
+			{
+				sWAGU_PRODUCTS* pProduct = *it;
+
+				pProduct->btnBunchInfo->ClickEnable(FALSE);
+				pProduct->btnExcute->ClickEnable(FALSE);
+				pProduct->btnNext->ClickEnable(FALSE);
+				pProduct->btnPrev->ClickEnable(FALSE);
+				pProduct->btnWaguInfo->ClickEnable(FALSE);
+			}
 		}
 	}
 }
@@ -544,6 +1034,14 @@ void CHLShopGui::OnPaint()
 		pProduct->mSurface.Render();
 		pProduct->ItemSlot.Paint();
 	}
+
+	for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecVisibleProductsWagu.begin(); it != m_vecVisibleProductsWagu.end(); it++)
+	{
+		sWAGU_PRODUCTS* pProduct = *it;
+
+		pProduct->mSurface.Render();
+		pProduct->ItemSlot[pProduct->CurShowItem].Paint();
+	}
 }
 
 void CHLShopGui::OnMove(RwInt32 iOldX, RwInt32 iOldY)
@@ -555,6 +1053,20 @@ void CHLShopGui::OnMove(RwInt32 iOldX, RwInt32 iOldY)
 		CRectangle rect = pProduct->ppnlItemSlot->GetScreenRect();
 
 		pProduct->ItemSlot.SetParentPosition(rect.left, rect.top);
+
+		CRectangle drect = pProduct->pDialog->GetScreenRect();
+
+		pProduct->mSurface.SetPositionbyParent(drect.left, drect.top);
+	}
+
+	for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecVisibleProductsWagu.begin(); it != m_vecVisibleProductsWagu.end(); it++)
+	{
+		sWAGU_PRODUCTS* pProduct = *it;
+
+		CRectangle rect = pProduct->ppnlItemSlot->GetScreenRect();
+
+		for (int i = 0; i < 10; i++)
+			pProduct->ItemSlot[i].SetParentPosition(rect.left, rect.top);
 
 		CRectangle drect = pProduct->pDialog->GetScreenRect();
 
@@ -1007,6 +1519,250 @@ void CHLShopGui::ShowItemInfoWindow(bool bIsShow, sHLS_PRODUCTS* pProduct)
 		if (GetInfoWndManager()->GetRequestGui() == DIALOG_HLSHOP)
 			GetInfoWndManager()->ShowInfoWindow(FALSE);
 	}
+}
+
+void CHLShopGui::ShowItemInfoWindow(bool bIsShow, sWAGU_PRODUCTS* pProduct)
+{
+	if (bIsShow && pProduct->ItemSlot[pProduct->CurShowItem].GetItemTable() != NULL)
+	{
+		CRectangle rect = pProduct->ppnlItemSlot->GetScreenRect();
+
+		GetInfoWndManager()->ShowInfoWindow(TRUE, CInfoWndManager::INFOWND_TABLE_ITEM, rect.left, rect.top, pProduct->ItemSlot[pProduct->CurShowItem].GetItemTable(), DIALOG_HLSHOP);
+	}
+	else
+	{
+		if (GetInfoWndManager()->GetRequestGui() == DIALOG_HLSHOP)
+			GetInfoWndManager()->ShowInfoWindow(FALSE);
+	}
+}
+
+void CHLShopGui::OnMouseEnterWaguItem(gui::CComponent* pComponent)
+{
+	for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecVisibleProductsWagu.begin(); it != m_vecVisibleProductsWagu.end(); it++)
+	{
+		sWAGU_PRODUCTS* pProduct = *it;
+
+		if (pProduct->ppnlItemSlot == pComponent)
+		{
+			ShowItemInfoWindow(true, pProduct);
+
+			break;
+		}
+	}
+}
+
+void CHLShopGui::OnMouseLeaveWaguItem(gui::CComponent* pComponent)
+{
+	for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecVisibleProductsWagu.begin(); it != m_vecVisibleProductsWagu.end(); it++)
+	{
+		sWAGU_PRODUCTS* pProduct = *it;
+
+		if (pProduct->ppnlItemSlot == pComponent)
+		{
+			ShowItemInfoWindow(false, pProduct);
+
+			break;
+		}
+	}
+}
+
+void CHLShopGui::OnClickedWaguPrev(gui::CComponent* pComponent)
+{
+	CTextTable* pItemTable = API_GetTableContainer()->GetTextAllTable()->GetItemTbl();
+
+	for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecVisibleProductsWagu.begin(); it != m_vecVisibleProductsWagu.end(); it++)
+	{
+		sWAGU_PRODUCTS* pProduct = *it;
+
+		if (pProduct->btnPrev == pComponent)
+		{
+			if (pProduct->CurShowItem == 0)
+				pProduct->CurShowItem = 9;
+			else
+				pProduct->CurShowItem--;
+
+			WCHAR Buff[256];
+			swprintf_s(Buff, 256, GetDisplayStringManager()->GetString("DST_WAGU_ITEM_CHAMPION_ITEM"), pProduct->CurShowItem + 1);
+			pProduct->stbChampionItem->SetText(Buff);
+
+			if (pProduct->ItemSlot[pProduct->CurShowItem].GetItemTable())
+			{
+				std::wstring text = pItemTable->GetText(pProduct->ItemSlot[pProduct->CurShowItem].GetItemTable()->Name);
+				pProduct->stbChampionItemName->SetText(text.c_str());
+			}
+
+			break;
+		}
+	}
+}
+
+void CHLShopGui::OnClickedWaguNext(gui::CComponent* pComponent)
+{
+	CTextTable* pItemTable = API_GetTableContainer()->GetTextAllTable()->GetItemTbl();
+
+	for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecVisibleProductsWagu.begin(); it != m_vecVisibleProductsWagu.end(); it++)
+	{
+		sWAGU_PRODUCTS* pProduct = *it;
+
+		if (pProduct->btnNext == pComponent)
+		{
+			if (pProduct->CurShowItem == 9)
+				pProduct->CurShowItem = 0;
+			else
+				pProduct->CurShowItem++;
+
+			WCHAR Buff[256];
+			swprintf_s(Buff, 256, GetDisplayStringManager()->GetString("DST_WAGU_ITEM_CHAMPION_ITEM"), pProduct->CurShowItem + 1);
+			pProduct->stbChampionItem->SetText(Buff);
+
+			if (pProduct->ItemSlot[pProduct->CurShowItem].GetItemTable())
+			{
+				std::wstring text = pItemTable->GetText(pProduct->ItemSlot[pProduct->CurShowItem].GetItemTable()->Name);
+				pProduct->stbChampionItemName->SetText(text.c_str());
+			}
+
+			break;
+		}
+	}
+}
+
+void CHLShopGui::OnclickedBtnWaguInfo(gui::CComponent* pComponent)
+{
+	for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecVisibleProductsWagu.begin(); it != m_vecVisibleProductsWagu.end(); it++)
+	{
+		sWAGU_PRODUCTS* pProduct = *it;
+
+		if (pProduct->btnWaguInfo == pComponent)
+		{
+			// position the winner-list dialog next to the shop
+			CRectangle rect = GetPosition();
+			CNtlPLGui* pPLGui = GetDialogManager()->GetDialog(DIALOG_HLSHOP_WAGU_INFO);
+			pPLGui->SetPosition(rect.left + rect.GetWidth() + NTL_LINKED_DIALOG_GAP, rect.top);
+
+			GetDboGlobal()->GetChatPacketGenerator()->SendLoadWaguMachineWinnerInfoReq(pProduct->CurMachineIndex);
+			CDboEventGenerator::HLShopWaguEventInfo(pProduct->ItemTblidx, pProduct->stbWaguTitle->GetText(), pProduct->CurMachineIndex);
+
+			break;
+		}
+	}
+}
+
+void CHLShopGui::OnClickedBtnBunchInfo(gui::CComponent* pComponent)
+{
+	// full odds/prize table popup — not wired up in this build
+}
+
+void CHLShopGui::OnClickedExcute(gui::CComponent* pComponent)
+{
+	for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecVisibleProductsWagu.begin(); it != m_vecVisibleProductsWagu.end(); it++)
+	{
+		sWAGU_PRODUCTS* pProduct = *it;
+
+		if (pProduct->btnExcute == pComponent)
+		{
+			CDboEventGenerator::WaguMachinesExcute(1, pProduct->CurMachineIndex, pProduct->CurMachineType, pProduct->CurNeedCoin);
+
+			break;
+		}
+	}
+}
+
+void CHLShopGui::OnWaguFlashEnd(gui::CComponent* pComponent)
+{
+	m_pWaguFlash->PlayMovie(FALSE);
+
+	CDboEventGenerator::WaguExcuteRes();
+
+	if (!m_WaguInfo.isEventType)
+	{
+		int OldWaguPoints = m_WaguInfo.wNewWaguWaguPoints - Logic_GetWaguPoint();
+		Logic_SetWaguPoint(m_WaguInfo.wNewWaguWaguPoints);
+
+		WCHAR Buff[256];
+		swprintf_s(Buff, 256, GetDisplayStringManager()->GetString("DST_WP_ADD_POINT"), OldWaguPoints);
+		GetAlarmManager()->AlarmMessage(Buff, 8);
+	}
+
+	// show what was won
+	CHLSItemTable* pHlsItemTable = API_GetTableContainer()->GetHLSItemTable();
+	CItemTable* pItemTable = API_GetTableContainer()->GetItemTable();
+	bool bHasTop1 = false;
+
+	for (int i = 0; i < m_WaguInfo.byReallyExtractCount; i++)
+	{
+		sITEM_TBLDAT* pItemData = (sITEM_TBLDAT*)pItemTable->FindData(m_WaguInfo.ItemTblidx[i]);
+		if (pItemData)
+		{
+			GetAlarmManager()->FormattedAlarmMessage("DST_NOTIFY_GET_ITEM", FALSE, NULL, m_WaguInfo.byStackCount[i], Logic_GetItemName(m_WaguInfo.ItemTblidx[i]));
+		}
+
+		if (m_WaguInfo.byRanking[i] == 1)
+			bHasTop1 = true;
+	}
+
+	if (bHasTop1)
+	{
+		sNtlSoundPlayParameta tSoundParam;
+		tSoundParam.iChannelGroup = CHANNEL_GROUP_UI_SOUND;
+		tSoundParam.pcFileName = GSD_WAGU_FIRST_PRIZE;
+		GetSoundManager()->Play(&tSoundParam);
+	}
+}
+
+void CHLShopGui::RefreshWaguInfo(BYTE WaguType, WORD* CurCap, WORD* MaxCap, WORD* MachineIndex)
+{
+	// hide currently shown wagu machines
+	for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecVisibleProductsWagu.begin(); it != m_vecVisibleProductsWagu.end(); it++)
+	{
+		sWAGU_PRODUCTS* pProduct = *it;
+
+		pProduct->pDialog->Show(false);
+	}
+	m_vecVisibleProductsWagu.clear();
+
+	if (WaguType >= 2)
+		return;
+
+	int i = 0;
+	for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecProductsWagu[WaguType].begin(); it != m_vecProductsWagu[WaguType].end(); it++)
+	{
+		sWAGU_PRODUCTS* pProduct = *it;
+
+		pProduct->CurCapNum = CurCap[i];
+		pProduct->MaxCapNum = MaxCap[i];
+
+		int CurWaguPercent = (MaxCap[i] > 0) ? (int)((float)CurCap[i] / (float)MaxCap[i] * 100) : 0;
+
+		pProduct->pProgressbar->SetPos(CurWaguPercent);
+
+		WCHAR Buff[64];
+		swprintf_s(Buff, 64, L"%d / %d", CurCap[i], MaxCap[i]);
+		pProduct->stbLeftCapsuleNum->SetText(Buff);
+
+		const char* pSkinSuffix = (CurWaguPercent > 75) ? "_4" : (CurWaguPercent > 50) ? "_3" : (CurWaguPercent > 25) ? "_2" : "_1";
+		const char* pSkinColor = NULL;
+		switch (pProduct->CurMachineIndex % 100)
+		{
+			case 1: pSkinColor = "srfBuleMachine"; break;
+			case 2: pSkinColor = "srfYellowMachine"; break;
+			case 3: pSkinColor = "srfRedMachine"; break;
+			default: pSkinColor = "srfGreenMachine"; break;
+		}
+
+		char szSurfaceName[64];
+		sprintf_s(szSurfaceName, "%s%s", pSkinColor, pSkinSuffix);
+
+		pProduct->pnlWaguMachine->ClearSurface();
+		pProduct->pnlWaguMachine->AddSurface(GetNtlGuiManager()->GetSurfaceManager()->GetSurface("HLS.srf", szSurfaceName));
+
+		m_vecVisibleProductsWagu.push_back(pProduct);
+		pProduct->pDialog->Show(true);
+
+		if (++i >= 4)
+			break;
+	}
+
+	OnMove(0, 0);
 }
 
 void CHLShopGui::InitSearch()

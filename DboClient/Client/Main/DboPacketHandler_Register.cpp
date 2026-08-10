@@ -736,6 +736,11 @@ void RegisterPacketHandler(void)
 	// Naming
 	CNtlPacketHandler::Register(TU_CHAR_NAME_CHANGED_NFY, PacketHandler_CharNameChangedNfy);
 	CNtlPacketHandler::Register(TU_BROADCASTING_SYSTEM_NFY, PacketHandler_TUBroadCastRes);
+	CNtlPacketHandler::Register(TU_HLS_SLOT_MACHINE_INFO_RES, PacketHandler_TUWaguMachinesInfo);
+	CNtlPacketHandler::Register(TU_HLS_SLOT_MACHINE_WINNER_INFO_RES, PacketHandler_TUWaguMachineWinnerInfo);
+	CNtlPacketHandler::Register(TU_HLS_SLOT_MACHINE_EXTRACT_RES, PacketHandler_TUWaguMachineExcuteRes);
+	CNtlPacketHandler::Register(TU_WAGUWAGUCOIN_UPDATE_INFO, PacketHandler_TUWaguCoinUpdateInfo);
+	CNtlPacketHandler::Register(TU_EVENTCOIN_UPDATE_INFO, PacketHandler_TUEventCoinUpdateInfo);
 
 	// Display message
 	CNtlPacketHandler::Register(GU_SYSTEM_DISPLAY_RESULTCODE, PacketHandler_SystemDisplayResultCode);
@@ -1459,6 +1464,12 @@ void UnRegisterPacketHandler(void)
 	CNtlPacketHandler::UnRegister(TU_BUDOKAI_NOTICE_NFY);
 
 	CNtlPacketHandler::UnRegister(TU_CHAR_NAME_CHANGED_NFY);
+
+	CNtlPacketHandler::UnRegister(TU_HLS_SLOT_MACHINE_INFO_RES);
+	CNtlPacketHandler::UnRegister(TU_HLS_SLOT_MACHINE_WINNER_INFO_RES);
+	CNtlPacketHandler::UnRegister(TU_HLS_SLOT_MACHINE_EXTRACT_RES);
+	CNtlPacketHandler::UnRegister(TU_WAGUWAGUCOIN_UPDATE_INFO);
+	CNtlPacketHandler::UnRegister(TU_EVENTCOIN_UPDATE_INFO);
 
 	// Naming
 //	CNtlPacketHandler::UnRegister(GU_CHAR_NICKNAME_CHANGED_NFY);

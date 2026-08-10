@@ -265,6 +265,15 @@ public:
 	static void HLShopEventItemAddNfy(sCASHITEM_BRIEF* aInfo);
 	static void HLShopEventItemDelNfy(QWORD qwProductId);
 
+	// hls slot machine
+	static void HLShopWaguEventInfo(TBLIDX* pData, std::wstring Name, WORD Index);
+	static void WaguMachinesInfo(SDboEventWaguMachineInfo pData);
+	static void WaguMachinesExcute(BYTE Count, WORD MachineIndex, BYTE Type, BYTE NeedCoin);
+	static void WaguExcuteRes();
+	static void WaguMachinesExcuteRes(SDboEventWaguExcuteRes pData);
+	static void WaguWinnerInfoRes(SDboEventWaguWinnerInfo pData);
+	static void HlsCoinUpdateInfo(WORD Coin, BYTE Type);
+
 	// open BagGui, ScouterBackgroundGui, ...
 	static void OpenBagGui();
 	static void OpenScouterBackgroundGui();

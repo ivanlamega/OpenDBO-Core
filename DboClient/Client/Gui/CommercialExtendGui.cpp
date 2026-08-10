@@ -1019,6 +1019,16 @@ VOID CCommercialExtendGui::HandleEvents( RWS::CMsg& msg )
 
 			DeleteMascot(pExData->index);
 		}
+		else if (eWAGU_EXCUTE == pData->eCommandType)
+		{
+			SDboEventWaguExcuteData* pExData = (SDboEventWaguExcuteData*)pData->pData;
+
+			WaguExcute(pExData->Type, pExData->Count, pExData->MachineIndex, pExData->NeedCoin);
+		}
+		else if (eWAGU_EXCUTE_RES == pData->eCommandType)
+		{
+			WaguExcuteRes();
+		}
 	}
 	else if( msg.Id == g_EventMsgBoxResult )
 		HandleEventsSubMsgBox( msg );
@@ -1165,6 +1175,16 @@ VOID CCommercialExtendGui::HandleEventsSubMsgBox( RWS::CMsg& msg )
 		if (pEvent->eResult == MBR_OK)
 		{
 			NetSendMascotDelete();
+		}
+	}
+	else if (pEvent->strID == "DST_WAGU_ITEM_ASK_EXCUTE_BUNCH_WP" ||
+		pEvent->strID == "DST_WAGU_ITEM_ASK_EXCUTE_WP" ||
+		pEvent->strID == "DST_WAGU_ITEM_ASK_EXCUTE_BUNCH" ||
+		pEvent->strID == "DST_WAGU_ITEM_ASK_EXCUTE")
+	{
+		if (pEvent->eResult == MBR_OK)
+		{
+			NetSendWaguMachinesExcute(m_NetSendData.DataSendWaguExcute.m_Count, m_NetSendData.DataSendWaguExcute.m_Index);
 		}
 	}
 
@@ -1334,6 +1354,36 @@ VOID CCommercialExtendGui::DeleteMascot(BYTE index)
 {
 	GetAlarmManager()->FormattedAlarmMessage("DST_MASCOT_DELETE_MB_CONFIRM", FALSE, NULL);
 	m_NetSendData.DataSendMascot.m_Index = index;
+}
+
+VOID CCommercialExtendGui::WaguExcute(BYTE Type, BYTE Count, WORD Index, BYTE NeedCoin)
+{
+	if (Type == 0)
+	{
+		if (Count > 1)
+			GetAlarmManager()->FormattedAlarmMessage("DST_WAGU_ITEM_ASK_EXCUTE_BUNCH_WP", FALSE, NULL, NeedCoin * Count);
+		else
+			GetAlarmManager()->FormattedAlarmMessage("DST_WAGU_ITEM_ASK_EXCUTE_WP", FALSE, NULL, NeedCoin);
+	}
+	else
+	{
+		if (Count > 1)
+			GetAlarmManager()->FormattedAlarmMessage("DST_WAGU_ITEM_ASK_EXCUTE_BUNCH", FALSE, NULL, NeedCoin * Count);
+		else
+			GetAlarmManager()->FormattedAlarmMessage("DST_WAGU_ITEM_ASK_EXCUTE", FALSE, NULL, NeedCoin);
+	}
+
+	m_NetSendData.DataSendWaguExcute.m_Count = Count;
+	m_NetSendData.DataSendWaguExcute.m_Index = Index;
+}
+
+VOID CCommercialExtendGui::WaguExcuteRes()
+{
+}
+
+VOID CCommercialExtendGui::NetSendWaguMachinesExcute(BYTE Count, WORD Index)
+{
+	GetDboGlobal()->GetChatPacketGenerator()->SendWaguMachineExcute(Count, Index);
 }
 
 VOID CCommercialExtendGui::NetSendMascotSummon()

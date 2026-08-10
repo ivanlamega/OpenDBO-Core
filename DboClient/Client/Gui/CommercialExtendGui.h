@@ -162,12 +162,20 @@ protected:
 		BYTE					m_Index;
 	};
 
+	class CDataSendWaguExcute
+	{
+	public:
+		BYTE					m_Count;
+		WORD					m_Index;
+	};
+
 	typedef union
 	{
 		CDataSendBuyDurItemNPC			DataSendBuyDurItemNPC;
 		CDataSendBuyDurItemNetpy		DataSendBuyDurItemNetpy;
 		CDataSendMoveDurItemFromYardrat	DataSendMoveDurItemFromYardrat;
 		CDataSendMascot					DataSendMascot;
+		CDataSendWaguExcute				DataSendWaguExcute;
 	} UNI_NET_SEND;
 
 	UNI_NET_SEND				m_NetSendData;		
@@ -207,6 +215,11 @@ public:
 	VOID						NetSendMascotSummon();
 	VOID						NetSendMascotUnSummon();
 	VOID						NetSendMascotDelete();
+
+	// HLS Slot Machine
+	VOID						WaguExcute(BYTE Type, BYTE Count, WORD Index, BYTE NeedCoin);
+	VOID						WaguExcuteRes();
+	VOID						NetSendWaguMachinesExcute(BYTE Count, WORD Index);
 
 	//! Event
 	virtual VOID				HandleEvents( RWS::CMsg& msg );

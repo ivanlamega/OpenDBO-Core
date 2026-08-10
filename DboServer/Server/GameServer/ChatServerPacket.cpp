@@ -762,6 +762,17 @@ void CChatServerSession::RecvWaguCoinDecreaseNfy(CNtlPacket * pPacket)
 	}
 }
 
+void CChatServerSession::RecvEventCoinDecreaseNfy(CNtlPacket * pPacket)
+{
+	sTG_EVENTCOIN_DECREASE_NFY * req = (sTG_EVENTCOIN_DECREASE_NFY*)pPacket->GetPacketData();
+
+	CPlayer* player = g_pObjectManager->FindByChar(req->charId);
+	if (player && player->IsInitialized())
+	{
+		player->SetEventMachineCoin((DWORD)req->wEventCoin);
+	}
+}
+
 void CChatServerSession::RecvWaguWaguMachineUpdateCashitemInfo(CNtlPacket * pPacket)
 {
 	sTG_WAGUWAGUMACHINE_UPDATE_CASHITEM_INFO * req = (sTG_WAGUWAGUMACHINE_UPDATE_CASHITEM_INFO*)pPacket->GetPacketData();

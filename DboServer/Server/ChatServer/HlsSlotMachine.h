@@ -72,8 +72,8 @@ private:
 
 	SLOTMACHINEGROUP							m_slotMachineGroup;
 
-	QWORD										m_aWinnerIndex[2];
-	std::list<sHLS_SLOT_WINNER_INFO*>			m_slotWinnerInfo[2]; // 2 = amount of machines
+	std::map<TBLIDX, QWORD>							m_mapWinnerIndex;
+	std::map<TBLIDX, std::list<sHLS_SLOT_WINNER_INFO*>>	m_mapSlotWinnerInfo;
 
 	std::map<TBLIDX, sSLOT_MACHINE*>			m_mapSlotMachine;
 };

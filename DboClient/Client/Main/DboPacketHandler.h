@@ -871,6 +871,12 @@ void PacketHandler_TUBudokaiTournamentTeamInfoRes(void* pPacket);
 // Naming
 void PacketHandler_CharNameChangedNfy(void* pPacket);
 void PacketHandler_TUBroadCastRes(void* pPacket);
+
+void PacketHandler_TUWaguMachinesInfo(void* pPacket);
+void PacketHandler_TUWaguMachineWinnerInfo(void* pPacket);
+void PacketHandler_TUWaguMachineExcuteRes(void* pPacket);
+void PacketHandler_TUWaguCoinUpdateInfo(void* pPacket);
+void PacketHandler_TUEventCoinUpdateInfo(void* pPacket);
 void PacketHandler_NickNameChangedNfy(void* pPacket);
 
 // Display message

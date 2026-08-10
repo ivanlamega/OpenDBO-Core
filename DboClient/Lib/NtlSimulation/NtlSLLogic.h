@@ -187,6 +187,15 @@ void		Logic_SetHlsCash(DWORD dwCash);
 DWORD		Logic_GetHlsCash(void);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// HLS Slot Machine (wagu/event coins & wagu points)
+void		Logic_SetWaguCoin(DWORD dwCoin);
+DWORD		Logic_GetWaguCoin(void);
+void		Logic_SetEventCoin(DWORD dwCoin);
+DWORD		Logic_GetEventCoin(void);
+void		Logic_SetWaguPoint(DWORD dwPoint);
+DWORD		Logic_GetWaguPoint(void);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Sp
 void		Logic_SetSp( RwUInt32 uiSp );
 

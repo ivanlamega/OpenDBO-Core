@@ -739,6 +739,72 @@ DWORD Logic_GetHlsCash(void)
 	return pAvatarAttr->m_dwHlsCash;
 }
 
+void Logic_SetWaguCoin(DWORD dwCoin)
+{
+	CNtlSobAvatar* pAvatar = GetNtlSLGlobal()->GetSobAvatar();
+	if (!pAvatar)
+		return;
+
+	CNtlSobAvatarAttr* pAvatarAttr = reinterpret_cast<CNtlSobAvatarAttr*>(pAvatar->GetSobAttr());
+
+	pAvatarAttr->m_dwWaguCoin = dwCoin;
+}
+
+DWORD Logic_GetWaguCoin(void)
+{
+	CNtlSobAvatar* pAvatar = GetNtlSLGlobal()->GetSobAvatar();
+	if (!pAvatar)
+		return 0;
+
+	CNtlSobAvatarAttr* pAvatarAttr = reinterpret_cast<CNtlSobAvatarAttr*>(pAvatar->GetSobAttr());
+
+	return pAvatarAttr->m_dwWaguCoin;
+}
+
+void Logic_SetEventCoin(DWORD dwCoin)
+{
+	CNtlSobAvatar* pAvatar = GetNtlSLGlobal()->GetSobAvatar();
+	if (!pAvatar)
+		return;
+
+	CNtlSobAvatarAttr* pAvatarAttr = reinterpret_cast<CNtlSobAvatarAttr*>(pAvatar->GetSobAttr());
+
+	pAvatarAttr->m_dwEventCoin = dwCoin;
+}
+
+DWORD Logic_GetEventCoin(void)
+{
+	CNtlSobAvatar* pAvatar = GetNtlSLGlobal()->GetSobAvatar();
+	if (!pAvatar)
+		return 0;
+
+	CNtlSobAvatarAttr* pAvatarAttr = reinterpret_cast<CNtlSobAvatarAttr*>(pAvatar->GetSobAttr());
+
+	return pAvatarAttr->m_dwEventCoin;
+}
+
+void Logic_SetWaguPoint(DWORD dwPoint)
+{
+	CNtlSobAvatar* pAvatar = GetNtlSLGlobal()->GetSobAvatar();
+	if (!pAvatar)
+		return;
+
+	CNtlSobAvatarAttr* pAvatarAttr = reinterpret_cast<CNtlSobAvatarAttr*>(pAvatar->GetSobAttr());
+
+	pAvatarAttr->m_dwWaguPoint = dwPoint;
+}
+
+DWORD Logic_GetWaguPoint(void)
+{
+	CNtlSobAvatar* pAvatar = GetNtlSLGlobal()->GetSobAvatar();
+	if (!pAvatar)
+		return 0;
+
+	CNtlSobAvatarAttr* pAvatarAttr = reinterpret_cast<CNtlSobAvatarAttr*>(pAvatar->GetSobAttr());
+
+	return pAvatarAttr->m_dwWaguPoint;
+}
+
 void Logic_SetSp( RwUInt32 uiSp )
 {
 	CNtlSobAvatar* pAvatar = GetNtlSLGlobal()->GetSobAvatar();

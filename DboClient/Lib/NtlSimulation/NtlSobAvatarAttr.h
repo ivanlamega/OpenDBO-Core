@@ -59,6 +59,9 @@ public:
 	// PC room related
 	DWORD    m_dwNetPy;                 ///<
 	DWORD    m_dwHlsCash;                 ///<
+	DWORD    m_dwWaguCoin;
+	DWORD    m_dwEventCoin;
+	DWORD    m_dwWaguPoint;
 
 	//////////////////////////////////////////////////////////////////////////
 
