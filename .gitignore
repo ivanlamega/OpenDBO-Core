@@ -516,11 +516,12 @@ DboClient/RenderwareX64/Lib/Release_x64.bak/
 # Task lists (local planning, not tracked)
 /tasks/
 
-# fmod generated binaries (rebuilt per-architecture into Win32/x64)
-DboClient/Lib/NtlSound/fmod/*.dll
-DboClient/Lib/NtlSound/fmod/*.lib
-DboClient/Lib/NtlSound/fmod/*.exp
+# fmod runtime DLL copies land in DragonBall via post-build
 DboClient/DragonBall/fmod*.dll
+
+# fmod binaries are required to build (cannot be rebuilt from the repo)
+!DboClient/Lib/NtlSound/fmod/Win32/
+!DboClient/Lib/NtlSound/fmod/x64/
 
 # build staging folder (headers xcopied by RW plugin post-build)
 DboClient/inc/*
