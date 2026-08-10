@@ -88,6 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Renderware\Include\rwcore;$(SolutionDir)Renderware\Include\rwplcore;$(SolutionDir)Renderware\Include\;$(ProjectDir);$(ProjectDir)d3d9;$(SolutionDir)Renderware\Include\rpskin2;$(SolutionDir)Renderware\Include\rpskin2\d3d9;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -102,6 +103,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Renderware\Include\rwcore;$(SolutionDir)Renderware\Include\rwplcore;$(SolutionDir)Renderware\Include\;$(ProjectDir);$(ProjectDir)d3d9;$(SolutionDir)Renderware\Include\rpskin2;$(SolutionDir)Renderware\Include\rpskin2\d3d9;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
