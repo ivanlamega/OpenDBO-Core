@@ -16,6 +16,7 @@
 #define IDR_MAINFRAME_256			129
 #define IDR_TableEditorTYPE				130
 #define ID_WINDOW_MANAGER			131
+#define ID_VIEW_ACTIONBAR			132
 #define ID_VIEW_FILEVIEW			133
 #define ID_VIEW_CLASSVIEW			134
 #define ID_PROPERTIES				135
@@ -66,6 +67,11 @@
 #define IDR_OUTPUT_POPUP			182
 #define IDR_PROPERTIES				183
 #define IDB_PROPERTIES_HC			184
+#define ID_TABLE_LOAD_RDF			190
+#define ID_TABLE_SAVE_RDF			191
+#define ID_TABLE_LOAD_XML			192
+#define ID_TABLE_SAVE_XML			193
+
 #define IDS_BUILD_TAB				300
 #define IDS_DEBUG_TAB				301
 #define IDS_FIND_TAB				302
