@@ -1,0 +1,10 @@
+{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   { "name":  "Tblidx",			"type":  "dword" },
+                   { "name":  "Group",				"type":  "dword" },
+                   { "name":  "ExecuterType",		"type":  "byte" },
+                   { "name":  "ShareType",			"type":  "byte" },
+                   { "name":  "ShareLimitTime",		"type":  "dword" }
+               ]
+}

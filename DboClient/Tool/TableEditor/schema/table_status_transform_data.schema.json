@@ -1,0 +1,23 @@
+{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   { "name":  "Tblidx",						"type":  "dword" },
+                   { "name":  "LP_Transform",					"type":  "float" },
+                   { "name":  "EP_Transform",					"type":  "float" },
+                   { "name":  "Physical_Offence_Transform",		"type":  "float" },
+                   { "name":  "Energy_Offence_Transform",		"type":  "float" },
+                   { "name":  "Physical_Defence_Transform",		"type":  "float" },
+                   { "name":  "Energy_Defence_Transform",		"type":  "float" },
+                   { "name":  "Run_Speed_Transform",			"type":  "float" },
+                   { "name":  "Attack_Speed_Transform",			"type":  "float" },
+                   { "name":  "Attack_Rate_Transform",			"type":  "float" },
+                   { "name":  "Dodge_Rate_Transform",			"type":  "float" },
+                   { "name":  "Block_Rate_Transform",			"type":  "float" },
+                   { "name":  "Curse_Success_Transform",		"type":  "float" },
+                   { "name":  "Curse_Tolerance_Transform",		"type":  "float" },
+                   { "name":  "Attack_Range_Change",			"type":  "float" },
+                   { "name":  "LP_Consume_Rate",				"type":  "float" },
+                   { "name":  "EP_Consume_Rate",				"type":  "float" },
+                   { "name":  "Duration",						"type":  "dword" }
+               ]
+}

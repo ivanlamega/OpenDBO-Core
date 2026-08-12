@@ -1,0 +1,13 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Quest_Text_Index",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Quest_Text",
+                       "type":  "wide"
+                   }
+               ]
+}

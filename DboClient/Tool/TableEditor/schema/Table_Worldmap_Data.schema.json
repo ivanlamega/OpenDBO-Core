@@ -1,0 +1,93 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "World_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zone_Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Worldmap_Name",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Name_Text",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Validity_Able",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Map_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Standard_Loc_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Standard_Loc_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Worldmap_Scale",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Link_Map_Idx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Combobox_Type",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Warfog_1",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Warfog_2",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Warfog_3",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Warfog_4",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Warfog_5",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Warfog_6",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Warfog_7",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Warfog_8",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Recomm_Min_Level",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Recomm_Max_Level",
+                       "type":  "byte"
+                   }
+               ]
+}

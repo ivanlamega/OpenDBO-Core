@@ -1,0 +1,12 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Tblidx", "type": "dword" },
+    { "name": "Model_Name", "type": "ansi" },
+    { "name": "SRP_Type", "type": "byte" },
+    { "name": "Speed", "type": "byte" },
+    { "name": "Vehicle_Type", "type": "byte" },
+    { "name": "Run_Height", "type": "word" },
+    { "name": "Personnel", "type": "byte" }
+  ]
+}

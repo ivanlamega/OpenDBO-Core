@@ -1,0 +1,11 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Help_Tblidx", "type": "dword" },
+    { "name": "Category", "type": "byte" },
+    { "name": "Help_Title", "type": "dword" },
+    { "name": "Popo_Hint", "type": "dword" },
+    { "name": "Help_HTML_Name", "type": "wide" },
+    { "name": "Condition_Check", "type": "byte" }
+  ]
+}

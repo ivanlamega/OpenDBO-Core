@@ -1,0 +1,601 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Name_Text",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Sell_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Tab_Name",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Mileage",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_6",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_7",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_8",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_9",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_10",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_11",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_12",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_13",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_14",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_15",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_16",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_17",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_18",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_19",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_20",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_21",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_22",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_23",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_24",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_25",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_26",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_27",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_28",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_29",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_30",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_31",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_32",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_33",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_34",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_35",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Item_Tblidx_36",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_6",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_7",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_8",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_9",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_10",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_11",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_12",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_13",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_14",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_15",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_16",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_17",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_18",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_19",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_20",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_21",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_22",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_23",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_24",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_25",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_26",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_27",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_28",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_29",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_30",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_31",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_32",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_33",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_34",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_35",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Tindex_36",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_1",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_2",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_3",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_4",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_5",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_6",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_7",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_8",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_9",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_10",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_11",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_12",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_13",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_14",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_15",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_16",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_17",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_18",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_19",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_20",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_21",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_22",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_23",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_24",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_25",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_26",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_27",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_28",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_29",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_30",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_31",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_32",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_33",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_34",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_35",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Item_Stack_36",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Need_Zenny_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_6",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_7",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_8",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_9",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_10",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_11",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_12",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_13",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_14",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_15",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_16",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_17",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_18",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_19",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_20",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_21",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_22",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_23",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_24",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_25",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_26",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_27",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_28",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_29",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_30",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_31",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_32",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_33",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_34",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_35",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny_36",
+                       "type":  "dword"
+                   }
+               ]
+}

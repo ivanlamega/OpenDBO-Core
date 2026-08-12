@@ -1,0 +1,10 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Idx", "type": "dword" },
+    { "name": "Rate1", "type": "float" },
+    { "name": "Rate2", "type": "float" },
+    { "name": "Rate3", "type": "float" },
+    { "name": "Rate4", "type": "float" }
+  ]
+}

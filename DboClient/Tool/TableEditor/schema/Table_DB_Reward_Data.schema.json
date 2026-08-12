@@ -1,0 +1,17 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Tblidx", "type": "dword" },
+    { "name": "Ball_Type", "type": "byte" },
+    { "name": "Reward_Category_Depth", "type": "byte" },
+    { "name": "class_bit", "type": "dword" },
+    { "name": "Reward_Category_Name", "type": "dword" },
+    { "name": "Reward_Category_Dialog", "type": "dword" },
+    { "name": "Reward_Type", "type": "byte" },
+    { "name": "Reward_Name", "type": "dword" },
+    { "name": "Reward_Link_Tblidx", "type": "dword" },
+    { "name": "Reward_Zenny", "type": "dword" },
+    { "name": "Reward_Dialog_1", "type": "dword" },
+    { "name": "Reward_Dialog_2", "type": "dword" }
+  ]
+}

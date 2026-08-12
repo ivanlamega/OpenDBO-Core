@@ -23,7 +23,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release4Tools|x64'" Label="Configuration">
@@ -31,7 +31,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -80,6 +80,10 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>xcopy "$(ProjectDir)schema\*.json" "$(OutDir)schema\" /Y /I</Command>
+      <Message>Copying XML export schema files next to the built exe</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release4Tools|x64'">
     <ClCompile>
@@ -109,39 +113,127 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ActionBar.h" />
     <ClInclude Include="ClassView.h" />
     <ClInclude Include="FileView.h" />
+    <ClInclude Include="FlatButton.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="ItemPreviewWnd.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ProgressDlg.h" />
     <ClInclude Include="PropertiesWnd.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="TableEditor.h" />
     <ClInclude Include="TableEditorDoc.h" />
     <ClInclude Include="TableEditorView.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TabStrip.h" />
+    <ClInclude Include="Theme.h" />
     <ClInclude Include="Util.h" />
     <ClInclude Include="ViewTree.h" />
+    <ClInclude Include="XmlExport.h" />
+    <ClInclude Include="TableSchema.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ActionBar.cpp" />
     <ClCompile Include="ClassView.cpp" />
     <ClCompile Include="FileView.cpp" />
-    <ClCompile Include="ItemPreviewWnd.cpp" />
+    <ClCompile Include="FlatButton.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release4Tools|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release4Tools|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ProgressDlg.cpp" />
     <ClCompile Include="PropertiesWnd.cpp" />
+    <ClCompile Include="TabStrip.cpp" />
     <ClCompile Include="TableEditor.cpp" />
     <ClCompile Include="TableEditorDoc.cpp" />
     <ClCompile Include="TableEditorView.cpp" />
     <ClCompile Include="Util.cpp" />
     <ClCompile Include="ViewTree.cpp" />
+    <ClCompile Include="XmlExport.cpp" />
+    <ClCompile Include="TableSchema.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="schema\Table_Item_Data.schema.json" />
+    <None Include="schema\Table_Newbie_Data.schema.json" />
+    <None Include="schema\table_mascot_data.schema.json" />
+    <None Include="schema\Table_Mascot_Grade_Data.schema.json" />
+    <None Include="schema\Table_Mascot_Status_Data.schema.json" />
+    <None Include="schema\Table_CharTitle_Data.schema.json" />
+    <None Include="schema\table_chatting_filter_data.schema.json" />
+    <None Include="schema\Table_Item_Enchant_Data.schema.json" />
+    <None Include="schema\Table_Merchant_Data.schema.json" />
+    <None Include="schema\TD_Formula.schema.json" />
+    <None Include="schema\Table_Item_Mix_Exp_Data.schema.json" />
+    <None Include="schema\Table_Chat_Command_Data.schema.json" />
+    <None Include="schema\Table_Vehicle_Data.schema.json" />
+    <None Include="schema\Table_Dungeon_Data.schema.json" />
+    <None Include="schema\Table_DB_Reward_Data.schema.json" />
+    <None Include="schema\table_exp_data.schema.json" />
+    <None Include="schema\Table_Charm_Data.schema.json" />
+    <None Include="schema\Table_Action_Data.schema.json" />
+    <None Include="schema\Table_Help_Data.schema.json" />
+    <None Include="schema\Table_Guide_Hint_Data.schema.json" />
+    <None Include="schema\Table_Dynamic_Object_Data.schema.json" />
+    <None Include="schema\Table_Use_Item_Data.schema.json" />
+    <None Include="schema\Table_Set_Item_Data.schema.json" />
+    <None Include="schema\Table_Quest_Reward_Data.schema.json" />
+    <None Include="schema\Table_Quest_Reward_Select_Data.schema.json" />
+    <None Include="schema\table_npc_data_server.schema.json" />
+    <None Include="schema\Table_World_Data.schema.json" />
+    <None Include="schema\Table_System_Effect_Data.schema.json" />
+    <None Include="schema\Table_Item_Option_Data.schema.json" />
+    <None Include="schema\Table_Skill_Data.schema.json" />
+    <None Include="schema\table_hls_item_data.schema.json" />
+    <None Include="schema\table_status_transform_data.schema.json" />
+    <None Include="schema\table_quest_probability_data.schema.json" />
+    <None Include="schema\table_world_play_data.schema.json" />
+    <None Include="schema\table_slot_machine_data.schema.json" />
+    <None Include="schema\table_slot_machine_item_data.schema.json" />
+    <None Include="schema\table_item_upgrade_newrate_data.schema.json" />
+    <None Include="schema\table_item_bag_list_data.schema.json" />
+    <None Include="schema\table_item_group_list_data.schema.json" />
+    <None Include="schema\table_mob_data_server.schema.json" />
+    <None Include="schema\table_db_returnpoint.schema.json" />
+    <None Include="schema\table_event_system_data.schema.json" />
+    <None Include="schema\table_event_system_dynamic_data.schema.json" />
+    <None Include="schema\Table_Text_All_Data.schema.json" />
+    <None Include="schema\Table_NPC_Speech_Data.schema.json" />
+    <None Include="schema\Table_HTB_Set_Data.schema.json" />
+    <None Include="schema\Table_Direction_Link_Data.schema.json" />
+    <None Include="schema\Table_Dojo_Data.schema.json" />
+    <None Include="schema\Table_Mob_Move_Pattern_Data.schema.json" />
+    <None Include="schema\Table_Landmark_Data.schema.json" />
+    <None Include="schema\Table_Aircostume_Data.schema.json" />
+    <None Include="schema\Table_Quest_Text_Data.schema.json" />
+    <None Include="schema\Table_TMQ_Data.schema.json" />
+    <None Include="schema\Table_Tenkaichibudokai_Data.schema.json" />
+    <None Include="schema\Table_RankBattle_Data.schema.json" />
+    <None Include="schema\Table_Script_Link_Data.schema.json" />
+    <None Include="schema\Table_Quest_Narration_Data.schema.json" />
+    <None Include="schema\Table_Quest_Item_Data.schema.json" />
+    <None Include="schema\table_item_disassemble_data.schema.json" />
+    <None Include="schema\Table_Portal_Data.schema.json" />
+    <None Include="schema\Table_Item_Recipe_Data.schema.json" />
+    <None Include="schema\Table_Item_Mix_Machine_Data.schema.json" />
+    <None Include="schema\Table_Dragon_Ball_Data.schema.json" />
+    <None Include="schema\Table_World_Zone_Data.schema.json" />
+    <None Include="schema\table_common_config_data.schema.json" />
+    <None Include="schema\table_dwc_data.schema.json" />
+    <None Include="schema\Table_Worldmap_Data.schema.json" />
+    <None Include="schema\Table_PC_Data.schema.json" />
+    <None Include="schema\Table_MOB_Data.schema.json" />
+    <None Include="schema\Table_NPC_Data.schema.json" />
+    <None Include="schema\table_dwc_mission_data.schema.json" />
+    <None Include="schema\table_quest_drop_data.schema.json" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TableEditor.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="TableEditor.manifest" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\classview.bmp" />

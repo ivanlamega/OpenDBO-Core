@@ -1,0 +1,16 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Tblidx", "type": "dword" },
+    { "name": "Dungeon_Type", "type": "byte" },
+    { "name": "Max_Member", "type": "byte" },
+    { "name": "Link_World", "type": "dword" },
+    { "name": "Min_Level", "type": "byte" },
+    { "name": "Max_Level", "type": "byte" },
+    { "name": "Need_Item", "type": "dword" },
+    { "name": "Honor_Point", "type": "dword" },
+    { "name": "Wps_Tblidx", "type": "dword" },
+    { "name": "Open_Cine", "type": "dword" },
+    { "name": "Group_Index", "type": "dword" }
+  ]
+}

@@ -1,0 +1,153 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Rule_Type",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Battle_Mode",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Name",
+                       "type":  "wide"
+                   },
+                   {
+                       "name":  "Map_Index",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Item",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Need_Zenny",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Min_Level",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Max_Level",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Battle_Count",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "WaitTime",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "DirectionTime",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "MatchReadyTime",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "StageReadyTime",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "StageRunTime",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "StageFinishTime",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "MatchFinishTime",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "BossDirection_Time",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "BossKill_Time",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "BossEndingTime",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "EndTime",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "KO_Score",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OutofArea_Score",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Pointwin_Score",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Draw_Score",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Lost_Score",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Excellent_Result",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Greate_Result",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Good_Result",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Draw_Result",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Lost_Result",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "PerfectWinner_Score",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "NormalWinner_Score",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Day_Entry_Num",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "OutSide_Able",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Info_Index",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "StageMinClearTime",
+                       "type":  "dword"
+                   }
+               ]
+}

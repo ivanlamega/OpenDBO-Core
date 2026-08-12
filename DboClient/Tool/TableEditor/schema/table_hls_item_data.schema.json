@@ -1,0 +1,11 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Tblidx", "type": "dword" },
+    { "name": "Item_Tblidx", "type": "dword" },
+    { "name": "On_Sale", "type": "bool" },
+    { "name": "Cash", "type": "dword" },
+    { "name": "Item_Stack_Count", "type": "byte" },
+    { "name": "Display_Bit_Flag", "type": "hex" }
+  ]
+}

@@ -9,7 +9,37 @@
 #include "MainFrm.h"
 #include "ClassView.h"
 #include "PropertiesWnd.h"
+#include "Util.h"
+#include "ProgressDlg.h"
+#include "Theme.h"
 
+#include <atlconv.h>
+#include <dwmapi.h>
+#pragma comment(lib, "dwmapi.lib")
+
+// Not guaranteed to be declared in the SDK headers this toolset ships
+// with (they were added for Windows 11) -- the DWM API itself has been
+// stable since Vista, so defining the numeric values directly and calling
+// it is safe; it just no-ops (returns an error we ignore) on older
+// Windows where the attribute doesn't exist.
+#ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
+#define DWMWA_USE_IMMERSIVE_DARK_MODE 20
+#endif
+#ifndef DWMWA_WINDOW_CORNER_PREFERENCE
+#define DWMWA_WINDOW_CORNER_PREFERENCE 33
+#endif
+#ifndef DWMWCP_ROUND
+#define DWMWCP_ROUND 2
+#endif
+#ifndef DWMWA_BORDER_COLOR
+#define DWMWA_BORDER_COLOR 34
+#endif
+#ifndef DWMWA_CAPTION_COLOR
+#define DWMWA_CAPTION_COLOR 35
+#endif
+#ifndef DWMWA_TEXT_COLOR
+#define DWMWA_TEXT_COLOR 36
+#endif
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -21,25 +51,18 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWndEx)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_WM_CREATE()
-	ON_COMMAND(ID_VIEW_CUSTOMIZE, &CMainFrame::OnViewCustomize)
-	ON_REGISTERED_MESSAGE(AFX_WM_CREATETOOLBAR, &CMainFrame::OnToolbarCreateNew)
-	ON_WM_SETTINGCHANGE()
-	ON_MESSAGE(WM_UPDATE_ICON, &CMainFrame::OnUpdateIcon)
+	ON_WM_SIZE()
+	ON_WM_ERASEBKGND()
+	ON_COMMAND(ID_TABLE_LOAD_RDF, &CMainFrame::OnTableLoadRdf)
+	ON_COMMAND(ID_TABLE_SAVE_RDF, &CMainFrame::OnTableSaveRdf)
+	ON_COMMAND(ID_TABLE_LOAD_XML, &CMainFrame::OnTableLoadXml)
+	ON_COMMAND(ID_TABLE_SAVE_XML, &CMainFrame::OnTableSaveXml)
 END_MESSAGE_MAP()
-
-static UINT indicators[] =
-{
-	ID_SEPARATOR,           // status line indicator
-	ID_INDICATOR_CAPS,
-	ID_INDICATOR_NUM,
-	ID_INDICATOR_SCRL,
-};
 
 // CMainFrame construction/destruction
 
 CMainFrame::CMainFrame()
 {
-	// TODO: add member initialization code here
 }
 
 CMainFrame::~CMainFrame()
@@ -51,176 +74,177 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	BOOL bNameValid;
-
-	if (!m_wndMenuBar.Create(this))
+	// This app doesn't use the doc/view machinery for anything real --
+	// all content lives in the panels created below, which fully cover
+	// the client area. Hide *and* zero-size the framework's initial view
+	// so it can't steal focus, show through, or leave a stray gray patch
+	// behind if the panels don't cover every pixel on some resize.
+	if (CWnd* pView = GetActiveView())
 	{
-		TRACE0("Failed to create menubar\n");
-		return -1;      // fail to create
+		pView->ShowWindow(SW_HIDE);
+		pView->SetWindowPos(nullptr, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOACTIVATE | SWP_HIDEWINDOW);
 	}
 
-	m_wndMenuBar.SetPaneStyle(m_wndMenuBar.GetPaneStyle() | CBRS_SIZE_DYNAMIC | CBRS_TOOLTIPS | CBRS_FLYBY);
+	// Flat, modern skin for whatever bit of MFC chrome still shows through
+	// (the property grid's own small toolbar) -- this MFC toolset tops
+	// out at Office2007, there's no "2016"-style manager available to
+	// link against here. Everything else (action bar, tabs, tree, search
+	// bar) is fully self-drawn instead of relying on a visual manager.
+	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerOffice2007));
+	CMFCVisualManagerOffice2007::SetStyle(CMFCVisualManagerOffice2007::Office2007_Silver);
 
-	// prevent the menu bar from taking the focus on activation
-	CMFCPopupMenu::SetForceMenuFocus(FALSE);
+	// No native Win32 dropdown menu -- CActionBar below replaces it.
+	SetMenu(nullptr);
 
-	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
-		!m_wndToolBar.LoadToolBar(theApp.m_bHiColorIcons ? IDR_MAINFRAME_256 : IDR_MAINFRAME))
+	ApplyModernChrome();
+
+	if (!m_wndActionBar.Create(this, ID_VIEW_ACTIONBAR))
 	{
-		TRACE0("Failed to create toolbar\n");
-		return -1;      // fail to create
-	}
-
-	CString strToolBarName;
-	bNameValid = strToolBarName.LoadString(IDS_TOOLBAR_STANDARD);
-	ASSERT(bNameValid);
-	m_wndToolBar.SetWindowText(strToolBarName);
-
-	CString strCustomize;
-	bNameValid = strCustomize.LoadString(IDS_TOOLBAR_CUSTOMIZE);
-	ASSERT(bNameValid);
-	m_wndToolBar.EnableCustomizeButton(TRUE, ID_VIEW_CUSTOMIZE, strCustomize);
-
-	if (!m_wndStatusBar.Create(this))
-	{
-		TRACE0("Failed to create status bar\n");
-		return -1;      // fail to create
-	}
-	m_wndStatusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
-
-	// TODO: Delete these five lines if you don't want the toolbar and menubar to be dockable
-	m_wndMenuBar.EnableDocking(CBRS_ALIGN_ANY);
-	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
-	EnableDocking(CBRS_ALIGN_ANY);
-	DockPane(&m_wndMenuBar);
-	DockPane(&m_wndToolBar);
-
-
-	// enable Visual Studio 2005 style docking window behavior
-	CDockingManager::SetDockingMode(DT_SMART);
-	// enable Visual Studio 2005 style docking window auto-hide behavior
-	EnableAutoHidePanes(CBRS_ALIGN_ANY);
-
-	// Load menu item image (not placed on any standard toolbars):
-	CMFCToolBar::AddToolBarForImageCollection(IDR_MENU_IMAGES, theApp.m_bHiColorIcons ? IDB_MENU_IMAGES_24 : 0);
-
-	// create docking windows
-	if (!CreateDockingWindows())
-	{
-		TRACE0("Failed to create docking windows\n");
+		TRACE0("Failed to create action bar\n");
 		return -1;
 	}
 
-	m_wndFileView.EnableDocking(CBRS_ALIGN_ANY);
-	m_wndFileView.m_wndClassView.EnableDocking(CBRS_ALIGN_ANY);
-	DockPane(&m_wndFileView);
-	CDockablePane* pTabbedBar = nullptr;
-	m_wndFileView.m_wndClassView.AttachToTabWnd(&m_wndFileView, DM_SHOW, TRUE, &pTabbedBar);
-	m_wndFileView.m_wndClassView.m_wndProperties.EnableDocking(CBRS_ALIGN_ANY);
-	DockPane(&m_wndFileView.m_wndClassView.m_wndProperties);
+	// No CMFCToolBar / dockable content panes below the action bar -- a
+	// fixed layout of plain child windows reads as a flat tool instead
+	// of a VS-style IDE.
+	if (!m_wndFileView.Create(this, ID_VIEW_FILEVIEW))
+	{
+		TRACE0("Failed to create File View window\n");
+		return -1;
+	}
 
-	// set the visual manager used to draw all user interface elements
-	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows7));
+	if (!m_wndFileView.m_wndClassView.Create(this, ID_VIEW_CLASSVIEW))
+	{
+		TRACE0("Failed to create Class View window\n");
+		return -1;
+	}
 
-	// Enable toolbar and docking window menu replacement
-	EnablePaneMenu(TRUE, ID_VIEW_CUSTOMIZE, strCustomize, ID_VIEW_TOOLBAR);
+	if (!m_wndFileView.m_wndClassView.m_wndProperties.Create(this, ID_VIEW_PROPERTIESWND))
+	{
+		TRACE0("Failed to create Properties window\n");
+		return -1;
+	}
 
-	// enable quick (Alt+drag) toolbar customization
-	CMFCToolBar::EnableQuickCustomization();
-
-	// enable menu personalization (most-recently used commands)
-	// TODO: define your own basic commands, ensuring that each pulldown menu has at least one basic command.
-	CList<UINT, UINT> lstBasicCommands;
-
-	lstBasicCommands.AddTail(ID_FILE_NEW);
-	lstBasicCommands.AddTail(ID_FILE_OPEN);
-	lstBasicCommands.AddTail(ID_FILE_SAVE);
-	lstBasicCommands.AddTail(ID_APP_EXIT);
-	lstBasicCommands.AddTail(ID_EDIT_CUT);
-	lstBasicCommands.AddTail(ID_EDIT_PASTE);
-	lstBasicCommands.AddTail(ID_APP_ABOUT);
-	lstBasicCommands.AddTail(ID_VIEW_STATUS_BAR);
-	lstBasicCommands.AddTail(ID_VIEW_TOOLBAR);
-
-	CMFCToolBar::SetBasicCommands(lstBasicCommands);
-
-	m_wndFileView.ShowPane(TRUE, FALSE, TRUE);
+	RepositionPanels();
 
 	return 0;
+}
+
+void CMainFrame::OnSize(UINT nType, int cx, int cy)
+{
+	CFrameWndEx::OnSize(nType, cx, cy);
+	RepositionPanels();
+}
+
+void CMainFrame::RepositionPanels()
+{
+	if (GetSafeHwnd() == nullptr)
+	{
+		return;
+	}
+
+	CRect rectClient;
+	GetClientRect(rectClient);
+
+	const int cyActionBar = 40;
+	m_wndActionBar.SetWindowPos(nullptr, rectClient.left, rectClient.top, rectClient.Width(), cyActionBar, SWP_NOACTIVATE | SWP_NOZORDER);
+
+	int nTop = rectClient.top + cyActionBar;
+
+	const int cyTabs = 36;
+	const int cxGap = 1;
+
+	m_wndFileView.SetWindowPos(nullptr, rectClient.left, nTop, rectClient.Width(), cyTabs, SWP_NOACTIVATE | SWP_NOZORDER);
+
+	int nContentTop = nTop + cyTabs;
+	int nContentHeight = rectClient.bottom - nContentTop;
+	if (nContentHeight < 0)
+	{
+		nContentHeight = 0;
+	}
+
+	// Row list gets roughly a third of the width, the property grid gets
+	// the rest -- matching a typical id/name list next to a wider detail
+	// grid, rather than splitting the window 50/50.
+	int nListWidth = (int)(rectClient.Width() * 0.36);
+	if (nListWidth > rectClient.Width())
+	{
+		nListWidth = rectClient.Width();
+	}
+
+	m_wndFileView.m_wndClassView.SetWindowPos(nullptr, rectClient.left, nContentTop, nListWidth, nContentHeight, SWP_NOACTIVATE | SWP_NOZORDER);
+
+	int nGridLeft = rectClient.left + nListWidth + cxGap;
+	int nGridWidth = rectClient.Width() - nListWidth - cxGap;
+	if (nGridWidth < 0)
+	{
+		nGridWidth = 0;
+	}
+
+	m_wndFileView.m_wndClassView.m_wndProperties.SetWindowPos(nullptr, nGridLeft, nContentTop, nGridWidth, nContentHeight, SWP_NOACTIVATE | SWP_NOZORDER);
+}
+
+// Windows 11 DWM touches -- rounded corners and a dark, theme-matching
+// title bar/border, so the one bit of chrome this app can't paint itself
+// (the actual OS window frame) doesn't look like it belongs to a
+// different, older application. All of these quietly no-op (non-zero
+// HRESULT, ignored) on Windows versions that don't support them.
+void CMainFrame::ApplyModernChrome()
+{
+	HWND hWnd = GetSafeHwnd();
+	if (!hWnd)
+	{
+		return;
+	}
+
+	DWORD dwCornerPref = DWMWCP_ROUND;
+	::DwmSetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, &dwCornerPref, sizeof(dwCornerPref));
+
+	BOOL bDarkMode = TRUE;
+	::DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &bDarkMode, sizeof(bDarkMode));
+
+	COLORREF clrCaption = Theme::Bg1;
+	::DwmSetWindowAttribute(hWnd, DWMWA_CAPTION_COLOR, &clrCaption, sizeof(clrCaption));
+
+	COLORREF clrText = Theme::Text;
+	::DwmSetWindowAttribute(hWnd, DWMWA_TEXT_COLOR, &clrText, sizeof(clrText));
+
+	COLORREF clrBorder = Theme::Border;
+	::DwmSetWindowAttribute(hWnd, DWMWA_BORDER_COLOR, &clrBorder, sizeof(clrBorder));
+}
+
+BOOL CMainFrame::OnEraseBkgnd(CDC* pDC)
+{
+	CRect rectClient;
+	GetClientRect(rectClient);
+	pDC->FillSolidRect(rectClient, Theme::Bg0);
+	return TRUE;
 }
 
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
 	if( !CFrameWndEx::PreCreateWindow(cs) )
 		return FALSE;
-	// TODO: Modify the Window class or styles here by modifying
-	//  the CREATESTRUCT cs
 
 	return TRUE;
 }
 
-BOOL CMainFrame::CreateDockingWindows()
+void CMainFrame::OnUpdateFrameTitle(BOOL bAddToTitle)
 {
-	BOOL bNameValid;
-
-	// Create file view
-	CString strFileView;
-	bNameValid = strFileView.LoadString(IDS_FILE_VIEW);
-	ASSERT(bNameValid);
-	if (!m_wndFileView.Create(strFileView, this, CRect(0, 0, 200, 200), TRUE, ID_VIEW_FILEVIEW, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_LEFT | CBRS_FLOAT_MULTI))
-	{
-		TRACE0("Failed to create File View window\n");
-		return FALSE; // failed to create
-	}
-
-	// Create class view
-	CString strClassView;
-	bNameValid = strClassView.LoadString(IDS_CLASS_VIEW);
-	ASSERT(bNameValid);
-	if (!m_wndFileView.m_wndClassView.Create(strClassView, this, CRect(0, 0, 200, 200), TRUE, ID_VIEW_CLASSVIEW, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_LEFT | CBRS_FLOAT_MULTI))
-	{
-		TRACE0("Failed to create Class View window\n");
-		return FALSE; // failed to create
-	}
-
-	// Create properties window
-	CString strPropertiesWnd;
-	bNameValid = strPropertiesWnd.LoadString(IDS_PROPERTIES_WND);
-	ASSERT(bNameValid);
-	if (!m_wndFileView.m_wndClassView.m_wndProperties.Create(strPropertiesWnd, this, CRect(0, 0, 200, 200), TRUE, ID_VIEW_PROPERTIESWND, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_RIGHT | CBRS_FLOAT_MULTI))
-	{
-		TRACE0("Failed to create Properties window\n");
-		return FALSE; // failed to create
-	}
-
-	// Create Item Preview pane
-	CString strItemPreview;
-	strItemPreview = _T("Item Preview"); 
-	ASSERT(bNameValid);
-	if (!m_wndItemPreview.Create(strItemPreview, this, CRect(300, 300, 600, 500), TRUE, ID_VIEW_ITEMPREVIEW,
-		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_FLOAT_MULTI))
-	{
-		TRACE0("Failed to create Item Preview pane\n");
-		return FALSE; // failed to create
-	}
-	m_wndItemPreview.SetIcon(theApp.LoadIcon(IDI_CLASS_VIEW), FALSE);
-
-
-	SetDockingWindowIcons(theApp.m_bHiColorIcons);
-	return TRUE;
+	UNREFERENCED_PARAMETER(bAddToTitle);
+	SetWindowText(_T("DBO Table Editor"));
 }
 
-void CMainFrame::SetDockingWindowIcons(BOOL bHiColorIcons)
+BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
-	HICON hFileViewIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_FILE_VIEW_HC : IDI_FILE_VIEW), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
-	m_wndFileView.SetIcon(hFileViewIcon, FALSE);
+	// Plain child windows don't get their own PreTranslateMessage called
+	// by the message pump, so Enter-in-the-search-box is routed here.
+	if (m_wndFileView.m_wndClassView.HandleSearchKeyDown(pMsg))
+	{
+		return TRUE;
+	}
 
-	HICON hClassViewIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_CLASS_VIEW_HC : IDI_CLASS_VIEW), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
-	m_wndFileView.m_wndClassView.SetIcon(hClassViewIcon, FALSE);
-
-	HICON hPropertiesBarIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_PROPERTIES_WND_HC : IDI_PROPERTIES_WND), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
-	m_wndFileView.m_wndClassView.m_wndProperties.SetIcon(hPropertiesBarIcon, FALSE);
-
+	return CFrameWndEx::PreTranslateMessage(pMsg);
 }
 
 // CMainFrame diagnostics
@@ -240,43 +264,104 @@ void CMainFrame::Dump(CDumpContext& dc) const
 
 // CMainFrame message handlers
 
-LRESULT CMainFrame::OnUpdateIcon(WPARAM, LPARAM lParam)
+bool CMainFrame::ReloadTables(const CString& strPath, CTable::eLOADING_METHOD eLoadingMethod)
 {
-	CString* pIcon = reinterpret_cast<CString*>(lParam);
-	if (pIcon)
+	// Clear anything pointing into the table container we're about to
+	// destroy -- the sTBLDAT* pointers held by the row list and the
+	// property grid become dangling once it's deleted.
+	m_wndFileView.m_wndClassView.ResetView();
+	m_wndFileView.m_wndClassView.m_wndProperties.LoadTableData(-1, nullptr);
+
+	DeleteTableContainer();
+
+	CString strPathCopy = strPath;
+	bool bSuccess = RunWithProgress(this, _T("Loading tables..."), [strPathCopy, eLoadingMethod]() -> bool
 	{
-		m_wndItemPreview.SetIconImage(*pIcon);
-		delete pIcon;
-	}
-	return 0;
-}
+		// CreateTableContainer takes a narrow path (it calls straight into
+		// the shared table engine, which is narrow-only) -- CT2A converts
+		// from whatever strPathCopy's width is.
+		CT2A pszPath(strPathCopy);
+		return CreateTableContainer(pszPath, eLoadingMethod);
+	});
 
-void CMainFrame::OnViewCustomize()
-{
-	CMFCToolBarsCustomizeDialog* pDlgCust = new CMFCToolBarsCustomizeDialog(this, TRUE /* scan menus */);
-	pDlgCust->Create();
-}
-
-LRESULT CMainFrame::OnToolbarCreateNew(WPARAM wp,LPARAM lp)
-{
-	LRESULT lres = CFrameWndEx::OnToolbarCreateNew(wp,lp);
-	if (lres == 0)
+	if (!bSuccess)
 	{
-		return 0;
+		AfxMessageBox(_T("Failed to load tables from:\n") + strPath);
+		return false;
 	}
 
-	CMFCToolBar* pUserToolbar = (CMFCToolBar*)lres;
-	ASSERT_VALID(pUserToolbar);
+	m_wndFileView.RefreshTables();
 
-	BOOL bNameValid;
-	CString strCustomize;
-	bNameValid = strCustomize.LoadString(IDS_TOOLBAR_CUSTOMIZE);
-	ASSERT(bNameValid);
-
-	pUserToolbar->EnableCustomizeButton(TRUE, ID_VIEW_CUSTOMIZE, strCustomize);
-	return lres;
+	return true;
 }
 
+void CMainFrame::OnTableLoadRdf()
+{
+	CFolderPickerDialog dlg(nullptr, 0, this);
+	if (dlg.DoModal() != IDOK)
+	{
+		return;
+	}
+
+	// CTableContainer always appends its own separator before the file
+	// name (see DBO_EXPORT_TABLE / InitializeTable), so pass the folder
+	// path without a trailing backslash.
+	ReloadTables(dlg.GetPathName(), CTable::LOADING_METHOD_BINARY);
+}
+
+void CMainFrame::OnTableSaveRdf()
+{
+	if (!GetTableContainer())
+	{
+		AfxMessageBox(_T("No tables are loaded."));
+		return;
+	}
+
+	CFolderPickerDialog dlg(nullptr, 0, this);
+	if (dlg.DoModal() != IDOK)
+	{
+		return;
+	}
+
+	CString strPath = dlg.GetPathName();
+
+	bool bSuccess = RunWithProgress(this, _T("Saving tables..."), [strPath]() -> bool
+	{
+		// SaveTableContainer takes a narrow path (it calls straight into
+		// the shared table engine, which is narrow-only) -- CT2A converts
+		// from whatever strPath's width is.
+		CT2A pszPath(strPath);
+		return SaveTableContainer(pszPath, false);
+	});
+
+	if (!bSuccess)
+	{
+		AfxMessageBox(_T("Failed to save tables to:\n") + strPath);
+		return;
+	}
+
+	AfxMessageBox(_T("Tables saved."));
+}
+
+void CMainFrame::OnTableLoadXml()
+{
+	CFolderPickerDialog dlg(nullptr, 0, this);
+	if (dlg.DoModal() != IDOK)
+	{
+		return;
+	}
+
+	ReloadTables(dlg.GetPathName(), CTable::LOADING_METHOD_XML);
+}
+
+void CMainFrame::OnTableSaveXml()
+{
+	// The table engine only knows how to write the .rdf/.edf binary format
+	// (see CTableContainer::SaveToFile / DBO_EXPORT_TABLE) -- there is no
+	// XML writer counterpart to CTable::LoadFromXml yet. Wiring this up
+	// means adding a SaveToXml path per table in DboShared/NtlGameTable.
+	AfxMessageBox(_T("Saving to XML is not implemented yet."));
+}
 
 BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParentWnd, CCreateContext* pContext)
 {
@@ -287,12 +372,5 @@ BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParent
 		return FALSE;
 	}
 
-
 	return TRUE;
-}
-
-
-void CMainFrame::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
-{
-	CFrameWndEx::OnSettingChange(uFlags, lpszSection);
 }

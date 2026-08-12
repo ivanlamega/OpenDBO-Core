@@ -1,0 +1,17 @@
+{
+  "sheetName": "Table_Data_KOR",
+  "fields": [
+    { "name": "Tblidx", "type": "dword" },
+    { "name": "Validity_Able", "type": "bool" },
+    { "name": "Type", "type": "byte" },
+    { "name": "Model_Name", "type": "ansi" },
+    { "name": "State_Type", "type": "byte" },
+    { "name": "Spawn_Animation", "type": "dword" },
+    { "name": "Idle_Animation", "type": "dword" },
+    { "name": "Despawn_Animation", "type": "dword" },
+    { "name": "State1_Animation", "type": "dword" },
+    { "name": "State2_Animation", "type": "dword" },
+    { "name": "Boundary_Distance", "type": "byte" },
+    { "name": "Despawn_Distance", "type": "byte" }
+  ]
+}

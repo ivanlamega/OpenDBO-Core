@@ -6,7 +6,16 @@
 #include "TableEditor.h"
 
 #include "Util.h"
+#include "XmlExport.h"
+#include "ProgressDlg.h"
+#include "WorldTable.h"
+#include "Theme.h"
 
+#include <atlconv.h>
+#include <vector>
+#include <algorithm>
+
+#define IDC_TABLE_TABS 2001
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -26,54 +35,35 @@ CFileView::~CFileView()
 	DeleteTableContainer();
 }
 
-BEGIN_MESSAGE_MAP(CFileView, CDockablePane)
+BEGIN_MESSAGE_MAP(CFileView, CWnd)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
-	ON_WM_CONTEXTMENU()
-	ON_COMMAND(ID_OPEN, OnFileOpen)
-	ON_COMMAND(ID_DUMMY_COMPILE, OnDummyCompile)
-	ON_WM_PAINT()
-	ON_WM_SETFOCUS()
+	ON_WM_ERASEBKGND()
+	ON_MESSAGE(TBSTN_SELCHANGE, OnTabSelChange)
+	ON_MESSAGE(TBSTN_RCLICK, OnTabRightClick)
 END_MESSAGE_MAP()
 
+BOOL CFileView::Create(CWnd* pParentWnd, UINT nID)
+{
+	static CString strClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW,
+		::LoadCursor(nullptr, IDC_ARROW), (HBRUSH)nullptr, nullptr);
+
+	return CWnd::Create(strClass, _T(""), WS_CHILD | WS_VISIBLE, CRect(0, 0, 0, 0), pParentWnd, nID);
+}
+
 /////////////////////////////////////////////////////////////////////////////
-// CWorkspaceBar message handlers
+// CFileView message handlers
 
 int CFileView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CDockablePane::OnCreate(lpCreateStruct) == -1)
+	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	CRect rectDummy;
-	rectDummy.SetRectEmpty();
-
-	// Create view:
-	const DWORD dwViewStyle = WS_CHILD | WS_VISIBLE | TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS;
-
-	if (!m_wndFileView.Create(dwViewStyle, rectDummy, this, 4))
+	if (!m_wndTabs.Create(this, IDC_TABLE_TABS))
 	{
-		TRACE0("Failed to create file view\n");
+		TRACE0("Failed to create table tab bar\n");
 		return -1;      // fail to create
 	}
-
-	// Load view images:
-	m_FileViewImages.Create(IDB_FILE_VIEW, 16, 0, RGB(255, 0, 255));
-	m_wndFileView.SetImageList(&m_FileViewImages, TVSIL_NORMAL);
-
-	m_wndToolBar.Create(this, AFX_DEFAULT_TOOLBAR_STYLE, IDR_EXPLORER);
-	m_wndToolBar.LoadToolBar(IDR_EXPLORER, 0, 0, TRUE /* Is locked */);
-
-	OnChangeVisualStyle();
-
-	m_wndToolBar.SetPaneStyle(m_wndToolBar.GetPaneStyle() | CBRS_TOOLTIPS | CBRS_FLYBY);
-
-	m_wndToolBar.SetPaneStyle(m_wndToolBar.GetPaneStyle() & ~(CBRS_GRIPPER | CBRS_SIZE_DYNAMIC | CBRS_BORDER_TOP | CBRS_BORDER_BOTTOM | CBRS_BORDER_LEFT | CBRS_BORDER_RIGHT));
-
-	m_wndToolBar.SetOwner(this);
-
-	// All commands will be routed via this control , not via the parent frame:
-	m_wndToolBar.SetRouteCommandsViaFrame(FALSE);
-
 
 	//////////////////////////////////////////////////////////////////////////
 	//
@@ -86,8 +76,7 @@ int CFileView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
-	//
-	FillFileView();
+	RefreshTables();
 
 	AdjustLayout();
 
@@ -96,65 +85,280 @@ int CFileView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CFileView::OnSize(UINT nType, int cx, int cy)
 {
-	CDockablePane::OnSize(nType, cx, cy);
+	CWnd::OnSize(nType, cx, cy);
 	AdjustLayout();
 }
 
-void CFileView::FillFileView()
+BOOL CFileView::OnEraseBkgnd(CDC* pDC)
 {
-	HTREEITEM hRoot = m_wndFileView.InsertItem(_T("Tables"), 0, 0);
-	m_wndFileView.SetItemState(hRoot, TVIS_BOLD, TVIS_BOLD);
-
-	HTREEITEM item = m_wndFileView.InsertItem(_T("Table_Item_Data"), 1, 1, hRoot);
-	m_wndFileView.SetItemData(item, CTableContainer::TABLE_ITEM);
-
-	item = m_wndFileView.InsertItem(_T("Table_Newbie_Data"), 1, 1, hRoot);
-	m_wndFileView.SetItemData(item, CTableContainer::TABLE_NEWBIE);
-
-	item = m_wndFileView.InsertItem(_T("Table_NPC_Speech_Data"), 1, 1, hRoot);
-	m_wndFileView.SetItemData(item, CTableContainer::TABLE_SPEECH);
-
-	m_wndFileView.Expand(hRoot, TVE_EXPAND);
+	CRect rectClient;
+	GetClientRect(rectClient);
+	pDC->FillSolidRect(rectClient, Theme::Bg1);
+	return TRUE;
 }
 
-void CFileView::OpenTable(HTREEITEM item)
+void CFileView::RefreshTables()
 {
-	CTableContainer::eTABLE tableType = (CTableContainer::eTABLE)m_wndFileView.GetItemData(item);
+	m_wndTabs.DeleteAllTabs();
+	m_aTabToTableIndex.RemoveAll();
+	m_aTabSpawnInfo.RemoveAll();
 
-	/*CString strName;
-	strName.Format("Selected Table Type: %i", tableType);
-	AfxMessageBox(strName);*/
+	int nCount = 0;
+	const STableInfo* pTables = GetRegisteredTables(nCount);
 
-	m_wndClassView.LoadTableData(tableType);
-}
+	STabSpawnInfo emptySpawnInfo = { 0, 0 };
 
-void CFileView::OnContextMenu(CWnd* pWnd, CPoint point)
-{
-	CTreeCtrl* pWndTree = (CTreeCtrl*) &m_wndFileView;
-	ASSERT_VALID(pWndTree);
-
-	if (pWnd != pWndTree)
+	for (int i = 0; i < nCount; ++i)
 	{
-		CDockablePane::OnContextMenu(pWnd, point);
-		return;
+		if (!pTables[i].bBrowsable)
+		{
+			continue;
+		}
+
+		m_wndTabs.AddTab(pTables[i].pszDisplayName);
+		m_aTabToTableIndex.Add(i);
+		m_aTabSpawnInfo.Add(emptySpawnInfo);
 	}
 
-	if (point != CPoint(-1, -1))
-	{
-		// Select clicked item:
-		CPoint ptTree = point;
-		pWndTree->ScreenToClient(&ptTree);
+	// Each individual per-World spawn table (e.g. "spawn_npc_dungeon_001")
+	// gets its own tab, same as any other RDF table -- they're genuinely
+	// different tables that just happen to share a struct shape, not
+	// sub-categories of one shared "Spawn" table. CTableContainer only
+	// knows about the ones an actually-loaded World row references, so
+	// this list comes from what's really loaded, not a fixed count.
+	CTableContainer* pContainer = GetTableContainer();
+	CWorldTable* pWorldTable = pContainer ? pContainer->GetWorldTable() : nullptr;
 
-		UINT flags = 0;
-		HTREEITEM hTreeItem = pWndTree->HitTest(ptTree, &flags);
-		if (hTreeItem != nullptr)
+	if (pContainer)
+	{
+		struct SSpawnTabCandidate
 		{
-			pWndTree->SelectItem(hTreeItem);
+			CString strLabel;
+			int nCategory;
+			TBLIDX worldTblidx;
+		};
+
+		std::vector<SSpawnTabCandidate> spawnTabs;
+
+		for (CTableContainer::SPAWNTABLEIT it = pContainer->BeginNpcSpawnTable(); it != pContainer->EndNpcSpawnTable(); ++it)
+		{
+			spawnTabs.push_back({ GetSpawnTabLabel(0, it->first, pWorldTable), 0, it->first });
+		}
+		for (CTableContainer::SPAWNTABLEIT it = pContainer->BeginMobSpawnTable(); it != pContainer->EndMobSpawnTable(); ++it)
+		{
+			spawnTabs.push_back({ GetSpawnTabLabel(1, it->first, pWorldTable), 1, it->first });
+		}
+		for (CTableContainer::OBJTABLEIT it = pContainer->BeginObjectTable(); it != pContainer->EndObjectTable(); ++it)
+		{
+			spawnTabs.push_back({ GetSpawnTabLabel(2, it->first, pWorldTable), 2, it->first });
+		}
+
+		// Sort by label so tabs read alphabetically and same-basename,
+		// different-number files (spawn_npc_dungeon_001, _002, ...) stay
+		// grouped together in the tab strip.
+		std::sort(spawnTabs.begin(), spawnTabs.end(), [](const SSpawnTabCandidate& a, const SSpawnTabCandidate& b)
+		{
+			return a.strLabel.CompareNoCase(b.strLabel) < 0;
+		});
+
+		// Multiple Worlds can reference the exact same spawn file (e.g.
+		// several instanced copies of the same dungeon) -- CTableContainer
+		// loads a separate copy per World tblidx, but that would otherwise
+		// show one tab per copy, repeating the same file under the same
+		// name many times over. Duplicates are adjacent after the sort
+		// above, so a single pass catches them all.
+		CString strLastLabel;
+		bool bFirst = true;
+		for (const SSpawnTabCandidate& candidate : spawnTabs)
+		{
+			if (!bFirst && candidate.strLabel.CompareNoCase(strLastLabel) == 0)
+			{
+				continue;
+			}
+
+			AddSpawnTab(candidate.nCategory, candidate.worldTblidx, pWorldTable);
+			strLastLabel = candidate.strLabel;
+			bFirst = false;
 		}
 	}
 
-	pWndTree->SetFocus();
-	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EXPLORER, point.x, point.y, this, TRUE);
+	if (m_aTabToTableIndex.GetSize() > 0)
+	{
+		m_wndTabs.SetCurSel(0);
+		OpenTable(0);
+	}
+}
+
+// Labels a per-World spawn table with its actual spawn file name (falling
+// back to "Spawn [worldTblidx]" if the World table isn't loaded or the name
+// field is empty).
+CString CFileView::GetSpawnTabLabel(int nCategory, TBLIDX worldTblidx, CWorldTable* pWorldTable)
+{
+	sWORLD_TBLDAT* pWorldData = pWorldTable ? (sWORLD_TBLDAT*)pWorldTable->FindData(worldTblidx) : nullptr;
+
+	CString strLabel;
+	if (pWorldData)
+	{
+		LPCWSTR pwszFileName = (nCategory == 0) ? pWorldData->wszNpcSpawn_Table_Name
+			: (nCategory == 1) ? pWorldData->wszMobSpawn_Table_Name
+			: pWorldData->wszObjSpawn_Table_Name;
+
+		if (pwszFileName && pwszFileName[0] != L'\0')
+		{
+			strLabel = CString(pwszFileName);
+		}
+	}
+
+	if (strLabel.IsEmpty())
+	{
+		strLabel.Format(_T("Spawn [%u]"), worldTblidx);
+	}
+
+	return strLabel;
+}
+
+// Adds one tab for a single per-World spawn table.
+void CFileView::AddSpawnTab(int nCategory, TBLIDX worldTblidx, CWorldTable* pWorldTable)
+{
+	CString strLabel = GetSpawnTabLabel(nCategory, worldTblidx, pWorldTable);
+
+	m_wndTabs.AddTab(strLabel);
+	m_aTabToTableIndex.Add(-1);
+
+	STabSpawnInfo info;
+	info.nCategory = nCategory;
+	info.worldTblidx = worldTblidx;
+	m_aTabSpawnInfo.Add(info);
+}
+
+void CFileView::OpenTable(int nTabIndex)
+{
+	if (nTabIndex < 0 || nTabIndex >= m_aTabToTableIndex.GetSize())
+	{
+		return;
+	}
+
+	int nTableIndex = m_aTabToTableIndex[nTabIndex];
+
+	if (nTableIndex < 0)
+	{
+		const STabSpawnInfo& info = m_aTabSpawnInfo[nTabIndex];
+		m_wndClassView.LoadSpawnTable(info.nCategory, info.worldTblidx);
+		return;
+	}
+
+	int nCount = 0;
+	const STableInfo* pTables = GetRegisteredTables(nCount);
+
+	m_wndClassView.LoadTableData(pTables[nTableIndex].eType);
+}
+
+LRESULT CFileView::OnTabSelChange(WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	OpenTable((int)wParam);
+
+	return 0;
+}
+
+LRESULT CFileView::OnTabRightClick(WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
+	CPoint ptScreen;
+	::GetCursorPos(&ptScreen);
+
+	CPoint ptClient = ptScreen;
+	m_wndTabs.ScreenToClient(&ptClient);
+
+	int nTab = m_wndTabs.HitTest(ptClient);
+
+	// Right-clicking a tab selects it first, so "Load" below is obviously
+	// scoped to the table you right-clicked.
+	if (nTab >= 0)
+	{
+		m_wndTabs.SetCurSel(nTab);
+		OpenTable(nTab);
+	}
+
+	// "Load" reloads everything from the chosen folder -- same as the File
+	// menu commands, since the table file formats are all read/written
+	// together as one data set (see CTableContainer). "Save" below is
+	// scoped to just this one table -- not offered for the Spawn tabs,
+	// which have no single eTABLE to save (see CClassView::LoadSpawnTable).
+	enum { CMD_SAVE_RDF = 9001, CMD_SAVE_XML };
+
+	int nCount = 0;
+	const STableInfo* pTables = GetRegisteredTables(nCount);
+
+	bool bCanSaveSingleTable = (nTab >= 0 && nTab < m_aTabToTableIndex.GetSize() && m_aTabToTableIndex[nTab] >= 0);
+
+	CMenu menu;
+	menu.CreatePopupMenu();
+	menu.AppendMenu(MF_STRING, ID_TABLE_LOAD_RDF, _T("Load RDF Folder..."));
+	menu.AppendMenu(MF_STRING, ID_TABLE_LOAD_XML, _T("Load XML Folder..."));
+	menu.AppendMenu(MF_SEPARATOR);
+	menu.AppendMenu(bCanSaveSingleTable ? MF_STRING : (MF_STRING | MF_GRAYED), CMD_SAVE_RDF, _T("Save This Table as RDF..."));
+	menu.AppendMenu(bCanSaveSingleTable ? MF_STRING : (MF_STRING | MF_GRAYED), CMD_SAVE_XML, _T("Save This Table as XML..."));
+
+	UINT nCmd = menu.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, ptScreen.x, ptScreen.y, this);
+
+	if (nCmd == ID_TABLE_LOAD_RDF || nCmd == ID_TABLE_LOAD_XML)
+	{
+		CWnd* pFrame = GetParentFrame();
+		if (pFrame)
+		{
+			pFrame->SendMessage(WM_COMMAND, MAKEWPARAM(nCmd, 0));
+		}
+	}
+	else if ((nCmd == CMD_SAVE_RDF || nCmd == CMD_SAVE_XML) && bCanSaveSingleTable)
+	{
+		CTableContainer::eTABLE eTable = pTables[m_aTabToTableIndex[nTab]].eType;
+
+		CFolderPickerDialog dlg(nullptr, 0, this);
+		if (dlg.DoModal() != IDOK)
+		{
+			return 0;
+		}
+
+		if (nCmd == CMD_SAVE_RDF)
+		{
+			CString strPath = dlg.GetPathName();
+			bool bSuccess = RunWithProgress(this, _T("Saving table..."), [eTable, strPath]() -> bool
+			{
+				// SaveSingleTableRdf takes a narrow path (it calls straight
+				// into the shared table engine, which is narrow-only) --
+				// CT2A converts from whatever strPath's width is.
+				CT2A pszPath(strPath);
+				return SaveSingleTableRdf(eTable, pszPath, false);
+			});
+
+			AfxMessageBox(bSuccess ? _T("Table saved.") : _T("Failed to save table."));
+		}
+		else
+		{
+			CString strCaveat = GetXmlExportCaveat(eTable);
+			CString strPath = dlg.GetPathName();
+
+			bool bSuccess = RunWithProgress(this, _T("Saving table..."), [eTable, strPath]() -> bool
+			{
+				return SaveSingleTableXml(eTable, strPath);
+			});
+
+			if (bSuccess)
+			{
+				AfxMessageBox(strCaveat.IsEmpty() ? _T("Table saved.") : (_T("Table saved.\n\n") + strCaveat));
+			}
+			else
+			{
+				AfxMessageBox(_T("Failed to save table."));
+			}
+		}
+	}
+
+	return 0;
 }
 
 void CFileView::AdjustLayout()
@@ -167,73 +371,5 @@ void CFileView::AdjustLayout()
 	CRect rectClient;
 	GetClientRect(rectClient);
 
-	int cyTlb = m_wndToolBar.CalcFixedLayout(FALSE, TRUE).cy;
-
-	m_wndToolBar.SetWindowPos(nullptr, rectClient.left, rectClient.top, rectClient.Width(), cyTlb, SWP_NOACTIVATE | SWP_NOZORDER);
-	m_wndFileView.SetWindowPos(nullptr, rectClient.left + 1, rectClient.top + cyTlb + 1, rectClient.Width() - 2, rectClient.Height() - cyTlb - 2, SWP_NOACTIVATE | SWP_NOZORDER);
+	m_wndTabs.SetWindowPos(nullptr, rectClient.left, rectClient.top, rectClient.Width(), rectClient.Height(), SWP_NOACTIVATE | SWP_NOZORDER);
 }
-
-void CFileView::OnFileOpen()
-{
-	HTREEITEM item = m_wndFileView.GetSelectedItem();
-	
-	OpenTable(item);
-
-	m_wndClassView.ShowPane(TRUE, FALSE, TRUE);
-}
-
-void CFileView::OnDummyCompile()
-{
-	// TODO: Add your command handler code here
-}
-
-void CFileView::OnPaint()
-{
-	CPaintDC dc(this); // device context for painting
-
-	CRect rectTree;
-	m_wndFileView.GetWindowRect(rectTree);
-	ScreenToClient(rectTree);
-
-	rectTree.InflateRect(1, 1);
-	dc.Draw3dRect(rectTree, ::GetSysColor(COLOR_3DSHADOW), ::GetSysColor(COLOR_3DSHADOW));
-}
-
-void CFileView::OnSetFocus(CWnd* pOldWnd)
-{
-	CDockablePane::OnSetFocus(pOldWnd);
-
-	m_wndFileView.SetFocus();
-}
-
-void CFileView::OnChangeVisualStyle()
-{
-	m_wndToolBar.CleanUpLockedImages();
-	m_wndToolBar.LoadBitmap(theApp.m_bHiColorIcons ? IDB_EXPLORER_24 : IDR_EXPLORER, 0, 0, TRUE /* Locked */);
-
-	m_FileViewImages.DeleteImageList();
-
-	UINT uiBmpId = theApp.m_bHiColorIcons ? IDB_FILE_VIEW_24 : IDB_FILE_VIEW;
-
-	CBitmap bmp;
-	if (!bmp.LoadBitmap(uiBmpId))
-	{
-		TRACE(_T("Can't load bitmap: %x\n"), uiBmpId);
-		ASSERT(FALSE);
-		return;
-	}
-
-	BITMAP bmpObj;
-	bmp.GetBitmap(&bmpObj);
-
-	UINT nFlags = ILC_MASK;
-
-	nFlags |= (theApp.m_bHiColorIcons) ? ILC_COLOR24 : ILC_COLOR4;
-
-	m_FileViewImages.Create(16, bmpObj.bmHeight, nFlags, 0, 0);
-	m_FileViewImages.Add(&bmp, RGB(255, 0, 255));
-
-	m_wndFileView.SetImageList(&m_FileViewImages, TVSIL_NORMAL);
-}
-
-

@@ -1,0 +1,49 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Validity_Able",
+                       "type":  "bool"
+                   },
+                   {
+                       "name":  "Action_Animation_Index",
+                       "type":  "word"
+                   },
+                   {
+                       "name":  "Chat_Command_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Chat_Command_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Chat_Command_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Chat_Command_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Chat_Command_5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Chat_Command_6",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Chat_Command_7",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Chat_Command_8",
+                       "type":  "dword"
+                   }
+               ]
+}

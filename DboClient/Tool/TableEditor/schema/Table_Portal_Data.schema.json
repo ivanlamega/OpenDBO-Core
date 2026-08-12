@@ -1,0 +1,613 @@
+﻿{
+    "sheetName":  "Table_Data_KOR",
+    "fields":  [
+                   {
+                       "name":  "Tblidx",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_Name",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_Name_Text",
+                       "type":  "ansi"
+                   },
+                   {
+                       "name":  "World",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Grade",
+                       "type":  "byte"
+                   },
+                   {
+                       "name":  "Loc_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Loc_Y",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Loc_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Dir_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Dir_Z",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Map_X",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Map_Y",
+                       "type":  "float"
+                   },
+                   {
+                       "name":  "Point_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_6",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_7",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_8",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_9",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_10",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_11",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_12",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_13",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_14",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_15",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_16",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_17",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_18",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_19",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_20",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_21",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_22",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_23",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_24",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_25",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_26",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_27",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_28",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_29",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_30",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_31",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_32",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_33",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_34",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_35",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_36",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_37",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_38",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_39",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_40",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_41",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_42",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_43",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_44",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_45",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_46",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_47",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_48",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_49",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_50",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_51",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_52",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_53",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_54",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_55",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_56",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_57",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_58",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_59",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_60",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_61",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_62",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_63",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_64",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_65",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_66",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_67",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_68",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_69",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Point_70",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_1",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_2",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_3",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_4",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_5",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_6",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_7",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_8",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_9",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_10",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_11",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_12",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_13",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_14",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_15",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_16",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_17",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_18",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_19",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_20",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_21",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_22",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_23",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_24",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_25",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_26",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_27",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_28",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_29",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_30",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_31",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_32",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_33",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_34",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_35",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_36",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_37",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_38",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_39",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_40",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_41",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_42",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_43",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_44",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_45",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_46",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_47",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_48",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_49",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_50",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_51",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_52",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_53",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_54",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_55",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_56",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_57",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_58",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_59",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_60",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_61",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_62",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_63",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_64",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_65",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_66",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_67",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_68",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_69",
+                       "type":  "dword"
+                   },
+                   {
+                       "name":  "Zeny_70",
+                       "type":  "dword"
+                   }
+               ]
+}

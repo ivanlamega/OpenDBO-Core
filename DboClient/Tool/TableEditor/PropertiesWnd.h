@@ -1,23 +1,19 @@
 #pragma once
 
+#include "FlatButton.h"
+
 struct sTBLDAT;
 
-class CPropertiesToolBar : public CMFCToolBar
-{
-public:
-	virtual void OnUpdateCmdUI(CFrameWnd* /*pTarget*/, BOOL bDisableIfNoHndler)
-	{
-		CMFCToolBar::OnUpdateCmdUI((CFrameWnd*) GetOwner(), bDisableIfNoHndler);
-	}
-
-	virtual BOOL AllowShowOnList() const { return FALSE; }
-};
-
-class CPropertiesWnd : public CDockablePane
+// Fixed right-hand panel: the Name/Value grid for whatever row is
+// currently selected in CClassView. Plain child window -- not a
+// dockable/floatable pane.
+class CPropertiesWnd : public CWnd
 {
 // Construction
 public:
 	CPropertiesWnd();
+
+	BOOL Create(CWnd* pParentWnd, UINT nID);
 
 	void AdjustLayout();
 
@@ -33,9 +29,14 @@ public:
 
 protected:
 	CFont m_fntPropList;
-//	CComboBox m_wndObjectCombo;
-	CPropertiesToolBar m_wndToolBar;
 	CMFCPropertyGridCtrl m_wndPropList;
+
+	// Replaces the old CMFCToolBar (IDR_PROPERTIES, a stock MFC-wizard
+	// bitmap toolbar) -- its only two live buttons, Expand All and
+	// alphabetic Sort, as flat buttons matching the rest of the tool
+	// instead of a light-gray strip that would clash with the dark theme.
+	CFlatButton m_btnExpandAll;
+	CFlatButton m_btnSortAZ;
 
 	int			m_nTableType;
 	sTBLDAT*	m_pTbldat;
@@ -47,14 +48,9 @@ public:
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnExpandAllProperties();
-	afx_msg void OnUpdateExpandAllProperties(CCmdUI* pCmdUI);
 	afx_msg void OnSortProperties();
-	afx_msg void OnUpdateSortProperties(CCmdUI* pCmdUI);
-	afx_msg void OnProperties1();
-	afx_msg void OnUpdateProperties1(CCmdUI* pCmdUI);
-	afx_msg void OnProperties2();
-	afx_msg void OnUpdateProperties2(CCmdUI* pCmdUI);
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
 
