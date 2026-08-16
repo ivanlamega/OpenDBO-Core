@@ -1005,7 +1005,7 @@ void CPlayer::SendLoadPcDataReq()
 }
 
 
-void CPlayer::RecvLoadPcDataRes(sPC_DATA * pPcData, sDBO_SERVER_CHANGE_INFO * pserverChangeInfo, bool bTutorialFlag, sCHAR_WAR_FOG_FLAG * pWarFogInfo, sMAIL_NEW_BREIF * pMailBrief, sRANKBATTLE_SCORE_INFO * pRankBattleScore, BYTE * pbyTitleIndexFlag, WORD wWaguCoin)
+void CPlayer::RecvLoadPcDataRes(sPC_DATA * pPcData, sDBO_SERVER_CHANGE_INFO * pserverChangeInfo, bool bTutorialFlag, sCHAR_WAR_FOG_FLAG * pWarFogInfo, sMAIL_NEW_BREIF * pMailBrief, sRANKBATTLE_SCORE_INFO * pRankBattleScore, BYTE * pbyTitleIndexFlag, WORD wWaguCoin, WORD wEventCoin)
 {
 	CGameServer* app = (CGameServer*)g_pApp;
 
@@ -1140,6 +1140,7 @@ void CPlayer::RecvLoadPcDataRes(sPC_DATA * pPcData, sDBO_SERVER_CHANGE_INFO * ps
 	SendTitleInfo(pbyTitleIndexFlag);
 	SendRankBattleScoreInfo(pRankBattleScore);
 	SendWaguCoinInfo(wWaguCoin);
+	SendEventCoinInfo(wEventCoin);
 
 	CNtlPacket packetMail(sizeof(sGU_CHAR_MAIL_INFO));
 	sGU_CHAR_MAIL_INFO * resMail = (sGU_CHAR_MAIL_INFO *)packetMail.GetPacketData();
@@ -1714,6 +1715,18 @@ void CPlayer::SendWaguCoinInfo(WORD wWaguCoin)
 	g_pApp->Send(GetClientSessionID(), &packet);
 
 	SetWaguMachineCoin(wWaguCoin);
+}
+
+void CPlayer::SendEventCoinInfo(WORD wEventCoin)
+{
+	CNtlPacket packet(sizeof(sGU_EVENTCOIN_INFO));
+	sGU_EVENTCOIN_INFO * res = (sGU_EVENTCOIN_INFO *)packet.GetPacketData();
+	res->wOpCode = GU_EVENTCOIN_INFO;
+	res->wEventCoin = wEventCoin;
+	packet.SetPacketLen(sizeof(sGU_EVENTCOIN_INFO));
+	g_pApp->Send(GetClientSessionID(), &packet);
+
+	SetEventMachineCoin(wEventCoin);
 }
 
 void CPlayer::SendAvatarInfoEnd()

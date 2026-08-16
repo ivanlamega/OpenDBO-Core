@@ -93,7 +93,7 @@ struct sMSG_BROADCAST_DATA
 		struct sMSG_WAGUWAGU_1ST
 		{
 			WCHAR wszName[NTL_MAX_SIZE_CHAR_NAME + 1];
-			WCHAR wszItemName[20 + 1];
+			TBLIDX itemTblidx;
 		};
 		struct sMSG_FINISH_CCBD_LAST_STAGE
 		{

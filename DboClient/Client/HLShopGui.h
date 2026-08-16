@@ -6,6 +6,7 @@
 
 enum eHLS_CATEGORY
 {
+	eHLS_CATEGORY_ALL,
 	eHLS_CATEGORY_AVATAR,
 	eHLS_CATEGORY_CONSUMABLE,
 	eHLS_CATEGORY_VEHICLE,
@@ -24,6 +25,8 @@ enum eHLS_CATEGORY
 
 static bool abIsCategoryActice[eHLS_CATEGORY_NUM] =
 {
+	// eHLS_CATEGORY_ALL
+	true,
 	// eHLS_CATEGORY_AVATAR
 	true,
 	// eHLS_CATEGORY_CONSUMABLE
@@ -43,15 +46,71 @@ static bool abIsCategoryActice[eHLS_CATEGORY_NUM] =
 	// eHLS_CATEGORY_OTHER
 	true,
 	// eHLS_CATEGORY_WAGU_COIN
-	false,
+	true,
 	// eHLS_CATEGORY_WAGU_MACHINE
-	false,
+	true,
 	// eHLS_CATEGORY_EVENT_MACHINE
-	false
+	true
 };
 
 class CHLShopGui : public CNtlPLGui, public RWS::CEventHandler
 {
+	struct sWAGU_INFO
+	{
+		BYTE			byRanking[10];
+		TBLIDX			ItemTblidx[10];
+		BYTE			byStackCount[10];
+		BYTE			bySetCount[10];
+		BYTE			byReallyExtractCount;
+		TBLIDX			wMachineIndex;
+		WORD			wNewWaguWaguPoints;
+		RwBool			isEventType;
+	};
+
+	struct sWAGU_PRODUCTS
+	{
+		TBLIDX				ItemTblidx[10];
+		BYTE				Stack[10];
+		BYTE				hlsItemCount[10];
+		BYTE				CurShowItem;
+		TBLIDX				CurMachineIndex;
+		BYTE				CurMachineType;
+		BYTE				CurNeedCoin;
+		WORD				CurCapNum;
+		WORD				MaxCapNum;
+
+		gui::CPanel*		pDialog;
+		int					nDialogX;
+		int					nDialogY;
+
+		CRegularSlotGui		ItemSlot[10];
+		gui::CPanel*		ppnlItemSlot;
+		gui::CSlot			slotMouseEnterItem;
+		gui::CSlot			slotMouseLeaveItem;
+		gui::CSlot			slotClickPrev;
+		gui::CSlot			slotClickNext;
+		gui::CSlot			slotClickWaguInfo;
+		gui::CSlot			slotBunchInfo;
+		gui::CSlot			slotClickExcute;
+
+		CSurfaceGui			mSurface;
+
+		gui::CProgressBar*	pProgressbar;
+		gui::CButton*		btnPrev;
+		gui::CButton*		btnNext;
+		gui::CButton*		btnBunchInfo;
+		gui::CButton*		btnExcute;
+		gui::CButton*		btnWaguInfo;
+		gui::CStaticBox*	stbLeftCapsule;
+		gui::CStaticBox*	stbLeftCapsuleNum;
+		gui::CStaticBox*	stbWaguTitle;
+		gui::CStaticBox*	stbChampionItem;
+		gui::CStaticBox*	stbChampionItemName;
+		gui::CStaticBox*	stbNeedWaguCoin;
+		gui::CPanel*		pnlEventCoinMarkSmall;
+		gui::CPanel*		pnlWaguMachine;
+		gui::CPanel*		pnlEventMark;
+	};
 
 	struct sHLS_PRODUCTS
 	{
@@ -130,6 +189,9 @@ protected:
 	gui::CButton*		m_pbtnProductLastList;
 	gui::CSlot			m_slotClickedBtnProductLastList;
 
+	gui::CFlash*		m_pWaguFlash;
+	gui::CSlot			m_slotWaguFlashEnd;
+
 //	gui::CDialog*		m_pdlgBanner;
 
 	gui::CButton*		m_pBtnCategory[eHLS_CATEGORY_NUM];
@@ -141,8 +203,13 @@ private:
 	int					m_nCurrentPage;
 	int					m_nMaxPage;
 
+	sWAGU_INFO			m_WaguInfo;
+
 	std::vector<sHLS_PRODUCTS*>	m_vecProducts[eHLS_CATEGORY_NUM];
 	std::vector<sHLS_PRODUCTS*>	m_vecVisibleProducts;
+
+	std::vector<sWAGU_PRODUCTS*>	m_vecProductsWagu[2];
+	std::vector<sWAGU_PRODUCTS*>	m_vecVisibleProductsWagu;
 
 	bool				m_bSearch;
 
@@ -160,16 +227,20 @@ private:
 
 	void		CreateCategoryButton();
 	void		CreateItems();
+	void		CreateWaguItem();
 	void		SelectCategory(int iCategory);
 	void		SetPage(int nCurPage, int nMaxPage);
 
 	void		ClearVisibleItems();
+
+	void		ShowCoin();
 
 public:
 
 	void		HandleEvents(RWS::CMsg& msg);
 	RwInt32		SwitchDialog(bool bOpen);
 
+	void		Update(RwReal fElapsed);
 	void		OnPaint();
 	void		OnMove(RwInt32 iOldX, RwInt32 iOldY);
 
@@ -191,9 +262,25 @@ public:
 	void		OnMouseEnterItem(gui::CComponent* pComponent);
 	void		OnMouseLeaveItem(gui::CComponent* pComponent);
 
+	void		OnMouseEnterWaguItem(gui::CComponent* pComponent);
+	void		OnMouseLeaveWaguItem(gui::CComponent* pComponent);
+
+	void		OnClickedWaguPrev(gui::CComponent* pComponent);
+	void		OnClickedWaguNext(gui::CComponent* pComponent);
+
+	void		OnclickedBtnWaguInfo(gui::CComponent* pComponent);
+	void		OnClickedBtnBunchInfo(gui::CComponent* pComponent);
+
+	void		OnClickedExcute(gui::CComponent* pComponent);
+
+	void		OnWaguFlashEnd(gui::CComponent* pComponent);
+
+	void		RefreshWaguInfo(BYTE WaguType, WORD* CurCap, WORD* MaxCap, TBLIDX* MachineIndex);
+
 private:
 
 	void		ShowItemInfoWindow(bool bIsShow, sHLS_PRODUCTS* pProduct);
+	void		ShowItemInfoWindow(bool bIsShow, sWAGU_PRODUCTS* pProduct);
 
 	void		InitSearch();
 

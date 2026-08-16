@@ -128,6 +128,7 @@
 
 #include "ItemBindSealingGui.h"
 #include "HLShopGui.h"
+#include "WaguMachineInfo.h"
 #include "YardratWarehouseGui.h"
 #include "HLShopBuyGui.h"
 #include "HLShopBuyConfirmGui.h"
@@ -319,6 +320,7 @@ CGameGuiGroup::CGameGuiGroup()
 , m_pHLShopBuyConfirmGui(NULL)
 , m_pHLShopGiftGui(NULL)
 , m_pHLShopGiftConfirmGui(NULL)
+, m_pWaguMachineInfoGui(NULL)
 , m_pItemSwapGui(NULL)
 , m_pItemSwapCartGui(NULL)
 , m_pAuctionHouseGui(NULL)
@@ -777,6 +779,8 @@ RwBool CGameGuiGroup::Create(void)
 	AddDialog(m_pHLShopBuyConfirmGui, CHLShopBuyConfirmGui, "HLShopBuyConfirmGui", DIALOG_HLSHOP_BUY_CONFIRM);
 	AddDialog(m_pHLShopGiftGui, CHLShopGiftGui, "HLShopGiftGui", DIALOG_HLSHOP_GIFT);
 	AddDialog(m_pHLShopGiftConfirmGui, CHLShopGiftConfirmGui, "HLShopGiftConfirmGui", DIALOG_HLSHOP_GIFT_CONFIRM);
+	AddDialog(m_pWaguMachineInfoGui, CWaguMachineInfoGui, "WaguMachineInfoGui", DIALOG_HLSHOP_WAGU_INFO);
+	m_pHLShopGui->Link(m_pWaguMachineInfoGui->GetDialog());
 
 	AddDialog(m_pItemSwapGui, CItemSwapGui, "ItemSwapGui", DIALOG_ITEM_EXCHANGE_SHOP);
 	AddDialog(m_pItemSwapCartGui, CItemSwapCartGui, "ItemSwapCartGui", DIALOG_ITEM_EXCHANGE_CART);
@@ -971,6 +975,7 @@ void CGameGuiGroup::Destroy(void)
 	RemoveDialog(m_pHLShopBuyConfirmGui);
 	RemoveDialog(m_pHLShopGiftGui);
 	RemoveDialog(m_pHLShopGiftConfirmGui);
+	RemoveDialog(m_pWaguMachineInfoGui);
 	RemoveDialog(m_pItemSwapGui);
 	RemoveDialog(m_pItemSwapCartGui);
 	RemoveDialog(m_pAuctionHouseGui);

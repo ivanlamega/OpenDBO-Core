@@ -726,6 +726,7 @@ enum eOPCODE_GU
 	GU_EVENT_SCHEDULING_START,
 	GU_EVENT_SCHEDULING_END,
 
+	GU_EVENTCOIN_INFO,
 
 	GU_OPCODE_END_DUMMY,
 	GU_OPCODE_END = GU_OPCODE_END_DUMMY - 1,
@@ -3884,6 +3885,11 @@ END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(GU_WAGUWAGUMACHINE_COIN_INFO)
 	WORD				wWaguWaguCoin;
+END_PROTOCOL()
+
+//------------------------------------------------------------------
+BEGIN_PROTOCOL(GU_EVENTCOIN_INFO)
+	WORD				wEventCoin;
 END_PROTOCOL()
 
 //------------------------------------------------------------------

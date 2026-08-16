@@ -298,6 +298,15 @@ extern RWS::CEventId g_EventHLShopEventItemAddNfy;
 extern RWS::CEventId g_EventHLShopEventItemDelNfy;
 extern RWS::CEventId g_EventHLShopEventItemGiftRes;
 
+extern RWS::CEventId g_EventHLShopEventSelect;
+
+// hls slot machine (wagu / event)
+extern RWS::CEventId g_EventHLShopEventWaguInfo;
+extern RWS::CEventId g_EventWaguMachineInfo;
+extern RWS::CEventId g_EventHlsCoinUpdateInfo;
+extern RWS::CEventId g_EventWaguExcuteRes;
+extern RWS::CEventId g_EventWaguWinnerInfoRes;
+
 // Open BagGui, ScouterBackgroundGui, ...
 extern RWS::CEventId g_EventOpenBagGui; 
 extern RWS::CEventId g_EventOpenScouterBackgroundGui;
@@ -1355,6 +1364,11 @@ struct SDboEventHLShopEventItemGiftRes
 	DWORD dwCash;
 };
 
+struct SDboEventHLShopSelectCategory
+{
+	int Category;
+};
+
 struct SDboEventHLShopEventItemMoveRes
 {
 	QWORD qwProductId;
@@ -1391,6 +1405,65 @@ enum eCommercialExtendCommandType
 	eSUMMON_MASCOT,
 	eUNSUMMON_MASCOT,
 	eDELETE_MASCOT,
+
+	// HLS slot machine
+	eWAGU_EXCUTE,
+	eWAGU_EXCUTE_RES,
+};
+
+struct SDboEventWaguExcuteData
+{
+	BYTE Count;
+	TBLIDX MachineIndex;
+	BYTE Type;
+	BYTE NeedCoin;
+};
+
+struct SDboEventHLShopEventWaguInfo
+{
+	TBLIDX* pData;
+	std::wstring Name;
+	TBLIDX index;
+};
+
+struct SDboEventWaguMachineInfo
+{
+	BYTE			byType;
+	BYTE			byMachineCount;
+	TBLIDX			wMachineIndex[4];
+	BYTE			byCoin[4];
+	int				bOnOff[4];
+	TBLIDX			ItemTblidx[4][10];
+	WORD			wWaitingTime[4];
+	WORD			wCurrentCapsule[4];
+	WORD			wMaxCapsule[4];
+};
+
+struct SDboEventWaguWinnerInfo
+{
+	TBLIDX			wMachineIndex;
+	BYTE			byInfoCount;
+	WCHAR			wszPlayer[3][NTL_MAX_SIZE_CHAR_NAME + 1];
+	WORD			wWinCount[3];
+	DBOTIME			nExtractTime[3];
+	QWORD			nWinnerIndex[3];
+};
+
+struct SDboEventHlsCoinUpdate
+{
+	WORD Coin;
+	BYTE Type;
+};
+
+struct SDboEventWaguExcuteRes
+{
+	TBLIDX			wMachineIndex;
+	BYTE			byRanking[10];
+	TBLIDX			ItemTblidx[10];
+	BYTE			byStackCount[10];
+	BYTE			bySetCount[10];
+	BYTE			byReallyExtractCount;
+	WORD			wNewWaguWaguPoints;
 };
 
 struct SDboEventCommercialExtendNPCData

@@ -11,9 +11,6 @@
 
 CHlsSlotMachine::CHlsSlotMachine()
 {
-	//init winners
-	memset(m_aWinnerIndex, 0, sizeof(m_aWinnerIndex));
-
 	Init();
 }
 
@@ -74,8 +71,6 @@ void CHlsSlotMachine::Init()
 		//insert slot machine
 		sSLOT_MACHINE* pSlotMachine = new sSLOT_MACHINE;
 		pSlotMachine->pTbldat = pHlsMachineTbldat;
-		pSlotMachine->wCurrentCapsule = 800;
-		m_mapSlotMachine.insert({ pHlsMachineTbldat->tblidx, pSlotMachine });
 
 		for (BYTE i = 0; i < DBO_MAX_HLS_SLOT_MACHINES_MAX_ITEMS; i++)
 		{
@@ -85,22 +80,33 @@ void CHlsSlotMachine::Init()
 			sHLS_ITEM_TBLDAT* pHlsItem = (sHLS_ITEM_TBLDAT*)g_pTableContainer->GetHLSItemTable()->FindData(pHlsMachineTbldat->aItemTblidx[i]);
 			if (pHlsItem)
 			{
-				sHLS_SLOT_MACHINE_ITEM_TBLDAT* pHlsSlotItem = (sHLS_SLOT_MACHINE_ITEM_TBLDAT*)g_pTableContainer->GetSlotMachineItemTable()->FindData(pHlsMachineTbldat->aItemTblidx[i]);
-				if (pHlsSlotItem)
-				{
-					sHLS_SLOT_ITEM* pSlot = new sHLS_SLOT_ITEM;
+				sHLS_SLOT_ITEM* pSlot = new sHLS_SLOT_ITEM;
 
-					pSlot->wCountLeft = 1;
-					pSlot->byRank = i + 1;
-					pSlot->fPercent = 0.0f;
-					pSlot->pHlsItem = pHlsItem;
-					pSlot->pSlotItem = pHlsSlotItem;
+				pSlot->wCountLeft = pHlsMachineTbldat->wQuantity[i];
+				pSlot->byRank = i + 1;
+				pSlot->fPercent = 0.0f;
+				pSlot->pHlsItem = pHlsItem;
+				pSlot->pSlotItem = NULL;
 
-					m_slotMachineGroup.insert(SLOTMACHINEGROUP_VAL(pHlsSlotItem->slotMachineTblidx, pSlot));
-				}
-				else printf("pHlsMachineTbldat->aItemTblidx[i] %u not found in  table_slot_machine_item_data", pHlsMachineTbldat->aItemTblidx[i]);
+				m_slotMachineGroup.insert(SLOTMACHINEGROUP_VAL(pHlsMachineTbldat->tblidx, pSlot));
 			}
+			else printf("pHlsMachineTbldat->aItemTblidx[i] %u not found in table_hls_item_data\n", pHlsMachineTbldat->aItemTblidx[i]);
 		}
+
+		// capsule totals are the sum of every item actually assigned to this machine
+		// (both the type-0 percent pool and the rank items just inserted above)
+		SLOTMACHINEGROUP_IT itLow = m_slotMachineGroup.lower_bound(pHlsMachineTbldat->tblidx);
+		SLOTMACHINEGROUP_IT itUp = m_slotMachineGroup.upper_bound(pHlsMachineTbldat->tblidx);
+		int nCapsuleTotal = 0;
+		while (itLow != itUp)
+		{
+			nCapsuleTotal += itLow->second->wCountLeft;
+			++itLow;
+		}
+
+		pSlotMachine->wMaxCapsule = (WORD)nCapsuleTotal;
+		pSlotMachine->wCurrentCapsule = (WORD)nCapsuleTotal;
+		m_mapSlotMachine.insert({ pHlsMachineTbldat->tblidx, pSlotMachine });
 	}
 }
 
@@ -120,16 +126,25 @@ void CHlsSlotMachine::GetSlotItems(TBLIDX slotIdx, std::vector<sHLS_SLOT_ITEM*>*
 
 		if (pTbldat->wCountLeft > 0)
 		{
-			if (pTbldat->byRank == 0)
-			{
-				if (Dbo_CheckProbabilityF(pTbldat->fPercent))
-					pVec->push_back(pTbldat);
-			}
-			else
-			{
-				//if (Dbo_CheckProbabilityF((float)pTbldat->byRank + float(pSlot->wMaxCapsule / pSlot->wCurrentCapsule)))
-					pVec->push_back(pTbldat);
-			}
+			pTbldat->fPercent = (float)pTbldat->wCountLeft / (float)pSlot->wCurrentCapsule;
+			pVec->push_back(pTbldat);
+		}
+
+		++itLow;
+	}
+}
+
+void CHlsSlotMachine::SetWaguItemCount(TBLIDX slotIdx, BYTE Count, TBLIDX tblidx)
+{
+	std::multimap<TBLIDX, sHLS_SLOT_ITEM*>::iterator itLow = m_slotMachineGroup.lower_bound(slotIdx);
+	std::multimap<TBLIDX, sHLS_SLOT_ITEM*>::iterator itUp = m_slotMachineGroup.upper_bound(slotIdx);
+
+	while (itLow != itUp)
+	{
+		sHLS_SLOT_ITEM* pTbldat = itLow->second;
+		if (pTbldat->pHlsItem->tblidx == tblidx)
+		{
+			pTbldat->wCountLeft -= Count;
 		}
 
 		++itLow;
@@ -138,29 +153,28 @@ void CHlsSlotMachine::GetSlotItems(TBLIDX slotIdx, std::vector<sHLS_SLOT_ITEM*>*
 
 void CHlsSlotMachine::AddWinner(TBLIDX slotId, TBLIDX itemTblidx, CPlayer * pPlayer)
 {
-	m_aWinnerIndex[slotId - 1] += 1;
+	QWORD& winnerIndex = m_mapWinnerIndex[slotId];
+	winnerIndex += 1;
 
 	sHLS_SLOT_WINNER_INFO* pWinner = new sHLS_SLOT_WINNER_INFO;
 	pWinner->nExtractTime = time(NULL);
 	NTL_SAFE_WCSCPY(pWinner->wszPlayer, pPlayer->GetCharName());
 	pWinner->wWinCount = pPlayer->GetSlotMachineCount();
-	pWinner->winnerIndex = m_aWinnerIndex[slotId - 1];
+	pWinner->winnerIndex = winnerIndex;
 
-	m_slotWinnerInfo[slotId - 1].push_back(pWinner);
+	std::list<sHLS_SLOT_WINNER_INFO*>& winnerList = m_mapSlotWinnerInfo[slotId];
+	winnerList.push_back(pWinner);
 
-	if (m_slotWinnerInfo[slotId - 1].size() > 3)
+	if (winnerList.size() > 3)
 	{
-		sHLS_SLOT_WINNER_INFO* pInfo = m_slotWinnerInfo[slotId - 1].front();
+		sHLS_SLOT_WINNER_INFO* pInfo = winnerList.front();
 		SAFE_DELETE(pInfo);
-		m_slotWinnerInfo[slotId - 1].pop_front();
+		winnerList.pop_front();
 	}
 }
 
-void CHlsSlotMachine::GetWinnerInfo(WORD wSlot, CPlayer * pPlayer)
+void CHlsSlotMachine::GetWinnerInfo(TBLIDX wSlot, CPlayer * pPlayer)
 {
-	if (wSlot > 1)
-		return;
-
 	CNtlPacket packet(sizeof(sTU_HLS_SLOT_MACHINE_WINNER_INFO_RES));
 	sTU_HLS_SLOT_MACHINE_WINNER_INFO_RES* res = (sTU_HLS_SLOT_MACHINE_WINNER_INFO_RES*)packet.GetPacketData();
 	res->wOpCode = TU_HLS_SLOT_MACHINE_WINNER_INFO_RES;
@@ -168,17 +182,21 @@ void CHlsSlotMachine::GetWinnerInfo(WORD wSlot, CPlayer * pPlayer)
 	res->wMachineIndex = wSlot;
 	res->byInfoCount = 0;
 
-	for (std::list<sHLS_SLOT_WINNER_INFO*>::iterator it = m_slotWinnerInfo[wSlot - 1].begin(); it != m_slotWinnerInfo[wSlot - 1].end(); it++)
+	std::map<TBLIDX, std::list<sHLS_SLOT_WINNER_INFO*>>::iterator itWinnerList = m_mapSlotWinnerInfo.find(wSlot);
+	if (itWinnerList != m_mapSlotWinnerInfo.end())
 	{
-		sHLS_SLOT_WINNER_INFO* pInfo = *it;
+		for (std::list<sHLS_SLOT_WINNER_INFO*>::iterator it = itWinnerList->second.begin(); it != itWinnerList->second.end(); it++)
+		{
+			sHLS_SLOT_WINNER_INFO* pInfo = *it;
 
-		NTL_SAFE_WCSCPY(res->wszPlayer[res->byInfoCount], pInfo->wszPlayer);
-		res->wWinCount[res->byInfoCount] = pInfo->wWinCount;
-		res->nExtractTime[res->byInfoCount] = pInfo->nExtractTime;
-		res->nWinnerIndex[res->byInfoCount] = (WORD)pInfo->winnerIndex;
+			NTL_SAFE_WCSCPY(res->wszPlayer[res->byInfoCount], pInfo->wszPlayer);
+			res->wWinCount[res->byInfoCount] = pInfo->wWinCount;
+			res->nExtractTime[res->byInfoCount] = pInfo->nExtractTime;
+			res->nWinnerIndex[res->byInfoCount] = (WORD)pInfo->winnerIndex;
 
-		if (++res->byInfoCount == DBO_MAX_HLS_SLOT_MACHINES_MAX_WINNERS)
-			break;
+			if (++res->byInfoCount == DBO_MAX_HLS_SLOT_MACHINES_MAX_WINNERS)
+				break;
+		}
 	}
 
 	packet.SetPacketLen(sizeof(sTU_HLS_SLOT_MACHINE_WINNER_INFO_RES));
@@ -225,4 +243,15 @@ sSLOT_MACHINE * CHlsSlotMachine::GetSlotMachine(TBLIDX tblidx)
 		return it->second;
 
 	return nullptr;
+}
+
+void CHlsSlotMachine::DebugDumpSlotMachines(TBLIDX requestedIdx)
+{
+	printf("[HlsSlotMachine] machine index %u not found. Loaded machines (tblidx/type/bOnOff):", requestedIdx);
+	for (std::map<TBLIDX, sSLOT_MACHINE*>::iterator it = m_mapSlotMachine.begin(); it != m_mapSlotMachine.end(); it++)
+	{
+		sSLOT_MACHINE* pSlotMachine = it->second;
+		printf(" [%u/%u/%u]", it->first, pSlotMachine->pTbldat->byType, pSlotMachine->pTbldat->bOnOff);
+	}
+	printf("\n");
 }

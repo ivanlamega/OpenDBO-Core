@@ -109,6 +109,7 @@ class CHLShopBuyGui;
 class CHLShopBuyConfirmGui;
 class CHLShopGiftGui;
 class CHLShopGiftConfirmGui;
+class CWaguMachineInfoGui;
 class CItemSwapGui;
 class CItemSwapCartGui;
 class CAuctionHouseGui;
@@ -234,6 +235,7 @@ private:
 	CHLShopBuyConfirmGui*		m_pHLShopBuyConfirmGui;
 	CHLShopGiftGui*				m_pHLShopGiftGui;
 	CHLShopGiftConfirmGui*			m_pHLShopGiftConfirmGui;
+	CWaguMachineInfoGui*			m_pWaguMachineInfoGui;
 	CItemSwapGui*				m_pItemSwapGui;
 	CItemSwapCartGui*			m_pItemSwapCartGui;
 

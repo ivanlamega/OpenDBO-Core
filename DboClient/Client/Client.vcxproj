@@ -431,8 +431,13 @@
     <ClCompile Include="HLShopGiftConfirmGui.cpp" />
     <ClCompile Include="HLShopGiftGui.cpp" />
     <ClCompile Include="HLShopGui.cpp" />
+    <ClCompile Include="WaguMachineInfo.cpp" />
     <ClCompile Include="HLSSideIconGui.cpp" />
     <ClCompile Include="HLSSideView.cpp" />
+    <ClCompile Include="WaguMachineSideIconGui.cpp" />
+    <ClCompile Include="WaguMachineSideViewGui.cpp" />
+    <ClCompile Include="EventMachineSideIconGui.cpp" />
+    <ClCompile Include="EventMachineSideViewGui.cpp" />
     <ClCompile Include="HoiPoiMixCraftGui.cpp" />
     <ClCompile Include="HoiPoiMixRecipeGui.cpp" />
     <ClCompile Include="ItemBindSealingGui.cpp" />
@@ -777,8 +782,13 @@
     <ClInclude Include="Gui\WorldMap.h" />
     <ClInclude Include="Gui\MascotGui.h" />
     <ClInclude Include="HLShopGui.h" />
+    <ClInclude Include="WaguMachineInfo.h" />
     <ClInclude Include="HLSSideIconGui.h" />
     <ClInclude Include="HLSSideView.h" />
+    <ClInclude Include="WaguMachineSideIconGui.h" />
+    <ClInclude Include="WaguMachineSideViewGui.h" />
+    <ClInclude Include="EventMachineSideIconGui.h" />
+    <ClInclude Include="EventMachineSideViewGui.h" />
     <ClInclude Include="ItemBindSealingGui.h" />
     <ClInclude Include="LoadingScene\GameLoadingScene.h" />
     <ClInclude Include="Main\AvatarController.h" />

@@ -4104,8 +4104,22 @@ void PacketHandler_GUCharRankBattleScore( void* pPacket )
 	pAvatarInfo->sRankBattleScoreInfo.fPoint = pData->sScoreInfo.fPoint;
 }
 
+void PacketHandler_GUWaguCoinInfo( void* pPacket )
+{
+	sGU_WAGUWAGUMACHINE_COIN_INFO* pData = (sGU_WAGUWAGUMACHINE_COIN_INFO*)pPacket;
 
-void PacketHandler_GUDisconnectNfy( void* pPacket ) 
+	Logic_SetWaguCoin(pData->wWaguWaguCoin);
+}
+
+void PacketHandler_GUEventCoinInfo( void* pPacket )
+{
+	sGU_EVENTCOIN_INFO* pData = (sGU_EVENTCOIN_INFO*)pPacket;
+
+	Logic_SetEventCoin(pData->wEventCoin);
+}
+
+
+void PacketHandler_GUDisconnectNfy( void* pPacket )
 {
 	sGU_DISCONNECTED_NFY* pResult = (sGU_DISCONNECTED_NFY*)pPacket;
 

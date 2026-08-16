@@ -142,6 +142,16 @@ VOID CIconPopupItem::OnClick( gui::CComponent* pComponent )
 	{
 		GetDboGlobal()->GetGamePacketGenerator()->SendPCInfoView(Logic_GetAvatarTargetHandle());
 	}
+	else if (m_eWork == PMW_WAGU_ITEM_BUNCH)
+	{
+		auto Info = GetNtlSobManager()->GetSobObject(m_pIconPopup->GetSerial())->GetWaguInfo();
+		CDboEventGenerator::WaguMachinesExcute(5, Info.MachineIndex, Info.Type, Info.NeedCoin);
+	}
+	else if (m_eWork == PMW_WAGU_ITEM_BUNCH2)
+	{
+		auto Info = GetNtlSobManager()->GetSobObject(m_pIconPopup->GetSerial())->GetWaguInfo();
+		CDboEventGenerator::WaguMachinesExcute(10, Info.MachineIndex, Info.Type, Info.NeedCoin);
+	}
 	else
 	{
 		CDboEventGenerator::IconPopupResult( m_pIconPopup->GetSerial(), m_pIconPopup->GetPlace(), m_pIconPopup->GetSlotIdx(), m_eWork );
@@ -183,6 +193,8 @@ RwBool CIconPopupGui::Create(VOID)
 	CNtlPLGui::CreateComponents( GetNtlGuiManager()->GetGuiManager() );
 
 	m_pThis = (gui::CDialog*)GetComponent( "dlgMain" );
+
+	m_pThis->SetPriority(dDIALOGPRIORITY_HLSHOP);
 
 	CRectangle rect;
 	gui::CButton* pButton = NULL;
@@ -605,6 +617,11 @@ VOID CIconPopupGui::ShowEvent( RWS::CMsg& msg )
 		SelectItem(m_apMenu[PMW_ITEM_SORT]);
 		SelectItem(m_apMenu[PMW_ITEM_DISASSEMBLE]);
 	 }
+	else if (pData->nSrcPlace == PLACE_WAGU_ITEM_BUNCH)
+	{
+		SelectItem(m_apMenu[PMW_WAGU_ITEM_BUNCH]);
+		SelectItem(m_apMenu[PMW_WAGU_ITEM_BUNCH2]);
+	}
 	else
 	{
 		// Oh my goodness!
@@ -714,8 +731,18 @@ const WCHAR * CIconPopupGui::GetPopupMenuName(RwInt32 num)
 		case PMW_ITEM_SORT: return GetDisplayStringManager()->GetString("DST_POPUPMENU_ITEM_SORT");
 		case PMW_HELP: return GetDisplayStringManager()->GetString("DST_POPUPMENU_HELP");
 		case PMW_SCOUTER_CHECK_MENU_EQUIPMENT: return GetDisplayStringManager()->GetString("DST_SCOUTER_CHECK_MENU_EQUIPMENT");
-		case PMW_WAGU_ITEM_BUNCH: return GetDisplayStringManager()->GetString("DST_WAGU_ITEM_BUNCH");
-		case PMW_WAGU_ITEM_BUNCH2: return GetDisplayStringManager()->GetString("DST_WAGU_ITEM_BUNCH");
+		case PMW_WAGU_ITEM_BUNCH:
+		{
+			static WCHAR Buff[256];
+			swprintf_s(Buff, 256, GetDisplayStringManager()->GetString("DST_WAGU_ITEM_BUNCH"), 5);
+			return Buff;
+		}
+		case PMW_WAGU_ITEM_BUNCH2:
+		{
+			static WCHAR Buff[256];
+			swprintf_s(Buff, 256, GetDisplayStringManager()->GetString("DST_WAGU_ITEM_BUNCH"), 10);
+			return Buff;
+		}
 		case PMW_ITEM_DISASSEMBLE: return GetDisplayStringManager()->GetString("DST_MULTIDIALOG_MENU_SMITH_DISASSEMBLE");
 
 		default: break;

@@ -1265,7 +1265,10 @@ void CChatServerSession::RecvHlsSlotMachineExtractReq(CNtlPacket * pPacket, CQue
 		CPlayerCache* pCharCache = g_pPlayerCache->GetCharacter(req->charId);
 		if (pCharCache)
 		{
-			if (pCache->GetWaguCoin() >= (DWORD)req->wCoin)
+			bool bIsEvent = (req->byHlsMachineType == HLS_MACHINE_TYPE_EVENT);
+			DWORD dwCurCoin = bIsEvent ? pCache->GetEventCoin() : pCache->GetWaguCoin();
+
+			if (dwCurCoin >= (DWORD)req->wCoin)
 			{
 				SYSTEMTIME ti;
 				GetLocalTime(&ti);
@@ -1297,11 +1300,27 @@ void CChatServerSession::RecvHlsSlotMachineExtractReq(CNtlPacket * pPacket, CQue
 				}
 
 				GetLogDB.Execute("INSERT INTO slot_machine_log (accountid,charid,extractCount,type,coin,currentPoints,newPoints,ProductId1,ProductId2,ProductId3,ProductId4,ProductId5,ProductId6,ProductId7,ProductId8,ProductId9,ProductId10)VALUES(%u,%u,%u,%u,%u,%u,%u,%I64u,%I64u,%I64u,%I64u,%I64u,%I64u,%I64u,%I64u,%I64u,%I64u)",
-					req->accountId, req->charId, req->byExtractCount, req->byHlsMachineType, req->wCoin, pCache->GetWaguCoin(), pCache->GetWaguCoin() - (DWORD)req->wCoin, res->aProductId[0], res->aProductId[1], res->aProductId[2], res->aProductId[3], res->aProductId[4], res->aProductId[5], res->aProductId[6], res->aProductId[7], res->aProductId[8], res->aProductId[9]);
+					req->accountId, req->charId, req->byExtractCount, req->byHlsMachineType, req->wCoin, dwCurCoin, dwCurCoin - (DWORD)req->wCoin, res->aProductId[0], res->aProductId[1], res->aProductId[2], res->aProductId[3], res->aProductId[4], res->aProductId[5], res->aProductId[6], res->aProductId[7], res->aProductId[8], res->aProductId[9]);
 
-				pCache->SetWaguCoin(pCache->GetWaguCoin() - (DWORD)req->wCoin);
-				GetAccDB.WaitExecute("UPDATE accounts SET WaguCoins=%u WHERE AccountID=%u", pCache->GetWaguCoin(), req->accountId); //if player bought cash and did not update his cash in game.. This is why we do like this
-				
+				if (bIsEvent)
+				{
+					pCache->SetEventCoin(dwCurCoin - (DWORD)req->wCoin);
+					GetAccDB.WaitExecute("UPDATE accounts SET EventCoins=%u WHERE AccountID=%u", pCache->GetEventCoin(), req->accountId); //if player bought cash and did not update his cash in game.. This is why we do like this
+				}
+				else
+				{
+					pCache->SetWaguCoin(dwCurCoin - (DWORD)req->wCoin);
+					GetAccDB.WaitExecute("UPDATE accounts SET WaguCoins=%u WHERE AccountID=%u", pCache->GetWaguCoin(), req->accountId); //if player bought cash and did not update his cash in game.. This is why we do like this
+
+					if (req->waguPoint > 0)
+					{
+						DWORD dwNewWaguPoints = min(pCharCache->GetWaguPoints() + (DWORD)req->waguPoint, 2000);
+						pCharCache->SetWaguPoints(dwNewWaguPoints);
+						GetCharDB.Execute("UPDATE characters SET WaguPoint=%u WHERE CharID=%u", dwNewWaguPoints, req->charId);
+					}
+				}
+
+				res->waguPoint = (WORD)pCharCache->GetWaguPoints();
 			}
 			else res->wResultCode = QUERY_FAIL;
 		}

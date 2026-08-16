@@ -1707,6 +1707,72 @@ void CDboEventGenerator::HLShopEventItemGiftRes(DWORD dwRemainingCash)
 	SEND_MSG(g_EventHLShopEventItemGiftRes, &sData);
 }
 
+void CDboEventGenerator::HLShopSelectCategory(int iCategory)
+{
+	SDboEventHLShopSelectCategory sData;
+	sData.Category = iCategory;
+
+	SEND_MSG(g_EventHLShopEventSelect, &sData);
+}
+
+void CDboEventGenerator::HLShopWaguEventInfo(TBLIDX* pData, std::wstring Name, TBLIDX Index)
+{
+	SDboEventHLShopEventWaguInfo sData;
+	sData.pData = pData;
+	sData.Name = Name;
+	sData.index = Index;
+
+	SEND_MSG(g_EventHLShopEventWaguInfo, &sData);
+}
+
+void CDboEventGenerator::WaguMachinesInfo(SDboEventWaguMachineInfo pData)
+{
+	SEND_MSG(g_EventWaguMachineInfo, &pData);
+}
+
+void CDboEventGenerator::WaguMachinesExcute(BYTE Count, TBLIDX MachineIndex, BYTE Type, BYTE NeedCoin)
+{
+	SDboEventCommercialExtendCommand sData;
+	SDboEventWaguExcuteData sExData;
+	sData.eCommandType = eWAGU_EXCUTE;
+	sData.pData = &sExData;
+
+	sExData.Count = Count;
+	sExData.MachineIndex = MachineIndex;
+	sExData.Type = Type;
+	sExData.NeedCoin = NeedCoin;
+
+	SEND_MSG(g_EventCommercialExtendCommand, &sData);
+}
+
+void CDboEventGenerator::WaguExcuteRes()
+{
+	SDboEventCommercialExtendCommand sData;
+	sData.eCommandType = eWAGU_EXCUTE_RES;
+	sData.pData = NULL;
+
+	SEND_MSG(g_EventCommercialExtendCommand, &sData);
+}
+
+void CDboEventGenerator::WaguMachinesExcuteRes(SDboEventWaguExcuteRes pData)
+{
+	SEND_MSG(g_EventWaguExcuteRes, &pData);
+}
+
+void CDboEventGenerator::WaguWinnerInfoRes(SDboEventWaguWinnerInfo pData)
+{
+	SEND_MSG(g_EventWaguWinnerInfoRes, &pData);
+}
+
+void CDboEventGenerator::HlsCoinUpdateInfo(WORD Coin, BYTE Type)
+{
+	SDboEventHlsCoinUpdate sData;
+	sData.Coin = Coin;
+	sData.Type = Type;
+
+	SEND_MSG(g_EventHlsCoinUpdateInfo, &sData);
+}
+
 void CDboEventGenerator::HLShopEventItemMoveRes(QWORD qwProductId)
 {
 	SDboEventHLShopEventItemMoveRes sData;

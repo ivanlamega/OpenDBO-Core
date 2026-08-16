@@ -229,9 +229,8 @@ VOID CBroadCastSystem::HandleEvents(RWS::CMsg& msg)
 			}
 
 		}
-		else if (pNotify->MsgType == DBO_BROADCASTING_MSG_TYPE_WAGUWAGU_1ST) 
+		else if (pNotify->MsgType == DBO_BROADCASTING_MSG_TYPE_WAGUWAGU_1ST)
 		{
-			/* TODO: Uncomment when wagu system is done
 			swprintf_s(Text, 500, GetDisplayStringManager()->GetString("DST_WAGUWAGU_BROADINFO"), pNotify->pData.sWaguWagu1st.wszName, Logic_GetItemName(pNotify->pData.sWaguWagu1st.itemTblidx));
 
 			if (m_iTextValues % 2 == 0)
@@ -241,7 +240,6 @@ VOID CBroadCastSystem::HandleEvents(RWS::CMsg& msg)
 
 			Show(true);
 			m_iTextValues++;
-			*/
 		}
 		else if (pNotify->MsgType == DBO_BROADCASTING_MSG_TYPE_CCBD) 
 		{

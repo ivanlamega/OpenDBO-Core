@@ -150,6 +150,9 @@ public:
 	ACCOUNTID					GetAccountID() { return m_accountID; }
 	CHARACTERID					GetCharID() { return m_sPcData.charId; }
 
+	DWORD						GetWaguPoints() { return m_sPcData.dwWaguWaguPoints; }
+	void						SetWaguPoints(DWORD dwPoints) { m_sPcData.dwWaguWaguPoints = dwPoints; }
+
 	void						SetTutorialFlag(bool bFlag) { m_bTutorialFlag = bFlag; }
 
 	void						SetIsMailAway(bool bFlag) { m_sPcData.bIsMailAway = bFlag; }

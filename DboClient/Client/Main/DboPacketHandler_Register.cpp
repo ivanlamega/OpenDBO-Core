@@ -531,6 +531,8 @@ void RegisterPacketHandler(void)
 
 	// RankBattle Score Info
 	CNtlPacketHandler::Register(GU_CHAR_RANKBATTLE_SCORE, PacketHandler_GUCharRankBattleScore);
+	CNtlPacketHandler::Register(GU_WAGUWAGUMACHINE_COIN_INFO, PacketHandler_GUWaguCoinInfo);
+	CNtlPacketHandler::Register(GU_EVENTCOIN_INFO, PacketHandler_GUEventCoinInfo);
 
 	// Portal System
 	CNtlPacketHandler::Register(GU_PORTAL_INFO, PacketHandler_GUPortalInfoRes);
@@ -736,6 +738,11 @@ void RegisterPacketHandler(void)
 	// Naming
 	CNtlPacketHandler::Register(TU_CHAR_NAME_CHANGED_NFY, PacketHandler_CharNameChangedNfy);
 	CNtlPacketHandler::Register(TU_BROADCASTING_SYSTEM_NFY, PacketHandler_TUBroadCastRes);
+	CNtlPacketHandler::Register(TU_HLS_SLOT_MACHINE_INFO_RES, PacketHandler_TUWaguMachinesInfo);
+	CNtlPacketHandler::Register(TU_HLS_SLOT_MACHINE_WINNER_INFO_RES, PacketHandler_TUWaguMachineWinnerInfo);
+	CNtlPacketHandler::Register(TU_HLS_SLOT_MACHINE_EXTRACT_RES, PacketHandler_TUWaguMachineExcuteRes);
+	CNtlPacketHandler::Register(TU_WAGUWAGUCOIN_UPDATE_INFO, PacketHandler_TUWaguCoinUpdateInfo);
+	CNtlPacketHandler::Register(TU_EVENTCOIN_UPDATE_INFO, PacketHandler_TUEventCoinUpdateInfo);
 
 	// Display message
 	CNtlPacketHandler::Register(GU_SYSTEM_DISPLAY_RESULTCODE, PacketHandler_SystemDisplayResultCode);
@@ -857,6 +864,8 @@ void UnRegisterPacketHandler(void)
 	CNtlPacketHandler::UnRegister(GU_TUTORIAL_PLAY_QUIT_RES);
 
 	CNtlPacketHandler::UnRegister(GU_GAME_ENTER_RES);
+	CNtlPacketHandler::UnRegister(GU_WAGUWAGUMACHINE_COIN_INFO);
+	CNtlPacketHandler::UnRegister(GU_EVENTCOIN_INFO);
 	CNtlPacketHandler::UnRegister(GU_AVATAR_CHAR_INFO);
 	CNtlPacketHandler::UnRegister(GU_AVATAR_ITEM_INFO);
 	CNtlPacketHandler::UnRegister(GU_AVATAR_SKILL_INFO);
@@ -1459,6 +1468,12 @@ void UnRegisterPacketHandler(void)
 	CNtlPacketHandler::UnRegister(TU_BUDOKAI_NOTICE_NFY);
 
 	CNtlPacketHandler::UnRegister(TU_CHAR_NAME_CHANGED_NFY);
+
+	CNtlPacketHandler::UnRegister(TU_HLS_SLOT_MACHINE_INFO_RES);
+	CNtlPacketHandler::UnRegister(TU_HLS_SLOT_MACHINE_WINNER_INFO_RES);
+	CNtlPacketHandler::UnRegister(TU_HLS_SLOT_MACHINE_EXTRACT_RES);
+	CNtlPacketHandler::UnRegister(TU_WAGUWAGUCOIN_UPDATE_INFO);
+	CNtlPacketHandler::UnRegister(TU_EVENTCOIN_UPDATE_INFO);
 
 	// Naming
 //	CNtlPacketHandler::UnRegister(GU_CHAR_NICKNAME_CHANGED_NFY);

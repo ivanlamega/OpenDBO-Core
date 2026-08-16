@@ -467,3 +467,87 @@ void PacketHandler_TUBroadCastRes(void* pPacket)
 
 	CDboEventGenerator::BroadCast(pResult->byMsgType, pResult->sData);
 }
+
+void PacketHandler_TUWaguMachinesInfo(void* pPacket)
+{
+	API_GetSLPacketLockManager()->Unlock(TU_HLS_SLOT_MACHINE_INFO_RES);
+
+	sTU_HLS_SLOT_MACHINE_INFO_RES* pResult = (sTU_HLS_SLOT_MACHINE_INFO_RES*)pPacket;
+
+	SDboEventWaguMachineInfo sData;
+
+	sData.byMachineCount = pResult->byMachineCount;
+	sData.byType = pResult->byType;
+	memcpy(sData.bOnOff, pResult->bOnOff, sizeof(int) * 4);
+	memcpy(sData.byCoin, pResult->byCoin, sizeof(BYTE) * 4);
+	memcpy(sData.ItemTblidx, pResult->ItemTblidx, sizeof(TBLIDX) * 4 * 10);
+	memcpy(sData.wCurrentCapsule, pResult->wCurrentCapsule, sizeof(WORD) * 4);
+	memcpy(sData.wMaxCapsule, pResult->wMaxCapsule, sizeof(WORD) * 4);
+	memcpy(sData.wMachineIndex, pResult->wMachineIndex, sizeof(WORD) * 4);
+	memcpy(sData.wWaitingTime, pResult->wWaitingTime, sizeof(WORD) * 4);
+
+	CDboEventGenerator::WaguMachinesInfo(sData);
+}
+
+void PacketHandler_TUWaguMachineWinnerInfo(void* pPacket)
+{
+	API_GetSLPacketLockManager()->Unlock(TU_HLS_SLOT_MACHINE_WINNER_INFO_RES);
+
+	sTU_HLS_SLOT_MACHINE_WINNER_INFO_RES* pResult = (sTU_HLS_SLOT_MACHINE_WINNER_INFO_RES*)pPacket;
+
+	SDboEventWaguWinnerInfo sData;
+
+	sData.byInfoCount = pResult->byInfoCount;
+	sData.wMachineIndex = pResult->wMachineIndex;
+	memcpy(sData.nWinnerIndex, pResult->nWinnerIndex, sizeof(pResult->nWinnerIndex));
+	memcpy(sData.wszPlayer, pResult->wszPlayer, sizeof(pResult->wszPlayer));
+	memcpy(sData.wWinCount, pResult->wWinCount, sizeof(pResult->wWinCount));
+	memcpy(sData.nExtractTime, pResult->nExtractTime, sizeof(pResult->nExtractTime));
+
+	CDboEventGenerator::WaguWinnerInfoRes(sData);
+}
+
+void PacketHandler_TUWaguMachineExcuteRes(void* pPacket)
+{
+	API_GetSLPacketLockManager()->Unlock(TU_HLS_SLOT_MACHINE_EXTRACT_RES);
+
+	sTU_HLS_SLOT_MACHINE_EXTRACT_RES* pResult = (sTU_HLS_SLOT_MACHINE_EXTRACT_RES*)pPacket;
+
+	if (pResult->wResultCode == CHAT_SUCCESS)
+	{
+		SDboEventWaguExcuteRes pData;
+		for (int i = 0; i < 10; i++)
+		{
+			pData.byRanking[i] = pResult->byRanking[i];
+			pData.bySetCount[i] = pResult->bySetCount[i];
+			pData.byStackCount[i] = pResult->byStackCount[i];
+			pData.ItemTblidx[i] = pResult->ItemTblidx[i];
+		}
+
+		pData.wNewWaguWaguPoints = pResult->wNewWaguWaguPoints;
+		pData.byReallyExtractCount = pResult->byReallyExtractCount;
+		pData.wMachineIndex = pResult->wMachineIndex;
+
+		CDboEventGenerator::WaguMachinesExcuteRes(pData);
+	}
+	else
+	{
+		GetAlarmManager()->AlarmMessage(Logic_GetResultCodeString(pResult->wResultCode, "GAME_FAIL"), TRUE);
+	}
+}
+
+void PacketHandler_TUWaguCoinUpdateInfo(void* pPacket)
+{
+	sTU_WAGUWAGUCOIN_UPDATE_INFO* pResult = (sTU_WAGUWAGUCOIN_UPDATE_INFO*)pPacket;
+
+	Logic_SetWaguCoin(pResult->wWaguWaguCoin);
+	CDboEventGenerator::HlsCoinUpdateInfo(pResult->wWaguWaguCoin, 0);
+}
+
+void PacketHandler_TUEventCoinUpdateInfo(void* pPacket)
+{
+	sTU_EVENTCOIN_UPDATE_INFO* pResult = (sTU_EVENTCOIN_UPDATE_INFO*)pPacket;
+
+	Logic_SetEventCoin(pResult->wEventCoin);
+	CDboEventGenerator::HlsCoinUpdateInfo(pResult->wEventCoin, 1);
+}

@@ -173,7 +173,7 @@ public:
 	/* Player loading and savings*/
 	//new
 	void			SendLoadPcDataReq();
-	void			RecvLoadPcDataRes(sPC_DATA* pPcData, sDBO_SERVER_CHANGE_INFO* pserverChangeInfo, bool bTutorialFlag, sCHAR_WAR_FOG_FLAG* pWarFogInfo, sMAIL_NEW_BREIF* pMailBrief, sRANKBATTLE_SCORE_INFO* pRankBattleScore, BYTE* pbyTitleIndexFlag, WORD wWaguCoin);
+	void			RecvLoadPcDataRes(sPC_DATA* pPcData, sDBO_SERVER_CHANGE_INFO* pserverChangeInfo, bool bTutorialFlag, sCHAR_WAR_FOG_FLAG* pWarFogInfo, sMAIL_NEW_BREIF* pMailBrief, sRANKBATTLE_SCORE_INFO* pRankBattleScore, BYTE* pbyTitleIndexFlag, WORD wWaguCoin, WORD wEventCoin);
 
 	void			RecvPcItemLoadRes(sITEM_DATA* pData, BYTE byCount, WORD wCurPacketCount);
 	void			RecvPcSkillLoadRes(sSKILL_DATA* pData, BYTE byCount);
@@ -193,6 +193,7 @@ public:
 	void			SendTitleInfo(BYTE* pbyTitleIndexFlag);
 	void			SendRankBattleScoreInfo(const sRANKBATTLE_SCORE_INFO* pRankBattleScore);
 	void			SendWaguCoinInfo(WORD wWaguCoin);
+	void			SendEventCoinInfo(WORD wEventCoin);
 
 	void			SendAvatarInfoEnd();
 	void			SendQueryTutorialUpdate(bool bFlag);

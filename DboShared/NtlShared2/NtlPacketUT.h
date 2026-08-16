@@ -289,12 +289,12 @@ BEGIN_PROTOCOL(UT_HLS_SLOT_MACHINE_INFO_REQ)
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(UT_HLS_SLOT_MACHINE_EXTRACT_REQ)
-	WORD				wMachineIndex;	
+	TBLIDX				wMachineIndex;
 	BYTE				byExtractCount;
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(UT_HLS_SLOT_MACHINE_WINNER_INFO_REQ)
-	WORD				wMachineIndex;
+	TBLIDX				wMachineIndex;
 END_PROTOCOL()
 //------------------------------------------------------------------
 

@@ -288,3 +288,10 @@
 
 #define GSD_BGM_DOJO_SCRAMBLE_READY			"BGM\\BGM_PROLOGE_B.ogg"
 #define GSD_BGM_DOJO_SCRAMBLE_START			"BGM\\BGM_DOJO_BATTLE.ogg"
+
+//////////////////////////////////////////////////////////////////////////
+//						HLS 슬롯머신 (와구와구)								//
+//////////////////////////////////////////////////////////////////////////
+
+#define GSD_WAGU_DRAW						"System\\system_wagucacpsule.wav"
+#define GSD_WAGU_FIRST_PRIZE				"System\\general_wagu_respown.wav"

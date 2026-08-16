@@ -25,13 +25,15 @@
 #include "ChatGui.h"
 #include "DisplayStringManager.h"
 #include "MsgBoxManager.h"
+#include "InfoWndManager.h"
 
 #define MSGBOX_DISPLAYTEXT_YOFFSET	5
-#define MSGBOX_HEIGHT_OFFSET	( 80 + 2 * MSGBOX_DISPLAYTEXT_YOFFSET ) 
+#define MSGBOX_HEIGHT_OFFSET	( 80 + 2 * MSGBOX_DISPLAYTEXT_YOFFSET )
 #define MSGBOX_HEIGHT_OFFSET_FOR_INPUT		30
-#define MSGBOX_DISPLAYTEXT_YPOS	( 33 + MSGBOX_DISPLAYTEXT_YOFFSET )	
-#define MSGBOX_INPUT_YPOS_OFFSET_FROM_DISPLAY_BOTTOM	5	
+#define MSGBOX_DISPLAYTEXT_YPOS	( 33 + MSGBOX_DISPLAYTEXT_YOFFSET )
+#define MSGBOX_INPUT_YPOS_OFFSET_FROM_DISPLAY_BOTTOM	5
 #define MSGBOX_BTN_YPOS_OFFSET_FROM_DISPLAY_BOTTOM	( 9 + MSGBOX_DISPLAYTEXT_YOFFSET )
+#define MSGBOX_HEIGHT_OFFSET_FOR_WAGU		55
 
 CMsgBoxGui::CMsgBoxGui()
 {
@@ -94,8 +96,44 @@ RwBool CMsgBoxGui::Create(const char* StringID)
 	m_pbtnOk->SetText( GetDisplayStringManager()->GetString( "DST_MSG_BTN_OK" ) );
 	m_pbtnCancel->SetText( GetDisplayStringManager()->GetString( "DST_MSG_BTN_CANCEL" ) );
 
-	GetNtlGuiManager()->AddUpdateFunc( this );	
-	
+	CRectangle rect;
+	CRectangle rect2;
+	int x = 5;
+	int y = 60;
+	for (int i = 0 ; i < dMSG_BOX_SLOTS_MAX; i++)
+	{
+		if ( i % 5 == 0)
+		{
+			y += 50;
+			x = 5;
+		}
+		rect.SetRectWH(x += 50, y, 36, 36);
+		m_pItemIcon[i] = NTL_NEW gui::CPanel(rect, m_pThis, GetNtlGuiManager()->GetSurfaceManager());
+		m_pItemIcon[i]->AddSurface(GetNtlGuiManager()->GetSurfaceManager()->GetSurface("MsgBox.srf", "srfSlotItem"));
+		slotMouseEnterItem[i] = m_pItemIcon[i]->SigMouseEnter().Connect(this, &CMsgBoxGui::OnMouseEnterWaguItem);
+		slotMouseLeaveItem[i] = m_pItemIcon[i]->SigMouseLeave().Connect(this, &CMsgBoxGui::OnMouseLeaveWaguItem);
+		m_pItemIcon[i]->Show(false);
+		m_pItemIcon[i]->Enable(false);
+
+		rect2.SetRectWH(rect.left + 3 ,rect.top,34,34);
+		m_pItemCount[i] = NTL_NEW gui::CStaticBox(rect2, m_pThis, GetNtlGuiManager()->GetSurfaceManager(), DBOGUI_STACKNUM_ALIGN);
+		m_pItemCount[i]->CreateFontStd(DBOGUI_STACKNUM_FONT, DBOGUI_STACKNUM_FONTHEIGHT, DBOGUI_STACKNUM_FONTATTR);
+		m_pItemCount[i]->SetEffectMode(DBOGUI_STACKNUM_FONTEFFECTMODE);
+		m_pItemCount[i]->SetText(0);
+		m_pItemCount[i]->Show(false);
+		m_pItemCount[i]->Enable(false);
+
+		m_slotWaguPaint[i] = m_pItemIcon[i]->SigPaint().Connect(this, &CMsgBoxGui::OnWaguPaint);
+	}
+
+	CRectangle rect1;
+	rect1.SetRectWH(0, 0, 32, 32);
+	m_apflaEffect = NTL_NEW gui::CFlash(rect1, m_pThis, GetNtlGuiManager()->GetSurfaceManager(), "Skill_action.swf");
+	m_apflaEffect->Show(false);
+	m_apflaEffect->Enable(false);
+
+	GetNtlGuiManager()->AddUpdateFunc( this );
+
 	NTL_RETURN(TRUE);
 }
 
@@ -109,8 +147,19 @@ VOID CMsgBoxGui::Destroy(VOID)
 	if( GetNtlGuiManager()->GetGuiManager()->GetFocus() == m_pInput )
 		GetNtlGuiManager()->GetGuiManager()->SetFocus( GetNtlGuiManager()->GetGuiManager() );
 
+	for (int i = 0; i < dMSG_BOX_SLOTS_MAX; i++)
+	{
+		NTL_DELETE(m_pItemIcon[i]);
+		m_pItemIcon[i] = NULL;
+
+		ItemSlot[i].Destroy();
+	}
+
+	NTL_DELETE(m_apflaEffect);
+	m_apflaEffect = NULL;
+
 	CNtlPLGui::DestroyComponents();
-    CNtlPLGui::Destroy(); 
+    CNtlPLGui::Destroy();
 
 	NTL_RETURNVOID();
 }
@@ -135,8 +184,12 @@ VOID CMsgBoxGui::Update( RwReal fElapsed )
 			else if( m_fShowTime > 0.0f && nTime != (RwInt32)m_fCurrentTime )
 			{
 				SetText();
-			}		
-		}	
+			}
+		}
+		if (m_apflaEffect->IsVisible())
+		{
+			m_apflaEffect->Update(fElapsed);
+		}
 	}
 }
 
@@ -210,9 +263,56 @@ void CMsgBoxGui::SetBoxData( RwBool bPopup, RwBool bHasInput, std::list<sMsgBoxC
 				{
 					AddCustomBtn(pCustomBtn);
 				}
+
+				if (m_strStringID == "DST_WAGU_EXCUTE_RESULT" || m_strStringID == "DST_WAGU_EXCUTE_RESULT_MORE_SET")
+				{
+					for (int i = 0; i < dMSG_BOX_SLOTS_MAX; i++)
+					{
+						m_pItemCount[i]->Show(false);
+
+						if (i < m_Data.sWaguInfo.byReallyExtractCount)
+						{
+							m_pItemIcon[i]->Show(true);
+							m_pItemIcon[i]->Enable(true);
+						}
+						else
+						{
+							m_pItemIcon[i]->Show(false);
+							m_pItemIcon[i]->Enable(false);
+						}
+
+						ItemSlot[i].Destroy();
+					}
+
+					for (int i = 0; i < m_Data.sWaguInfo.byReallyExtractCount; i++)
+					{
+						ItemSlot[i].Create(m_pItemIcon[i], DIALOG_HLSHOP, REGULAR_SLOT_ITEM_TABLE, SDS_COUNT);
+						ItemSlot[i].SetSize(NTL_ITEM_ICON_SIZE);
+						ItemSlot[i].SetPosition_fromParent(2, 2);
+						ItemSlot[i].SetParentPosition(m_pItemIcon[i]->GetScreenRect().left, m_pItemIcon[i]->GetScreenRect().top);
+						ItemSlot[i].SetIcon(m_Data.sWaguInfo.ItemTblidx[i],0);
+
+						if (m_Data.sWaguInfo.byStackCount[i] > 1)
+						{
+							m_pItemCount[i]->Show(true);
+							m_pItemCount[i]->SetText(m_Data.sWaguInfo.byStackCount[i]);
+							m_pItemCount[i]->Raise();
+						}
+
+						if (m_Data.sWaguInfo.byRanking[i] == 1)
+						{
+							CRectangle rect;
+							rect.SetRectWH(m_pItemIcon[i]->GetScreenRect().left + 1, m_pItemIcon[i]->GetScreenRect().top + 1, 32, 32);
+							m_apflaEffect->SetPosition(rect);
+							m_apflaEffect->PlayMovie(TRUE);
+							m_apflaEffect->Show(true);
+							m_apflaEffect->Raise();
+						}
+					}
+				}
 			}
 		}
-	}	
+	}
 
 	if(bHasInput)
 	{
@@ -233,8 +333,29 @@ void CMsgBoxGui::SetBoxData( RwBool bPopup, RwBool bHasInput, std::list<sMsgBoxC
 		m_pThis->SetPriority( dDIALOGPRIORITY_MSGBOX );
 
 	RaiseTop();
-	
+
 	SetText();
+
+	// a single item won gets its own dialog: center it under the now-final
+	// message text instead of leaving it in the old top-left grid slot
+	if (m_Data.sWaguInfo.byReallyExtractCount == 1 && m_pItemIcon[0]->IsVisible())
+	{
+		CRectangle rect = m_pItemIcon[0]->GetPosition();
+		RwInt32 nCenteredX = (GetWidth() - rect.GetWidth()) / 2;
+		RwInt32 nY = MSGBOX_DISPLAYTEXT_YPOS + m_phtmDisplay->GetHeight() + 10;
+		m_pItemIcon[0]->SetPosition(nCenteredX, nY);
+		m_pItemCount[0]->SetPosition(nCenteredX + 3, nY);
+
+		ItemSlot[0].SetParentPosition(m_pItemIcon[0]->GetScreenRect().left, m_pItemIcon[0]->GetScreenRect().top);
+
+		if (m_Data.sWaguInfo.byRanking[0] == 1)
+		{
+			CRectangle rectFx;
+			rectFx.SetRectWH(m_pItemIcon[0]->GetScreenRect().left + 1, m_pItemIcon[0]->GetScreenRect().top + 1, 32, 32);
+			m_apflaEffect->SetPosition(rectFx);
+		}
+	}
+
 	MsgBoxSizeProc( TRUE );
 	ButtonPositionProc();
 
@@ -322,6 +443,7 @@ VOID CMsgBoxGui::Init(VOID)
 	m_fShowTime = 0.0f;
 	m_fCurrentTime = 0.0f;
 	m_bPopup = FALSE;
+	m_apflaEffect = NULL;
 
 	m_bHide = FALSE;
 
@@ -354,11 +476,13 @@ VOID CMsgBoxGui::MsgBoxSizeProc( RwBool bCenterAlign )
 	
 	if(m_pInput->IsVisible())
 	{
-		nMsgBoxHeight += MSGBOX_HEIGHT_OFFSET_FOR_INPUT;		
-		m_pInput->SetPosition( m_pInput->GetPosition().left, MSGBOX_DISPLAYTEXT_YPOS + nMessageHeight + MSGBOX_INPUT_YPOS_OFFSET_FROM_DISPLAY_BOTTOM + MSGBOX_DISPLAYTEXT_YOFFSET );		
+		nMsgBoxHeight += MSGBOX_HEIGHT_OFFSET_FOR_INPUT;
+		m_pInput->SetPosition( m_pInput->GetPosition().left, MSGBOX_DISPLAYTEXT_YPOS + nMessageHeight + MSGBOX_INPUT_YPOS_OFFSET_FROM_DISPLAY_BOTTOM + MSGBOX_DISPLAYTEXT_YOFFSET );
 	}
+	if (m_pItemIcon[0]->IsVisible())
+		nMsgBoxHeight += MSGBOX_HEIGHT_OFFSET_FOR_WAGU;
 
-	rect.SetRectWH( rect.left, rect.top, rect.GetWidth(), nMsgBoxHeight );	
+	rect.SetRectWH( rect.left, rect.top, rect.GetWidth(), nMsgBoxHeight );
 	SetPosition( rect );
 	m_srfBack.SetSize( rect.GetWidth(), rect.GetHeight() );
 	
@@ -408,6 +532,9 @@ VOID CMsgBoxGui::SetButtonPosition( gui::CComponent* pComponent, RwInt32 nIndex,
 
 	if(m_pInput->IsVisible())
 		nYPos += MSGBOX_HEIGHT_OFFSET_FOR_INPUT;
+
+	if (m_pItemIcon[0]->IsVisible())
+		nYPos += MSGBOX_HEIGHT_OFFSET_FOR_WAGU;
 
 	//nXPos = ( nWidth * nIndex ) + ( nWidth - pComponent->GetWidth() ) / 2;// disabled by daneos
 	nXPos = ( GetWidth() / ( nTotalButtonCount + 1 ) ) * ( nIndex + 1 ) - ( pComponent->GetWidth() / 2 ); // enabled by daneos
@@ -471,9 +598,16 @@ void CMsgBoxGui::OnClickedOk( gui::CComponent* pComponent )
 			m_Data.pwcText = (const WCHAR*)m_pInput->GetText();
 		}
 
+		if (m_pItemIcon[0]->IsVisible())
+		{
+			m_apflaEffect->Show(false);
+			m_apflaEffect->Enable(false);
+			m_apflaEffect->PlayMovie(false);
+		}
+
 		m_bHide = TRUE;
 		CDboEventGenerator::MsgBoxResult(MBR_OK, m_strStringID.c_str(), &m_Data );
-	}	
+	}
 }
 
 void CMsgBoxGui::OnClickedCancel( gui::CComponent* pComponent )
@@ -541,7 +675,15 @@ VOID CMsgBoxGui::OnMove( RwInt32 iOldX, RwInt32 iOldY )
 	CRectangle rtScreen = m_pThis->GetScreenRect();
 	CRectangle rtRect;
 
-	m_srfBack.SetPosition(rtScreen.left, rtScreen.top);	
+	if (m_pItemIcon[0]->IsVisible())
+	{
+		for (int i = 0; i < dMSG_BOX_SLOTS_MAX; i++)
+		{
+			ItemSlot[i].SetParentPosition(m_pItemIcon[i]->GetScreenRect().left, m_pItemIcon[i]->GetScreenRect().top);
+		}
+	}
+
+	m_srfBack.SetPosition(rtScreen.left, rtScreen.top);
 	CalcPosRate();
 }
 
@@ -551,7 +693,46 @@ VOID CMsgBoxGui::OnPaint(VOID)
 	m_srfBlackPanel.Render();
 }
 
+VOID CMsgBoxGui::OnWaguPaint(VOID)
+{
+	for (int i = 0 ; i < dMSG_BOX_SLOTS_MAX; i++)
+	{
+		ItemSlot[i].Paint();
+	}
+}
+
 VOID CMsgBoxGui::OnSetAlpha( RwUInt8 byAlpha )
 {
 	m_srfBack.SetAlpha( byAlpha );
+}
+
+VOID CMsgBoxGui::OnMouseEnterWaguItem(gui::CComponent* pComponent)
+{
+	for (int i = 0; i < dMSG_BOX_SLOTS_MAX; i++)
+	{
+		if (m_pItemIcon[i] == pComponent)
+		{
+			ShowItemInfoWindow(true, i);
+		}
+	}
+}
+
+VOID CMsgBoxGui::OnMouseLeaveWaguItem(gui::CComponent* pComponent)
+{
+	ShowItemInfoWindow(false, 0);
+}
+
+VOID CMsgBoxGui::ShowItemInfoWindow(RwBool isShow, BYTE i)
+{
+	if (isShow)
+	{
+		CRectangle rect = m_pItemIcon[i]->GetScreenRect();
+
+		GetInfoWndManager()->ShowInfoWindow(TRUE, CInfoWndManager::INFOWND_TABLE_ITEM, rect.left, rect.top, ItemSlot[i].GetItemTable(), DIALOG_HLSHOP);
+	}
+	else
+	{
+		if (GetInfoWndManager()->GetRequestGui() == DIALOG_HLSHOP)
+			GetInfoWndManager()->ShowInfoWindow(FALSE);
+	}
 }

@@ -409,6 +409,11 @@ public:
     bool SendFriend_Black_Add_Req(const WCHAR* pName);        ///< 占쏙옙占쏙옙 占쏙옙占쏙옙트 占쌩곤옙占쏙옙 占쏙옙청占싼댐옙.
     bool SendFriend_Black_Del_Req(RwUInt32 uiTargetID, const WCHAR* pName);       ///< 占쏙옙占쏙옙 占쏙옙占쏙옙트 占쏙옙占쏙옙占쏙옙 占쏙옙청占싼댐옙.
 
+	// HLS Slot Machine (wagu / event)
+	bool SendLoadWaguMachineInfoReq(BYTE Type);
+	bool SendLoadWaguMachineWinnerInfoReq(TBLIDX MachineIndex);
+	bool SendWaguMachineExcute(BYTE Count, TBLIDX MachineIndex);
+
 	// Ranking Board
 	bool SendRankBattle_Rank_List_Req( RwInt32 dwPage, RwInt8 byCompareDay );	// 占쏙옙킹 占쏙옙占쏙옙 占쏙옙占쏙옙트占쏙옙 占쏙옙청占싼댐옙.
 	bool SendRankBattle_Rank_Find_Character_Req( RwInt32 dwPage, RwInt8 byCompareDay, const WCHAR *pCharName );	// 占싯삼옙占쏙옙 캐占쏙옙占싶곤옙 占쌍댐옙 占쏙옙占쏙옙트占쏙옙 占쏙옙청占싼댐옙.

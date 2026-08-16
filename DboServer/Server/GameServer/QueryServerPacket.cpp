@@ -2057,7 +2057,7 @@ void CQueryServerSession::RecvPcDataLoadRes(CNtlPacket * pPacket)
 		return;
 	}
 
-	pOwner->RecvLoadPcDataRes(&req->sPcData, &req->serverChangeInfo, req->bTutorialFlag, &req->sWarFogInfo, &req->sMailBrief, &req->sRankBattleScore, req->TitleIndexFlag, req->wWaguCoins);
+	pOwner->RecvLoadPcDataRes(&req->sPcData, &req->serverChangeInfo, req->bTutorialFlag, &req->sWarFogInfo, &req->sMailBrief, &req->sRankBattleScore, req->TitleIndexFlag, req->wWaguCoins, req->wEventCoins);
 }
 
 void CQueryServerSession::RecvPcItemLoadRes(CNtlPacket * pPacket)

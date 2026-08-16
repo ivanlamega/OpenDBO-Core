@@ -303,6 +303,9 @@ CNtlPacketLockManager::CNtlPacketLockManager(VOID)
 	m_mapLockPacket[GU_CASHITEM_HLSHOP_REFRESH_RES]						= LT_HLSHOP;
 	m_mapLockPacket[GU_CASHITEM_BUY_RES] = LT_HLSHOP;
 	m_mapLockPacket[GU_CASHITEM_SEND_GIFT_RES] = LT_HLSHOP;
+	m_mapLockPacket[TU_HLS_SLOT_MACHINE_INFO_RES] = LT_HLSHOP;
+	m_mapLockPacket[TU_HLS_SLOT_MACHINE_WINNER_INFO_RES] = LT_HLSHOP;
+	m_mapLockPacket[TU_HLS_SLOT_MACHINE_EXTRACT_RES] = LT_HLSHOP;
 	m_mapLockPacket[GU_CASHITEM_MOVE_RES]								= LT_ITEM;
 	m_mapLockPacket[GU_CASHITEM_USE_RES]								= LT_ITEM;
 

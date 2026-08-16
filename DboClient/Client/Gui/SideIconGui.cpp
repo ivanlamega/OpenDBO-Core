@@ -38,6 +38,10 @@
 #include "DojoSideIconGui.h"
 
 #include "HLSSideIconGui.h"
+#include "WaguMachineSideIconGui.h"
+#include "WaguMachineSideViewGui.h"
+#include "EventMachineSideIconGui.h"
+#include "EventMachineSideViewGui.h"
 #include "HLSSideView.h"
 
 #include "SCSSideIconGui.h"
@@ -130,6 +134,10 @@ CSideIconGui::CSideIconGui(const RwChar* pName) : CNtlPLGui(pName), m_pPresentIc
 ,m_pHLSSideViewGui(NULL)
 , m_pNetPySideIconGui(NULL)
 , m_pNetPySideViewGui(NULL)
+, m_pWaguMachineSideIconGui(NULL)
+, m_pWaguMachineSideViewGui(NULL)
+, m_pEventMachineSideIconGui(NULL)
+, m_pEventMachineSideViewGui(NULL)
 {
 	m_nPresentViewType = INVALID_SIDEVIEW;
 	s_pSideIconGui = this;
@@ -205,6 +213,12 @@ RwBool CSideIconGui::Create()
 	RegisterSideIcon(m_pNetPySideIconGui, CNetPySideIconGui, "CNetPySideIconGui", SIDEICON_NETPY);
 	RegisterSideView(m_pNetPySideViewGui, CNetPySideViewGui, "CNetPySideViewGui", SIDEVIEW_NETPY);
 
+	// HLS Slot Machine (wagu / event)
+	RegisterSideIcon(m_pWaguMachineSideIconGui, CWaguMachineSideIconGui, "CWaguMachineSideIconGui", SIDEICON_WAGU);
+	RegisterSideView(m_pWaguMachineSideViewGui, CWaguMachineSideViewGui, "CWaguMachineSideViewGui", SIDEVIEW_WAGU);
+	RegisterSideIcon(m_pEventMachineSideIconGui, CEventMachineSideIconGui, "CEventMachineSideIconGui", SIDEICON_EVENT_WAGU);
+	RegisterSideView(m_pEventMachineSideViewGui, CEventMachineSideViewGui, "CEventMachineSideViewGui", SIDEVIEW_EVENT_WAGU);
+
 	SAvatarInfo* pAvatarInfo = GetNtlSLGlobal()->GetAvatarInfo();
 	if( pAvatarInfo->sCharPf.bIsGameMaster )
 		m_pGMSideIconGui->Show(true);
@@ -260,6 +274,10 @@ void CSideIconGui::Destroy()
 	UnRegisterSideView( m_pHLSSideViewGui, SIDEVIEW_HLS);
 	UnRegisterSideIcon( m_pNetPySideIconGui, SIDEICON_NETPY);
 	UnRegisterSideView( m_pNetPySideViewGui, SIDEVIEW_NETPY);
+	UnRegisterSideIcon( m_pWaguMachineSideIconGui, SIDEICON_WAGU);
+	UnRegisterSideView( m_pWaguMachineSideViewGui, SIDEVIEW_WAGU);
+	UnRegisterSideIcon( m_pEventMachineSideIconGui, SIDEICON_EVENT_WAGU);
+	UnRegisterSideView( m_pEventMachineSideViewGui, SIDEVIEW_EVENT_WAGU);
 
 	if (m_pThis)
 	{
@@ -514,7 +532,7 @@ RwInt32 CSideIconGui::SwitchDialog(bool bOpen)
 
 void CSideIconGui::RocateSideIcon()
 {
-	// 占쏙옙占쏙옙
+	// 5개마다 한 줄씩 새로 배치
 	SortSideIcon();
 
 	RwInt32 iPosX		= s_pSideIconGui->GetPosition().left;
@@ -522,19 +540,27 @@ void CSideIconGui::RocateSideIcon()
 	RwInt32 IMarginW	= dSIDEICON_MARGIN_WIDTH;
 	RwInt32 IMarginH	= dSIDEICON_MARGIN_HEIGHT;
 
+	int i = 0;
+
 	for (SIDEICONVEC::iterator it = m_vecSideIcon.begin(); it != m_vecSideIcon.end(); ++it)
 	{
 		CSideIconBase* pSideIcon = *it;
 
 		if (pSideIcon->IsDisplay())
 		{
-			RwInt32 iTempPosX = iPosX - pSideIcon->GetWidth() - IMarginW;
-			RwInt32 iTempPosY = iPosY - pSideIcon->GetHeight() - IMarginH;
+			RwInt32 iTempPosX;
+			RwInt32 iTempPosY;
 
+			if (i % dSIDEICON_LIMIT_NUM == 0)
+				iPosX = s_pSideIconGui->GetPosition().left;
+			else
+				iPosX = iTempPosX;
+
+			iTempPosX = (iPosX - pSideIcon->GetWidth() - IMarginW);
+			iTempPosY = (iPosY - pSideIcon->GetHeight() - IMarginH) - (i / dSIDEICON_LIMIT_NUM * 45);
 			pSideIcon->SetPosition(iTempPosX, iTempPosY);
-
-			iPosX = iTempPosX;
-		}		
+			i++;
+		}
 	}
 
 	if ( m_pPresentView && m_pPresentIcon )

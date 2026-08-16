@@ -268,6 +268,8 @@ enum EPlace
 	PLACE_SUB_AUCTIONHOUSE_PRICE,
 	PLACE_SUB_AUCTIONHOUSE_ITEM,
 
+	PLACE_WAGU_ITEM_BUNCH,
+
 	PLACE_CCBD_DIALOG,
 
 	PLACE_ZENNY_LAST = PLACE_CCBD_DIALOG,
@@ -367,6 +369,16 @@ struct sMsgDboBindEquipToEquipSlotMove
 	RwUInt32		hNPCHandle;
 };
 
+struct sMsgWaguExcuteRes
+{
+	BYTE			byRanking[10];
+	TBLIDX			ItemTblidx[10];
+	BYTE			byStackCount[10];
+	BYTE			bySetCount[10];
+	BYTE			byReallyExtractCount;
+	RwBool			isWagu;
+};
+
 struct sMsgShopBuyCart
 {
 	BYTE byMerchantTab;
@@ -392,6 +404,7 @@ struct sMsgBoxData
 	union
 	{
 		sMsgDboItemInfo			sItemInfo;
+		sMsgWaguExcuteRes		sWaguInfo;
 
 		sMsgShopBuyCart			sShopBuy;
 

@@ -660,6 +660,8 @@ void PacketHandler_GUSkillTerrorCourseChangeNfy(void* pPacket);             ///<
 
 // RankBattle Score
 void PacketHandler_GUCharRankBattleScore(void* pPacket);				///< 랭크배틀 Score
+void PacketHandler_GUWaguCoinInfo(void* pPacket);
+void PacketHandler_GUEventCoinInfo(void* pPacket);
 
 // 천하제일 무도회
 void PacketHandler_GUMinorMatchStateUpdateNfy(void* pPacket);
@@ -871,6 +873,12 @@ void PacketHandler_TUBudokaiTournamentTeamInfoRes(void* pPacket);
 // Naming
 void PacketHandler_CharNameChangedNfy(void* pPacket);
 void PacketHandler_TUBroadCastRes(void* pPacket);
+
+void PacketHandler_TUWaguMachinesInfo(void* pPacket);
+void PacketHandler_TUWaguMachineWinnerInfo(void* pPacket);
+void PacketHandler_TUWaguMachineExcuteRes(void* pPacket);
+void PacketHandler_TUWaguCoinUpdateInfo(void* pPacket);
+void PacketHandler_TUEventCoinUpdateInfo(void* pPacket);
 void PacketHandler_NickNameChangedNfy(void* pPacket);
 
 // Display message

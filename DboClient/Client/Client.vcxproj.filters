@@ -1151,10 +1151,25 @@
     <ClCompile Include="HLShopGui.cpp">
       <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29</Filter>
     </ClCompile>
+    <ClCompile Include="WaguMachineInfo.cpp">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29</Filter>
+    </ClCompile>
     <ClCompile Include="HLSSideIconGui.cpp">
       <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
     </ClCompile>
     <ClCompile Include="HLSSideView.cpp">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="WaguMachineSideIconGui.cpp">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="WaguMachineSideViewGui.cpp">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="EventMachineSideIconGui.cpp">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="EventMachineSideViewGui.cpp">
       <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
     </ClCompile>
     <ClCompile Include="YardratWarehouseGui.cpp">
@@ -2086,10 +2101,25 @@
     <ClInclude Include="HLShopGui.h">
       <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29</Filter>
     </ClInclude>
+    <ClInclude Include="WaguMachineInfo.h">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29</Filter>
+    </ClInclude>
     <ClInclude Include="HLSSideIconGui.h">
       <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
     </ClInclude>
     <ClInclude Include="HLSSideView.h">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="WaguMachineSideIconGui.h">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="WaguMachineSideViewGui.h">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="EventMachineSideIconGui.h">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="EventMachineSideViewGui.h">
       <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
     </ClInclude>
     <ClInclude Include="YardratWarehouseGui.h">
