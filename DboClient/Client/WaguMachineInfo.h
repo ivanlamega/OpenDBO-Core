@@ -31,7 +31,7 @@ protected:
 
 protected:
 
-	WORD					m_MachineIndex;
+	TBLIDX					m_MachineIndex;
 	TBLIDX					m_CurSlotItemTblidx[10];
 
 	gui::CSlot				m_slogClose;

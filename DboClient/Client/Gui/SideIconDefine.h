@@ -14,6 +14,8 @@ enum eSideIconType
 	SIDEICON_DOJO,						///< 도장 사이드 아이콘
     SIDEICON_NETPY,                     ///< NetPy 사이드 아이콘
 	SIDEICON_HLS,
+	SIDEICON_WAGU,
+	SIDEICON_EVENT_WAGU,
 
 	SIDEICON_NUMS,
 	INVALID_SIDEICON
@@ -35,6 +37,8 @@ enum eSideViewType
 	SIDEVIEW_DOJO,						///< 도장 뷰
     SIDEVIEW_NETPY,                     ///< NetPy 뷰
 	SIDEVIEW_HLS,
+	SIDEVIEW_WAGU,
+	SIDEVIEW_EVENT_WAGU,
 
 	SIDEVIEW_NUMS,
 	INVALID_SIDEVIEW

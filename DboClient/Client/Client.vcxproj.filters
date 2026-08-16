@@ -1160,6 +1160,18 @@
     <ClCompile Include="HLSSideView.cpp">
       <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
     </ClCompile>
+    <ClCompile Include="WaguMachineSideIconGui.cpp">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="WaguMachineSideViewGui.cpp">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="EventMachineSideIconGui.cpp">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="EventMachineSideViewGui.cpp">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClCompile>
     <ClCompile Include="YardratWarehouseGui.cpp">
       <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29</Filter>
     </ClCompile>
@@ -2096,6 +2108,18 @@
       <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
     </ClInclude>
     <ClInclude Include="HLSSideView.h">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="WaguMachineSideIconGui.h">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="WaguMachineSideViewGui.h">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="EventMachineSideIconGui.h">
+      <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="EventMachineSideViewGui.h">
       <Filter>Gui\Component\Game\HLS %28Hoipoi Luxury Shop%29\SideIcon</Filter>
     </ClInclude>
     <ClInclude Include="YardratWarehouseGui.h">

@@ -18,6 +18,7 @@
 #include "DboDef.h"
 #include "SurfaceGui.h"
 #include "Windowby3.h"
+#include "SlotGui.h"
 
 struct SDboEventMsgBoxShow;
 
@@ -29,6 +30,8 @@ struct sMsgBoxCustomBtnData : public sMsgBoxCustomBtn
 
 class CMsgBoxGui : public CNtlPLGui
 {
+	#define dMSG_BOX_SLOTS_MAX		10
+
 public:
 	CMsgBoxGui();
 	CMsgBoxGui( const RwChar* pName );
@@ -78,9 +81,14 @@ private:
 	VOID	OnClickedCancel( gui::CComponent* pComponent );
 	VOID	OnClickedCustomBtn( gui::CComponent* pComponent );
 	VOID	OnPaint(VOID);
+	VOID	OnWaguPaint(VOID);
 	VOID	OnSetAlpha( RwUInt8 byAlpha );
+	VOID	OnMouseEnterWaguItem(gui::CComponent* pComponent);
+	VOID	OnMouseLeaveWaguItem(gui::CComponent* pComponent);
 
 	VOID	OnMove( RwInt32 iOldX, RwInt32 iOldY );
+
+	VOID	ShowItemInfoWindow(RwBool isShow, BYTE i);
 
 	gui::CSlot			m_slotReturn;
 	gui::CSlot			m_slotGotFocus;
@@ -90,12 +98,20 @@ private:
 	gui::CSlot			m_slotPaint;
 	gui::CSlot			m_slotSetAlpha;
 	gui::CSlot			m_slotMove;
+	gui::CSlot			m_slotWaguPaint[dMSG_BOX_SLOTS_MAX];
+	gui::CSlot			slotMouseEnterItem[dMSG_BOX_SLOTS_MAX];
+	gui::CSlot			slotMouseLeaveItem[dMSG_BOX_SLOTS_MAX];
 
 	gui::CButton*		m_pbtnOk;
 	gui::CButton*		m_pbtnCancel;
 	gui::CHtmlBox*		m_phtmDisplay;
 	gui::CStaticBox*	m_pstbTitle;
 	gui::CInputBox*		m_pInput;
+	gui::CPanel*		m_pItemIcon[dMSG_BOX_SLOTS_MAX];
+	gui::CStaticBox*	m_pItemCount[dMSG_BOX_SLOTS_MAX];
+	gui::CFlash*		m_apflaEffect;
+
+	CRegularSlotGui		ItemSlot[dMSG_BOX_SLOTS_MAX];
 
 	CRectangle			m_rtOk;
 	CRectangle			m_rtCancel;

@@ -171,7 +171,8 @@ RwBool CHLShopGui::Create()
 
 
 	m_pWaguFlash = (gui::CFlash*)GetComponent("flsResult");
-	m_slotWaguFlashEnd = m_pWaguFlash->SigMovieEnd().Connect(this, &CHLShopGui::OnWaguFlashEnd);
+	if (m_pWaguFlash)
+		m_slotWaguFlashEnd = m_pWaguFlash->SigMovieEnd().Connect(this, &CHLShopGui::OnWaguFlashEnd);
 
 	//m_pdlgBanner = (gui::CDialog*)GetComponent("dlgBanner");
 	m_slotMove = m_pThis->SigMove().Connect(this, &CHLShopGui::OnMove);
@@ -182,7 +183,7 @@ RwBool CHLShopGui::Create()
 	CreateCategoryButton();
 	CreateItems();
 	CreateWaguItem();
-	SelectCategory(eHLS_CATEGORY_AVATAR);
+	SelectCategory(eHLS_CATEGORY_ALL);
 
 	// Dialog Priority
 	m_pThis->SetPriority(dDIALOGPRIORITY_HLSHOP);
@@ -191,9 +192,11 @@ RwBool CHLShopGui::Create()
 	LinkMsg(g_EventHLShopEventItemBuyRes);
 	LinkMsg(g_EventHLShopEventItemGiftRes);
 	LinkMsg(g_EventDialog);
+	LinkMsg(g_EventHLShopEventSelect);
 	LinkMsg(g_EventWaguMachineInfo);
 	LinkMsg(g_EventHlsCoinUpdateInfo);
 	LinkMsg(g_EventWaguExcuteRes);
+	LinkMsg(g_EventMsgBoxResult);
 
 	Show(false);
 
@@ -209,9 +212,11 @@ void CHLShopGui::Destroy()
 	UnLinkMsg(g_EventHLShopEventItemBuyRes);
 	UnLinkMsg(g_EventHLShopEventItemGiftRes);
 	UnLinkMsg(g_EventDialog);
+	UnLinkMsg(g_EventHLShopEventSelect);
 	UnLinkMsg(g_EventWaguMachineInfo);
 	UnLinkMsg(g_EventHlsCoinUpdateInfo);
 	UnLinkMsg(g_EventWaguExcuteRes);
+	UnLinkMsg(g_EventMsgBoxResult);
 
 	m_vecVisibleProducts.clear();
 	m_vecVisibleProductsWagu.clear();
@@ -287,7 +292,7 @@ void CHLShopGui::Destroy()
 
 void CHLShopGui::Update(RwReal fElapsed)
 {
-	if (m_pWaguFlash->IsPlayMovie())
+	if (m_pWaguFlash && m_pWaguFlash->IsPlayMovie())
 		m_pWaguFlash->Update(fElapsed);
 }
 
@@ -474,6 +479,9 @@ void CHLShopGui::CreateWaguItem()
 	}
 
 	CSlotMachineTable* pWaguMachineTable = API_GetTableContainer()->GetSlotMachineTable();
+	if (!pWaguMachineTable)
+		return;
+
 	for (CTable::TABLEIT it = pWaguMachineTable->Begin(); it != pWaguMachineTable->End(); it++)
 	{
 		sHLS_SLOT_MACHINE_TBLDAT* pWaguItem = (sHLS_SLOT_MACHINE_TBLDAT*)it->second;
@@ -525,20 +533,22 @@ void CHLShopGui::CreateWaguItem()
 		{
 			sHLS_ITEM_TBLDAT* pHlsItem = (sHLS_ITEM_TBLDAT*)pHlsItemTable->FindData(pWaguItem->aItemTblidx[i]);
 
+			// always create the slot so later unconditional loops (OnPaint/OnMove) over
+			// all 10 slots never touch an un-initialized CRegularSlotGui
+			pProduct->ItemSlot[i].Create(pProduct->ppnlItemSlot, DIALOG_HLSHOP, REGULAR_SLOT_ITEM_TABLE, SDS_COUNT);
+			pProduct->ItemSlot[i].SetSize(NTL_ITEM_ICON_SIZE);
+			pProduct->ItemSlot[i].SetPosition_fromParent(0, 0);
+			pProduct->ItemSlot[i].SetParentPosition(pProduct->ppnlItemSlot->GetScreenRect().left, pProduct->ppnlItemSlot->GetScreenRect().top);
+
 			if (pHlsItem)
 			{
-				pProduct->ItemSlot[i].Create(pProduct->ppnlItemSlot, DIALOG_HLSHOP, REGULAR_SLOT_ITEM_TABLE, SDS_COUNT);
-				pProduct->ItemSlot[i].SetSize(NTL_ITEM_ICON_SIZE);
-				pProduct->ItemSlot[i].SetPosition_fromParent(0, 0);
-				pProduct->ItemSlot[i].SetParentPosition(pProduct->ppnlItemSlot->GetScreenRect().left, pProduct->ppnlItemSlot->GetScreenRect().top);
-
 				pProduct->ItemSlot[i].SetIcon(pHlsItem->itemTblidx, 0);
-
 				pProduct->hlsItemCount[i] = pHlsItem->byStackCount;
 			}
 			else
 			{
 				DBO_WARNING_MESSAGE("Wagu Item does not exist " << pWaguItem->aItemTblidx[i]);
+				pProduct->hlsItemCount[i] = 0;
 			}
 		}
 
@@ -622,7 +632,7 @@ void CHLShopGui::CreateWaguItem()
 			std::wstring text = pItemTable->GetText(pProduct->ItemSlot[0].GetItemTable()->Name);
 			pProduct->stbChampionItemName->SetText(text.c_str());
 		}
-		pProduct->stbChampionItemName->SetTextColor(RGB(255, 0, 255), true);
+		pProduct->stbChampionItemName->SetTextColor(RGB(255, 255, 255), true);
 		pProduct->stbChampionItemName->Enable(false);
 
 		// coin cost
@@ -889,6 +899,17 @@ void CHLShopGui::HandleEvents(RWS::CMsg & msg)
 				pPLGui->SetPosition(rect.left - pPLGui->GetWidth() - NTL_LINKED_DIALOG_GAP, rect.top);
 
 				GetDialogManager()->OpenDialog(DIALOG_HLSHOP);
+
+				// If a wagu/event category was selected via the side icon before this
+				// response arrived, SelectCategory() already ran while the dialog was
+				// still hidden and the widgets never rendered. Re-apply it now that the
+				// dialog is actually visible.
+				if (m_nCurrentCategory == eHLS_CATEGORY_WAGU_MACHINE || m_nCurrentCategory == eHLS_CATEGORY_EVENT_MACHINE)
+				{
+					int iPendingCategory = m_nCurrentCategory;
+					m_nCurrentCategory = -1;
+					SelectCategory(iPendingCategory);
+				}
 			}
 			break;
 			case eHLSHOP_EVENT_REFRESH:
@@ -931,6 +952,11 @@ void CHLShopGui::HandleEvents(RWS::CMsg & msg)
 			OnClickedBtnClose(NULL);
 		}
 	}
+	else if (msg.Id == g_EventHLShopEventSelect)
+	{
+		SDboEventHLShopSelectCategory* pData = reinterpret_cast<SDboEventHLShopSelectCategory*>(msg.pData);
+		SelectCategory(pData->Category);
+	}
 	else if (msg.Id == g_EventWaguMachineInfo)
 	{
 		SDboEventWaguMachineInfo* pEvent = (SDboEventWaguMachineInfo*)msg.pData;
@@ -945,6 +971,30 @@ void CHLShopGui::HandleEvents(RWS::CMsg & msg)
 			m_pstbHaveWaguCoin->SetText(Logic_FormatZeni(pData->Coin));
 		else
 			m_pstbHaveEventCoin->SetText(Logic_FormatZeni(pData->Coin));
+	}
+	else if (msg.Id == g_EventMsgBoxResult)
+	{
+		SDboEventMsgBoxResult* pEvent = reinterpret_cast<SDboEventMsgBoxResult*>(msg.pData);
+
+		if (pEvent->strID == "DST_WAGU_EXCUTE_RESULT" || pEvent->strID == "DST_WAGU_EXCUTE_RESULT_MORE_SET")
+		{
+			if (pEvent->eResult == MBR_OK)
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecProductsWagu[i].begin(); it != m_vecProductsWagu[i].end(); it++)
+					{
+						sWAGU_PRODUCTS* pProduct = *it;
+
+						pProduct->btnBunchInfo->ClickEnable(TRUE);
+						pProduct->btnExcute->ClickEnable(TRUE);
+						pProduct->btnNext->ClickEnable(TRUE);
+						pProduct->btnPrev->ClickEnable(TRUE);
+						pProduct->btnWaguInfo->ClickEnable(TRUE);
+					}
+				}
+			}
+		}
 	}
 	else if (msg.Id == g_EventWaguExcuteRes)
 	{
@@ -977,33 +1027,41 @@ void CHLShopGui::HandleEvents(RWS::CMsg & msg)
 			m_WaguInfo.isEventType = true;
 		}
 
-		m_pWaguFlash->Raise();
-		switch (pData->wMachineIndex % 100)
+		if (m_pWaguFlash)
 		{
-			case 1: m_pWaguFlash->Load("Hls_SlotMachine1.swf"); m_pWaguFlash->PlayMovie(TRUE); break;
-			case 2: m_pWaguFlash->Load("Hls_SlotMachine2.swf"); m_pWaguFlash->PlayMovie(TRUE); break;
-			case 3: m_pWaguFlash->Load("Hls_SlotMachine3.swf"); m_pWaguFlash->PlayMovie(TRUE); break;
-			case 4: m_pWaguFlash->Load("Hls_SlotMachine4.swf"); m_pWaguFlash->PlayMovie(TRUE); break;
-		}
-
-		sNtlSoundPlayParameta tSoundParam;
-		tSoundParam.iChannelGroup = CHANNEL_GROUP_UI_SOUND;
-		tSoundParam.pcFileName = GSD_WAGU_DRAW;
-		GetSoundManager()->Play(&tSoundParam);
-
-		// disable all machine buttons until the flash finishes
-		for (int i = 0; i < 2; i++)
-		{
-			for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecProductsWagu[i].begin(); it != m_vecProductsWagu[i].end(); it++)
+			m_pWaguFlash->Raise();
+			switch (pData->wMachineIndex % 100)
 			{
-				sWAGU_PRODUCTS* pProduct = *it;
-
-				pProduct->btnBunchInfo->ClickEnable(FALSE);
-				pProduct->btnExcute->ClickEnable(FALSE);
-				pProduct->btnNext->ClickEnable(FALSE);
-				pProduct->btnPrev->ClickEnable(FALSE);
-				pProduct->btnWaguInfo->ClickEnable(FALSE);
+				case 1: m_pWaguFlash->Load("Hls_SlotMachine1.swf"); m_pWaguFlash->PlayMovie(TRUE); break;
+				case 2: m_pWaguFlash->Load("Hls_SlotMachine2.swf"); m_pWaguFlash->PlayMovie(TRUE); break;
+				case 3: m_pWaguFlash->Load("Hls_SlotMachine3.swf"); m_pWaguFlash->PlayMovie(TRUE); break;
+				case 4: m_pWaguFlash->Load("Hls_SlotMachine4.swf"); m_pWaguFlash->PlayMovie(TRUE); break;
 			}
+
+			sNtlSoundPlayParameta tSoundParam;
+			tSoundParam.iChannelGroup = CHANNEL_GROUP_UI_SOUND;
+			tSoundParam.pcFileName = GSD_WAGU_DRAW;
+			GetSoundManager()->Play(&tSoundParam);
+
+			// disable all machine buttons until the flash finishes
+			for (int i = 0; i < 2; i++)
+			{
+				for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecProductsWagu[i].begin(); it != m_vecProductsWagu[i].end(); it++)
+				{
+					sWAGU_PRODUCTS* pProduct = *it;
+
+					pProduct->btnBunchInfo->ClickEnable(FALSE);
+					pProduct->btnExcute->ClickEnable(FALSE);
+					pProduct->btnNext->ClickEnable(FALSE);
+					pProduct->btnPrev->ClickEnable(FALSE);
+					pProduct->btnWaguInfo->ClickEnable(FALSE);
+				}
+			}
+		}
+		else
+		{
+			// no flash component available - skip straight to showing the result
+			OnWaguFlashEnd(NULL);
 		}
 	}
 }
@@ -1649,7 +1707,22 @@ void CHLShopGui::OnclickedBtnWaguInfo(gui::CComponent* pComponent)
 
 void CHLShopGui::OnClickedBtnBunchInfo(gui::CComponent* pComponent)
 {
-	// full odds/prize table popup — not wired up in this build
+	for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecVisibleProductsWagu.begin(); it != m_vecVisibleProductsWagu.end(); it++)
+	{
+		sWAGU_PRODUCTS* pProduct = *it;
+
+		if (pProduct->btnBunchInfo == pComponent)
+		{
+			int x = pProduct->btnBunchInfo->GetScreenRect().left - 10;
+			int y = pProduct->btnBunchInfo->GetScreenRect().top - 20;
+
+			GetNtlSLGlobal()->GetSobAvatar()->SetWaguInfo(pProduct->CurMachineIndex, pProduct->CurNeedCoin, pProduct->CurMachineType);
+
+			CDboEventGenerator::IconPopupShow(true, GetNtlSLGlobal()->GetSobAvatar()->GetSerialID(), PLACE_WAGU_ITEM_BUNCH, PLACE_NONE, x, y);
+
+			break;
+		}
+	}
 }
 
 void CHLShopGui::OnClickedExcute(gui::CComponent* pComponent)
@@ -1669,7 +1742,8 @@ void CHLShopGui::OnClickedExcute(gui::CComponent* pComponent)
 
 void CHLShopGui::OnWaguFlashEnd(gui::CComponent* pComponent)
 {
-	m_pWaguFlash->PlayMovie(FALSE);
+	if (m_pWaguFlash)
+		m_pWaguFlash->PlayMovie(FALSE);
 
 	CDboEventGenerator::WaguExcuteRes();
 
@@ -1683,33 +1757,59 @@ void CHLShopGui::OnWaguFlashEnd(gui::CComponent* pComponent)
 		GetAlarmManager()->AlarmMessage(Buff, 8);
 	}
 
-	// show what was won
-	CHLSItemTable* pHlsItemTable = API_GetTableContainer()->GetHLSItemTable();
-	CItemTable* pItemTable = API_GetTableContainer()->GetItemTable();
-	bool bHasTop1 = false;
+	// one dialog per item won, each showing that single item centered.
+	// Called directly through MsgBoxShow (bAcceptDuplicate=TRUE) instead of
+	// AlarmMessage/FormattedAlarmMessage, since the latter's "allow duplicate
+	// window" flag is driven by local_msg_type.alm and depends on the client
+	// having repacked lang0.pak — going straight to MsgBoxShow guarantees a
+	// separate window per item regardless of that data file's state.
+	for (int i = 0; i < m_WaguInfo.byReallyExtractCount; i++)
+	{
+		sMsgBoxData data;
+		memset(&data, 0, sizeof(sMsgBoxData));
+		data.sWaguInfo.byRanking[0] = m_WaguInfo.byRanking[i];
+		data.sWaguInfo.ItemTblidx[0] = m_WaguInfo.ItemTblidx[i];
+		data.sWaguInfo.bySetCount[0] = m_WaguInfo.bySetCount[i];
+		data.sWaguInfo.byStackCount[0] = m_WaguInfo.byStackCount[i];
+		data.sWaguInfo.byReallyExtractCount = 1;
+		data.sWaguInfo.isWagu = true;
+
+		const char* pStrKey;
+		WCHAR Buff[256];
+		if (m_WaguInfo.bySetCount[i] > 1)
+		{
+			pStrKey = "DST_WAGU_EXCUTE_RESULT_MORE_SET";
+			swprintf_s(Buff, 256, GetDisplayStringManager()->GetString(pStrKey), m_WaguInfo.byRanking[i], Logic_GetItemName(m_WaguInfo.ItemTblidx[i]), m_WaguInfo.bySetCount[i]);
+		}
+		else
+		{
+			pStrKey = "DST_WAGU_EXCUTE_RESULT";
+			swprintf_s(Buff, 256, GetDisplayStringManager()->GetString(pStrKey), m_WaguInfo.byRanking[i], Logic_GetItemName(m_WaguInfo.ItemTblidx[i]));
+		}
+
+		std::list<sMsgBoxCustomBtn> listCustomBtn;
+		sMsgBoxCustomBtn btnOk;
+		btnOk.bHasButton = TRUE;
+		btnOk.strMessage = "DST_MSG_BTN_OK";
+		listCustomBtn.push_back(btnOk);
+
+		CDboEventGenerator::MsgBoxShow(pStrKey, Buff, TRUE, FALSE, 0.0f, &data, &listCustomBtn, TRUE, FALSE);
+	}
 
 	for (int i = 0; i < m_WaguInfo.byReallyExtractCount; i++)
 	{
-		sITEM_TBLDAT* pItemData = (sITEM_TBLDAT*)pItemTable->FindData(m_WaguInfo.ItemTblidx[i]);
-		if (pItemData)
-		{
-			GetAlarmManager()->FormattedAlarmMessage("DST_NOTIFY_GET_ITEM", FALSE, NULL, m_WaguInfo.byStackCount[i], Logic_GetItemName(m_WaguInfo.ItemTblidx[i]));
-		}
-
 		if (m_WaguInfo.byRanking[i] == 1)
-			bHasTop1 = true;
-	}
-
-	if (bHasTop1)
-	{
-		sNtlSoundPlayParameta tSoundParam;
-		tSoundParam.iChannelGroup = CHANNEL_GROUP_UI_SOUND;
-		tSoundParam.pcFileName = GSD_WAGU_FIRST_PRIZE;
-		GetSoundManager()->Play(&tSoundParam);
+		{
+			sNtlSoundPlayParameta tSoundParam;
+			tSoundParam.iChannelGroup = CHANNEL_GROUP_UI_SOUND;
+			tSoundParam.pcFileName = GSD_WAGU_FIRST_PRIZE;
+			GetSoundManager()->Play(&tSoundParam);
+			break;
+		}
 	}
 }
 
-void CHLShopGui::RefreshWaguInfo(BYTE WaguType, WORD* CurCap, WORD* MaxCap, WORD* MachineIndex)
+void CHLShopGui::RefreshWaguInfo(BYTE WaguType, WORD* CurCap, WORD* MaxCap, TBLIDX* MachineIndex)
 {
 	// hide currently shown wagu machines
 	for (std::vector<sWAGU_PRODUCTS*>::iterator it = m_vecVisibleProductsWagu.begin(); it != m_vecVisibleProductsWagu.end(); it++)

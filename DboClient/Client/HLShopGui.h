@@ -6,6 +6,7 @@
 
 enum eHLS_CATEGORY
 {
+	eHLS_CATEGORY_ALL,
 	eHLS_CATEGORY_AVATAR,
 	eHLS_CATEGORY_CONSUMABLE,
 	eHLS_CATEGORY_VEHICLE,
@@ -24,6 +25,8 @@ enum eHLS_CATEGORY
 
 static bool abIsCategoryActice[eHLS_CATEGORY_NUM] =
 {
+	// eHLS_CATEGORY_ALL
+	true,
 	// eHLS_CATEGORY_AVATAR
 	true,
 	// eHLS_CATEGORY_CONSUMABLE
@@ -43,7 +46,7 @@ static bool abIsCategoryActice[eHLS_CATEGORY_NUM] =
 	// eHLS_CATEGORY_OTHER
 	true,
 	// eHLS_CATEGORY_WAGU_COIN
-	false,
+	true,
 	// eHLS_CATEGORY_WAGU_MACHINE
 	true,
 	// eHLS_CATEGORY_EVENT_MACHINE
@@ -70,7 +73,7 @@ class CHLShopGui : public CNtlPLGui, public RWS::CEventHandler
 		BYTE				Stack[10];
 		BYTE				hlsItemCount[10];
 		BYTE				CurShowItem;
-		WORD				CurMachineIndex;
+		TBLIDX				CurMachineIndex;
 		BYTE				CurMachineType;
 		BYTE				CurNeedCoin;
 		WORD				CurCapNum;
@@ -272,7 +275,7 @@ public:
 
 	void		OnWaguFlashEnd(gui::CComponent* pComponent);
 
-	void		RefreshWaguInfo(BYTE WaguType, WORD* CurCap, WORD* MaxCap, WORD* MachineIndex);
+	void		RefreshWaguInfo(BYTE WaguType, WORD* CurCap, WORD* MaxCap, TBLIDX* MachineIndex);
 
 private:
 

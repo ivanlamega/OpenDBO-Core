@@ -166,7 +166,7 @@ protected:
 	{
 	public:
 		BYTE					m_Count;
-		WORD					m_Index;
+		TBLIDX					m_Index;
 	};
 
 	typedef union
@@ -217,9 +217,9 @@ public:
 	VOID						NetSendMascotDelete();
 
 	// HLS Slot Machine
-	VOID						WaguExcute(BYTE Type, BYTE Count, WORD Index, BYTE NeedCoin);
+	VOID						WaguExcute(BYTE Type, BYTE Count, TBLIDX Index, BYTE NeedCoin);
 	VOID						WaguExcuteRes();
-	VOID						NetSendWaguMachinesExcute(BYTE Count, WORD Index);
+	VOID						NetSendWaguMachinesExcute(BYTE Count, TBLIDX Index);
 
 	//! Event
 	virtual VOID				HandleEvents( RWS::CMsg& msg );

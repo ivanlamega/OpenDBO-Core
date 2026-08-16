@@ -155,7 +155,7 @@ void CWaguMachineInfoGui::HandleEvents(RWS::CMsg& msg)
 
 			m_CurSlotItemTblidx[i] = pItemData->tblidx;
 			WCHAR Buff[256];
-			swprintf_s(Buff, 256, GetDisplayStringManager()->GetString("DST_WAGUWAGU_ITEMRANK"), i + 1, pText->GetText(pItemData->Name));
+			swprintf_s(Buff, 256, GetDisplayStringManager()->GetString("DST_WAGUWAGU_ITEMRANK"), i + 1, pText->GetText(pItemData->Name).c_str());
 			m_stbProductList[i]->SetText(Buff);
 		}
 

@@ -1356,7 +1356,7 @@ VOID CCommercialExtendGui::DeleteMascot(BYTE index)
 	m_NetSendData.DataSendMascot.m_Index = index;
 }
 
-VOID CCommercialExtendGui::WaguExcute(BYTE Type, BYTE Count, WORD Index, BYTE NeedCoin)
+VOID CCommercialExtendGui::WaguExcute(BYTE Type, BYTE Count, TBLIDX Index, BYTE NeedCoin)
 {
 	if (Type == 0)
 	{
@@ -1381,7 +1381,7 @@ VOID CCommercialExtendGui::WaguExcuteRes()
 {
 }
 
-VOID CCommercialExtendGui::NetSendWaguMachinesExcute(BYTE Count, WORD Index)
+VOID CCommercialExtendGui::NetSendWaguMachinesExcute(BYTE Count, TBLIDX Index)
 {
 	GetDboGlobal()->GetChatPacketGenerator()->SendWaguMachineExcute(Count, Index);
 }
