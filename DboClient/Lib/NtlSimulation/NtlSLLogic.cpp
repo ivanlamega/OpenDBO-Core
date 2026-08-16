@@ -741,46 +741,22 @@ DWORD Logic_GetHlsCash(void)
 
 void Logic_SetWaguCoin(DWORD dwCoin)
 {
-	CNtlSobAvatar* pAvatar = GetNtlSLGlobal()->GetSobAvatar();
-	if (!pAvatar)
-		return;
-
-	CNtlSobAvatarAttr* pAvatarAttr = reinterpret_cast<CNtlSobAvatarAttr*>(pAvatar->GetSobAttr());
-
-	pAvatarAttr->m_dwWaguCoin = dwCoin;
+	GetNtlSLGlobal()->GetAvatarInfo()->wWaguCoin = (WORD)dwCoin;
 }
 
 DWORD Logic_GetWaguCoin(void)
 {
-	CNtlSobAvatar* pAvatar = GetNtlSLGlobal()->GetSobAvatar();
-	if (!pAvatar)
-		return 0;
-
-	CNtlSobAvatarAttr* pAvatarAttr = reinterpret_cast<CNtlSobAvatarAttr*>(pAvatar->GetSobAttr());
-
-	return pAvatarAttr->m_dwWaguCoin;
+	return GetNtlSLGlobal()->GetAvatarInfo()->wWaguCoin;
 }
 
 void Logic_SetEventCoin(DWORD dwCoin)
 {
-	CNtlSobAvatar* pAvatar = GetNtlSLGlobal()->GetSobAvatar();
-	if (!pAvatar)
-		return;
-
-	CNtlSobAvatarAttr* pAvatarAttr = reinterpret_cast<CNtlSobAvatarAttr*>(pAvatar->GetSobAttr());
-
-	pAvatarAttr->m_dwEventCoin = dwCoin;
+	GetNtlSLGlobal()->GetAvatarInfo()->wEventCoin = (WORD)dwCoin;
 }
 
 DWORD Logic_GetEventCoin(void)
 {
-	CNtlSobAvatar* pAvatar = GetNtlSLGlobal()->GetSobAvatar();
-	if (!pAvatar)
-		return 0;
-
-	CNtlSobAvatarAttr* pAvatarAttr = reinterpret_cast<CNtlSobAvatarAttr*>(pAvatar->GetSobAttr());
-
-	return pAvatarAttr->m_dwEventCoin;
+	return GetNtlSLGlobal()->GetAvatarInfo()->wEventCoin;
 }
 
 void Logic_SetWaguPoint(DWORD dwPoint)

@@ -70,6 +70,9 @@ typedef struct _SAvatarInfo
 
     sRANKBATTLE_SCORE_INFO sRankBattleScoreInfo;                        // Rank battle achievement info
 
+    RwUInt16            wWaguCoin;                                      // HLS slot machine wagu coin balance
+    RwUInt16            wEventCoin;                                     // HLS slot machine event coin balance
+
     RwUInt8             byDojoBriefCount;
     sDBO_DOJO_BRIEF     sDojoBrief[DBO_MAX_COUNT_DOJO_IN_WORLD];
 

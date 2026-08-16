@@ -74,6 +74,12 @@ class CNtlSob : public RWS::CEventHandler
 {
 protected:
 
+	struct sWAGU_INFO{
+		WORD MachineIndex;
+		BYTE Type;
+		BYTE NeedCoin;
+	};
+
 	RwUInt32 m_uiClassID;					/** class id */
 	RwChar m_strName[MAX_SLCLASS_NAME];		/** class name */	
 	RwUInt32 m_uiFlags;						/** flags */	
@@ -97,6 +103,8 @@ protected:
 	RwReal m_fWeightElapsedTime;			/** 가중치 elapsed time */
 
 	RwBool m_bEventHook;
+
+	sWAGU_INFO m_sWaguInfo;
 
 	// 생성자.
 	CNtlSob(); 
@@ -153,6 +161,9 @@ public:
 
 	void SetSobParent(const CNtlSob *pSobObj);
 	CNtlSob* GetSobParent(void) const;
+
+	void SetWaguInfo(WORD MachineIndex, BYTE NeedCoin, BYTE Type);
+	auto GetWaguInfo(void) const;
 
 	/////////////////////////////////////////////////////
 	// coordinate
@@ -311,6 +322,18 @@ inline void CNtlSob::SetSobParent(const CNtlSob *pSobObj)
 inline CNtlSob* CNtlSob::GetSobParent(void) const
 {
 	return m_pSobParent;
+}
+
+inline auto CNtlSob::GetWaguInfo(void) const
+{
+	return m_sWaguInfo;
+}
+
+inline void CNtlSob::SetWaguInfo(WORD MachineIndex, BYTE NeedCoin, BYTE Type)
+{
+	m_sWaguInfo.MachineIndex = MachineIndex;
+	m_sWaguInfo.NeedCoin = NeedCoin;
+	m_sWaguInfo.Type = Type;
 }
 
 inline CNtlSobAttr* CNtlSob::GetSobAttr(void) const

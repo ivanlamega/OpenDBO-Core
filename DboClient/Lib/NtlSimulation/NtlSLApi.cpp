@@ -252,6 +252,8 @@ RwBool CreateTableContainer(RwUInt8 byLoadMethod)
 	flagManager.Set(CTableContainer::TABLE_HELP);
 	flagManager.Set(CTableContainer::TABLE_GUIDE_HINT);		
 	flagManager.Set(CTableContainer::TABLE_HLS_ITEM);
+	flagManager.Set(CTableContainer::TABLE_HLS_SLOT_MACHINE);
+	flagManager.Set(CTableContainer::TABLE_HLS_SLOT_MACHINE_ITEM);
 	flagManager.Set(CTableContainer::TABLE_ITEM_DISASSEMBLE);
 	flagManager.Set(CTableContainer::TABLE_DRAGONBALL);			
 	flagManager.Set(CTableContainer::TABLE_DRAGONBALL_REWARD);	
@@ -314,6 +316,8 @@ RwBool CreateTableContainer(RwUInt8 byLoadMethod)
 	fileNameList.SetFileName(CTableContainer::TABLE_HELP,					"Table_Help_Data");
 	fileNameList.SetFileName(CTableContainer::TABLE_GUIDE_HINT,				"Table_Guide_Hint_Data");
 	fileNameList.SetFileName(CTableContainer::TABLE_HLS_ITEM,				"table_hls_item_data");
+	fileNameList.SetFileName(CTableContainer::TABLE_HLS_SLOT_MACHINE,		"table_slot_machine_data");
+	fileNameList.SetFileName(CTableContainer::TABLE_HLS_SLOT_MACHINE_ITEM,	"table_slot_machine_item_data");
 	fileNameList.SetFileName(CTableContainer::TABLE_ITEM_DISASSEMBLE,		"table_item_disassemble_data");
 	fileNameList.SetFileName(CTableContainer::TABLE_DRAGONBALL,				"Table_Dragon_Ball_Data");
 	fileNameList.SetFileName(CTableContainer::TABLE_DRAGONBALL_REWARD,		"Table_DB_Reward_Data");
