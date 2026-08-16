@@ -507,6 +507,7 @@ void CPlayerCache::SendPcDataLoadRes()
 	memcpy(&res->sRankBattleScore, &m_sRankBattleScore, sizeof(sRANKBATTLE_SCORE_INFO));
 	memcpy(res->TitleIndexFlag, m_abyTitleIndexFlag, sizeof(m_abyTitleIndexFlag));
 	res->wWaguCoins = (WORD)m_pAccountCache->GetWaguCoin();
+	res->wEventCoins = (WORD)m_pAccountCache->GetEventCoin();
 
 	packet.SetPacketLen(sizeof(sQG_PC_DATA_LOAD_RES));
 	app->Send(GetSession(), &packet);

@@ -161,7 +161,7 @@ bool CSlotMachineTable::LoadFromBinary(CNtlSerializer& serializer, bool bReload,
 		char* wszNameText = Ntl_WC2MB(pTableData->wszNameText);
 		std::string stringName = pTableData->szFile_Name;
 
-	//	printf("%u|%u|%s|%s|%u|%u|%u|%u|%u \n", pTableData->tblidx, pTableData->dwName, wszNameText, stringName.c_str(), pTableData->byCoin, pTableData->byType, pTableData->bOnOff, pTableData->byfirstWinCoin, pTableData->aItemTblidx[0]);
+		printf("[SlotMachineTable] tblidx=%u name=%s byCoin=%u byType=%u bOnOff=%u wfirstWinCoin=%u\n", pTableData->tblidx, wszNameText, pTableData->byCoin, pTableData->byType, pTableData->bOnOff, pTableData->wfirstWinCoin);
 		if( false == AddTable(pTableData, bReload, bUpdate) )
 		{
 			delete pTableData;

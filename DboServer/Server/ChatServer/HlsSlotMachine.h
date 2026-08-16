@@ -31,12 +31,6 @@ struct sHLS_SLOT_WINNER_INFO
 
 struct sSLOT_MACHINE
 {
-	sSLOT_MACHINE()
-	{
-		wMaxCapsule = 800;
-		wCurrentCapsule = 800;
-	}
-
 	sHLS_SLOT_MACHINE_TBLDAT*	pTbldat;
 	WORD						wMaxCapsule;
 	WORD						wCurrentCapsule;
@@ -56,13 +50,17 @@ public:
 
 	void							GetSlotItems(TBLIDX slotIdx, std::vector<sHLS_SLOT_ITEM*>* pVec);
 
+	void							SetWaguItemCount(TBLIDX slotIdx, BYTE Count, TBLIDX tblidx);
+
 	void							AddWinner(TBLIDX slotId, TBLIDX itemTblidx, CPlayer* pPlayer);
 
-	void							GetWinnerInfo(WORD wSlot, CPlayer * pPlayer);
+	void							GetWinnerInfo(TBLIDX wSlot, CPlayer * pPlayer);
 
 	void							LoadSlotMachines(CPlayer* pPlayer, BYTE byType);
 
 	sSLOT_MACHINE*					GetSlotMachine(TBLIDX tblidx);
+
+	void							DebugDumpSlotMachines(TBLIDX requestedIdx);
 
 private:
 
