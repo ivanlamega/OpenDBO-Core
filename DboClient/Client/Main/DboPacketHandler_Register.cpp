@@ -531,6 +531,8 @@ void RegisterPacketHandler(void)
 
 	// RankBattle Score Info
 	CNtlPacketHandler::Register(GU_CHAR_RANKBATTLE_SCORE, PacketHandler_GUCharRankBattleScore);
+	CNtlPacketHandler::Register(GU_WAGUWAGUMACHINE_COIN_INFO, PacketHandler_GUWaguCoinInfo);
+	CNtlPacketHandler::Register(GU_EVENTCOIN_INFO, PacketHandler_GUEventCoinInfo);
 
 	// Portal System
 	CNtlPacketHandler::Register(GU_PORTAL_INFO, PacketHandler_GUPortalInfoRes);
@@ -862,6 +864,8 @@ void UnRegisterPacketHandler(void)
 	CNtlPacketHandler::UnRegister(GU_TUTORIAL_PLAY_QUIT_RES);
 
 	CNtlPacketHandler::UnRegister(GU_GAME_ENTER_RES);
+	CNtlPacketHandler::UnRegister(GU_WAGUWAGUMACHINE_COIN_INFO);
+	CNtlPacketHandler::UnRegister(GU_EVENTCOIN_INFO);
 	CNtlPacketHandler::UnRegister(GU_AVATAR_CHAR_INFO);
 	CNtlPacketHandler::UnRegister(GU_AVATAR_ITEM_INFO);
 	CNtlPacketHandler::UnRegister(GU_AVATAR_SKILL_INFO);

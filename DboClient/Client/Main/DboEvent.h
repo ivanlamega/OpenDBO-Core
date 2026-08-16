@@ -298,6 +298,8 @@ extern RWS::CEventId g_EventHLShopEventItemAddNfy;
 extern RWS::CEventId g_EventHLShopEventItemDelNfy;
 extern RWS::CEventId g_EventHLShopEventItemGiftRes;
 
+extern RWS::CEventId g_EventHLShopEventSelect;
+
 // hls slot machine (wagu / event)
 extern RWS::CEventId g_EventHLShopEventWaguInfo;
 extern RWS::CEventId g_EventWaguMachineInfo;
@@ -1362,6 +1364,11 @@ struct SDboEventHLShopEventItemGiftRes
 	DWORD dwCash;
 };
 
+struct SDboEventHLShopSelectCategory
+{
+	int Category;
+};
+
 struct SDboEventHLShopEventItemMoveRes
 {
 	QWORD qwProductId;
@@ -1407,7 +1414,7 @@ enum eCommercialExtendCommandType
 struct SDboEventWaguExcuteData
 {
 	BYTE Count;
-	WORD MachineIndex;
+	TBLIDX MachineIndex;
 	BYTE Type;
 	BYTE NeedCoin;
 };
@@ -1416,14 +1423,14 @@ struct SDboEventHLShopEventWaguInfo
 {
 	TBLIDX* pData;
 	std::wstring Name;
-	WORD index;
+	TBLIDX index;
 };
 
 struct SDboEventWaguMachineInfo
 {
 	BYTE			byType;
 	BYTE			byMachineCount;
-	WORD			wMachineIndex[4];
+	TBLIDX			wMachineIndex[4];
 	BYTE			byCoin[4];
 	int				bOnOff[4];
 	TBLIDX			ItemTblidx[4][10];
@@ -1434,7 +1441,7 @@ struct SDboEventWaguMachineInfo
 
 struct SDboEventWaguWinnerInfo
 {
-	WORD			wMachineIndex;
+	TBLIDX			wMachineIndex;
 	BYTE			byInfoCount;
 	WCHAR			wszPlayer[3][NTL_MAX_SIZE_CHAR_NAME + 1];
 	WORD			wWinCount[3];

@@ -411,8 +411,8 @@ public:
 
 	// HLS Slot Machine (wagu / event)
 	bool SendLoadWaguMachineInfoReq(BYTE Type);
-	bool SendLoadWaguMachineWinnerInfoReq(WORD MachineIndex);
-	bool SendWaguMachineExcute(BYTE Count, WORD MachineIndex);
+	bool SendLoadWaguMachineWinnerInfoReq(TBLIDX MachineIndex);
+	bool SendWaguMachineExcute(BYTE Count, TBLIDX MachineIndex);
 
 	// Ranking Board
 	bool SendRankBattle_Rank_List_Req( RwInt32 dwPage, RwInt8 byCompareDay );	// 占쏙옙킹 占쏙옙占쏙옙 占쏙옙占쏙옙트占쏙옙 占쏙옙청占싼댐옙.

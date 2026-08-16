@@ -215,6 +215,14 @@ RwBool CDboEventHandler::Create(void)
 	RegisterMsg(g_EventHLShopEventItemAddNfy, "g_EventHLShopEventItemAddNfy", "SDboEventHLShopEventItemAddNfy");
 	RegisterMsg(g_EventHLShopEventItemDelNfy, "g_EventHLShopEventItemDelNfy", "SDboEventHLShopEventItemDelNfy");
 	RegisterMsg(g_EventHLShopEventItemGiftRes, "g_EventHLShopEventItemGiftRes", "SDboEventHLShopEventItemGiftRes");
+	RegisterMsg(g_EventHLShopEventSelect, "g_EventHLShopEventSelect", "SDboEventHLShopSelectCategory");
+
+	// hls slot machine (wagu / event)
+	RegisterMsg(g_EventHLShopEventWaguInfo, "g_EventHLShopEventWaguInfo", "SDboEventHLShopEventWaguInfo");
+	RegisterMsg(g_EventWaguMachineInfo, "g_EventWaguMachineInfo", "SDboEventWaguMachineInfo");
+	RegisterMsg(g_EventHlsCoinUpdateInfo, "g_EventHlsCoinUpdateInfo", "SDboEventHlsCoinUpdate");
+	RegisterMsg(g_EventWaguExcuteRes, "g_EventWaguExcuteRes", "SDboEventWaguExcuteRes");
+	RegisterMsg(g_EventWaguWinnerInfoRes, "g_EventWaguWinnerInfoRes", "SDboEventWaguWinnerInfo");
 
 	// Mascot
 	RegisterMsg(g_EventMascotRegister, "g_EventMascotRegister", "SDboEventMascotRegister");
@@ -421,6 +429,14 @@ void CDboEventHandler::Destroy(void)
 	UnRegisterMsg(g_EventHLShopEventItemAddNfy);
 	UnRegisterMsg(g_EventHLShopEventItemDelNfy);
 	UnRegisterMsg(g_EventHLShopEventItemGiftRes);
+	UnRegisterMsg(g_EventHLShopEventSelect);
+
+	// hls slot machine (wagu / event)
+	UnRegisterMsg(g_EventHLShopEventWaguInfo);
+	UnRegisterMsg(g_EventWaguMachineInfo);
+	UnRegisterMsg(g_EventHlsCoinUpdateInfo);
+	UnRegisterMsg(g_EventWaguExcuteRes);
+	UnRegisterMsg(g_EventWaguWinnerInfoRes);
 
 	// Mascot
 	UnRegisterMsg(g_EventMascotRegister);

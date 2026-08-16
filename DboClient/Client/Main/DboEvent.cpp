@@ -262,6 +262,7 @@ RWS::CEventId g_EventHLShopEventItemAddNfy;
 RWS::CEventId g_EventHLShopEventItemDelNfy;
 RWS::CEventId g_EventHLShopEventItemGiftRes;
 
+RWS::CEventId g_EventHLShopEventSelect;
 RWS::CEventId g_EventHLShopEventWaguInfo;
 RWS::CEventId g_EventWaguMachineInfo;
 RWS::CEventId g_EventHlsCoinUpdateInfo;

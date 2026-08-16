@@ -264,11 +264,12 @@ public:
 	static void HLShopEventItemUseRes(QWORD qwProductId);
 	static void HLShopEventItemAddNfy(sCASHITEM_BRIEF* aInfo);
 	static void HLShopEventItemDelNfy(QWORD qwProductId);
+	static void HLShopSelectCategory(int iCategory);
 
 	// hls slot machine
-	static void HLShopWaguEventInfo(TBLIDX* pData, std::wstring Name, WORD Index);
+	static void HLShopWaguEventInfo(TBLIDX* pData, std::wstring Name, TBLIDX Index);
 	static void WaguMachinesInfo(SDboEventWaguMachineInfo pData);
-	static void WaguMachinesExcute(BYTE Count, WORD MachineIndex, BYTE Type, BYTE NeedCoin);
+	static void WaguMachinesExcute(BYTE Count, TBLIDX MachineIndex, BYTE Type, BYTE NeedCoin);
 	static void WaguExcuteRes();
 	static void WaguMachinesExcuteRes(SDboEventWaguExcuteRes pData);
 	static void WaguWinnerInfoRes(SDboEventWaguWinnerInfo pData);

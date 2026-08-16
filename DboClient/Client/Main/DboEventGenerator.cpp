@@ -1707,7 +1707,15 @@ void CDboEventGenerator::HLShopEventItemGiftRes(DWORD dwRemainingCash)
 	SEND_MSG(g_EventHLShopEventItemGiftRes, &sData);
 }
 
-void CDboEventGenerator::HLShopWaguEventInfo(TBLIDX* pData, std::wstring Name, WORD Index)
+void CDboEventGenerator::HLShopSelectCategory(int iCategory)
+{
+	SDboEventHLShopSelectCategory sData;
+	sData.Category = iCategory;
+
+	SEND_MSG(g_EventHLShopEventSelect, &sData);
+}
+
+void CDboEventGenerator::HLShopWaguEventInfo(TBLIDX* pData, std::wstring Name, TBLIDX Index)
 {
 	SDboEventHLShopEventWaguInfo sData;
 	sData.pData = pData;
@@ -1722,7 +1730,7 @@ void CDboEventGenerator::WaguMachinesInfo(SDboEventWaguMachineInfo pData)
 	SEND_MSG(g_EventWaguMachineInfo, &pData);
 }
 
-void CDboEventGenerator::WaguMachinesExcute(BYTE Count, WORD MachineIndex, BYTE Type, BYTE NeedCoin)
+void CDboEventGenerator::WaguMachinesExcute(BYTE Count, TBLIDX MachineIndex, BYTE Type, BYTE NeedCoin)
 {
 	SDboEventCommercialExtendCommand sData;
 	SDboEventWaguExcuteData sExData;
