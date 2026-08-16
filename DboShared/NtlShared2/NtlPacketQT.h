@@ -500,7 +500,7 @@ WORD			wResultCode;
 CHARACTERID		charId;
 ACCOUNTID		accountId;
 BYTE			byHlsMachineType;
-WORD			wMachineIndex;
+TBLIDX			wMachineIndex;
 WORD			wCoin;
 WORD			waguPoint;
 BYTE			byRanking[DBO_MAX_HLS_SLOT_MACHINES_MAX_ITEMS];

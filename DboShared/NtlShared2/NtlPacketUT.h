@@ -149,25 +149,25 @@ BEGIN_PROTOCOL(UT_GUILD_CHANGE_GUILD_MASTER_REQ)
 	CHARACTERID			targetMemberCharId;
 END_PROTOCOL()
 //------------------------------------------------------------------
-BEGIN_PROTOCOL(UT_FRIEND_ADD_REQ)	// Ä£±¸ Ãß°¡
+BEGIN_PROTOCOL(UT_FRIEND_ADD_REQ)	// Ä£ï¿½ï¿½ ï¿½ß°ï¿½
 	WCHAR				wchName[NTL_MAX_SIZE_CHAR_NAME + 1];	
 END_PROTOCOL()
 //------------------------------------------------------------------
-BEGIN_PROTOCOL(UT_FRIEND_DEL_REQ)	// Ä£±¸ »èÁ¦
+BEGIN_PROTOCOL(UT_FRIEND_DEL_REQ)	// Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	CHARACTERID			targetID;
 	WCHAR				wchName[NTL_MAX_SIZE_CHAR_NAME + 1];//new
 END_PROTOCOL()
 //------------------------------------------------------------------
-BEGIN_PROTOCOL(UT_FRIEND_MOVE_REQ)	// Ä£±¸ -> ºí·¢¸®½ºÆ®·Î ÀÌµ¿
+BEGIN_PROTOCOL(UT_FRIEND_MOVE_REQ)	// Ä£ï¿½ï¿½ -> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ìµï¿½
 	CHARACTERID			targetID;
 	WCHAR				wchName[NTL_MAX_SIZE_CHAR_NAME + 1];//new
 END_PROTOCOL()
 //------------------------------------------------------------------
-BEGIN_PROTOCOL( UT_FRIEND_BLACK_ADD_REQ )	// Ä£±¸ ºí·¢ ¸®½ºÆ® Ãß°¡
+BEGIN_PROTOCOL( UT_FRIEND_BLACK_ADD_REQ )	// Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ß°ï¿½
 	WCHAR				awchName[NTL_MAX_SIZE_CHAR_NAME + 1];	
 END_PROTOCOL()
 //------------------------------------------------------------------
-BEGIN_PROTOCOL( UT_FRIEND_BLACK_DEL_REQ )	// Ä£±¸ ºí·¢ ¸®½ºÆ® »èÁ¦
+BEGIN_PROTOCOL( UT_FRIEND_BLACK_DEL_REQ )	// Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
 	CHARACTERID			targetID;
 	WCHAR				wchName[NTL_MAX_SIZE_CHAR_NAME + 1];//new
 END_PROTOCOL()
@@ -180,7 +180,7 @@ END_PROTOCOL()
 BEGIN_PROTOCOL(UT_RANKBATTLE_RANK_FIND_CHARACTER_REQ)
 	DWORD				dwPage;
 	BYTE				byCompareDay;
-	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// Ã£À» character
+	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// Ã£ï¿½ï¿½ character
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(UT_RANKBATTLE_RANK_COMPARE_DAY_REQ)
@@ -201,7 +201,7 @@ END_PROTOCOL()
 BEGIN_PROTOCOL(UT_TMQ_MEMBER_LIST_REQ)
 	TBLIDX						tmqTblidx;
 	BYTE						byDifficult;
-	BYTE						byRank;		// 0 : Best 1~5: ÇöÀç·©Å·
+	BYTE						byRank;		// 0 : Best 1~5: ï¿½ï¿½ï¿½ç·©Å·
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(UT_BUDOKAI_TOURNAMENT_INDIVIDUAL_LIST_REQ)
@@ -271,11 +271,11 @@ BEGIN_PROTOCOL( UT_PETITION_USER_CANCEL_REQ )
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(UT_DOJO_BUDOKAI_SEED_ADD_REQ)
-	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// µî·ÏÇÒ character
+	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// ï¿½ï¿½ï¿½ï¿½ï¿½ character
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(UT_DOJO_BUDOKAI_SEED_DEL_REQ)	
-	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// »èÁ¦ÇÒ character
+	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ character
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(UT_DOJO_NOTICE_CHANGE_REQ)
@@ -289,12 +289,12 @@ BEGIN_PROTOCOL(UT_HLS_SLOT_MACHINE_INFO_REQ)
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(UT_HLS_SLOT_MACHINE_EXTRACT_REQ)
-	WORD				wMachineIndex;	
+	TBLIDX				wMachineIndex;
 	BYTE				byExtractCount;
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(UT_HLS_SLOT_MACHINE_WINNER_INFO_REQ)
-	WORD				wMachineIndex;
+	TBLIDX				wMachineIndex;
 END_PROTOCOL()
 //------------------------------------------------------------------
 

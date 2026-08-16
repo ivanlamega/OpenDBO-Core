@@ -462,7 +462,7 @@ END_PROTOCOL()
 BEGIN_PROTOCOL(TQ_HLS_SLOT_MACHINE_EXTRACT_REQ)
 ACCOUNTID			accountId;
 CHARACTERID			charId;
-WORD				machineIndex;
+TBLIDX				machineIndex;
 BYTE				byHlsMachineType;
 WORD				wCoin;
 WORD				waguPoint;
