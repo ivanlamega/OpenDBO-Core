@@ -28,16 +28,16 @@ enum eOPCODE_QT
 	QT_GUILD_DISMISS_SECOND_MASTER_RES,
 	QT_GUILD_CHANGE_GUILD_MASTER_RES,
 
-	QT_FRIEND_ADD_RES,		// Ä£ï¿½ï¿½ ï¿½ß°ï¿½
-	QT_FRIEND_DEL_RES,		// Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-	QT_FRIEND_MOVE_RES,		// Ä£ï¿½ï¿½ -> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ìµï¿½
-	QT_FRIEND_LIST_LOAD_RES, // Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Îµï¿½
-	QT_FRIEND_BLACK_ADD_RES,		// Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ß°ï¿½
-	QT_FRIEND_BLACK_DEL_RES,		// Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
+	QT_FRIEND_ADD_RES,		// Ä£±¸ Ãß°¡
+	QT_FRIEND_DEL_RES,		// Ä£±¸ »èÁ¦
+	QT_FRIEND_MOVE_RES,		// Ä£±¸ -> ºí·¢¸®½ºÆ®·Î ÀÌµ¿
+	QT_FRIEND_LIST_LOAD_RES, // Ä£±¸ ¸®½ºÆ® ·Îµå
+	QT_FRIEND_BLACK_ADD_RES,		// Ä£±¸ ºí·¢ ¸®½ºÆ® Ãß°¡
+	QT_FRIEND_BLACK_DEL_RES,		// Ä£±¸ ºí·¢ ¸®½ºÆ® »èÁ¦
 
 	QT_RANKBATTLE_RANK_LIST_RES,
 	QT_RANKBATTLE_RANK_FIND_CHARACTER_RES,
-	QT_RANKBATTLE_RANK_DATA_UPDATE_NFY,		// RankBattleï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ë¸ï¿½
+	QT_RANKBATTLE_RANK_DATA_UPDATE_NFY,		// RankBattleÀÇ ¼øÀ§ Á¤º¸°¡ ¹Ù²î¾úÀ½À» ¾Ë¸²
 
 	QT_GUILD_FUNCTION_ADD_RES,
 	QT_GUILD_GIVE_ZENNY_RES,
@@ -210,9 +210,9 @@ END_PROTOCOL()
 BEGIN_PROTOCOL(QT_RANKBATTLE_RANK_LIST_RES)
 	WORD						wResultCode;
 
-	CHARACTERID					charId;					// -- Ä¿ï¿½Â´ï¿½Æ¼ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
-	BYTE						byCompareDay;			// ï¿½ï¿½ï¿½ï¿½ -- Ä¿ï¿½Â´ï¿½Æ¼ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
-	bool						bIsCompareRankReq;		// CompareRank ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã»ï¿½Î°ï¿½? -- Ä¿ï¿½Â´ï¿½Æ¼ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+	CHARACTERID					charId;					// -- Ä¿¹Â´ÏÆ¼ ¼­¹ö¿¡¼­ »ç¿ë
+	BYTE						byCompareDay;			// ºñ±³ÀÏ -- Ä¿¹Â´ÏÆ¼ ¼­¹ö¿¡¼­ »ç¿ë
+	bool						bIsCompareRankReq;		// CompareRank º¯°æÀ» À§ÇÑ ¿äÃ»ÀÎ°¡? -- Ä¿¹Â´ÏÆ¼ ¼­¹ö¿¡¼­ »ç¿ë
 
 	DWORD						dwPage;
 
@@ -223,10 +223,10 @@ END_PROTOCOL()
 BEGIN_PROTOCOL(QT_RANKBATTLE_RANK_FIND_CHARACTER_RES)
 	WORD						wResultCode;
 
-	CHARACTERID					charId;					// ï¿½ï¿½Ã»ï¿½ï¿½ character -- Ä¿ï¿½Â´ï¿½Æ¼ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
-	BYTE						byCompareDay;			// ï¿½ï¿½ï¿½ï¿½ -- Ä¿ï¿½Â´ï¿½Æ¼ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+	CHARACTERID					charId;					// ¿äÃ»ÇÑ character -- Ä¿¹Â´ÏÆ¼ ¼­¹ö¿¡¼­ »ç¿ë
+	BYTE						byCompareDay;			// ºñ±³ÀÏ -- Ä¿¹Â´ÏÆ¼ ¼­¹ö¿¡¼­ »ç¿ë
 
-	WCHAR						wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// Ã£ï¿½ï¿½ character
+	WCHAR						wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// Ã£Àº character
 
 	DWORD						dwPage;
 
@@ -235,8 +235,8 @@ BEGIN_PROTOCOL(QT_RANKBATTLE_RANK_FIND_CHARACTER_RES)
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(QT_RANKBATTLE_RANK_DATA_UPDATE_NFY)
-	DWORD						dwBeforeRank;			// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Rank
-	DWORD						dwAfterRank;			// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Rank
+	DWORD						dwBeforeRank;			// º¯°æ Àü Rank
+	DWORD						dwAfterRank;			// º¯°æ ÈÄ Rank
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(QT_GUILD_FUNCTION_ADD_RES)
@@ -306,7 +306,7 @@ BEGIN_PROTOCOL( QT_TMQ_RECORD_LIST_RES )
 	TBLIDX						tmqTblidx;
 	BYTE						byDifficult;
 	BYTE						byTeamCount;
-	sTIMEQUEST_TEAM_RANK_DATA	asTeam[DBO_TIMEQUEST_DEFAULT_TOTAL_RANK_COUNT];		// ï¿½ë·® ï¿½ï¿½ï¿½ï¿½
+	sTIMEQUEST_TEAM_RANK_DATA	asTeam[DBO_TIMEQUEST_DEFAULT_TOTAL_RANK_COUNT];		// ¿ë·® ÁÖÀÇ
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL( QT_TMQ_MEMBER_LIST_RES )
@@ -422,14 +422,14 @@ BEGIN_PROTOCOL(QT_DOJO_BUDOKAI_SEED_ADD_RES)
 	WORD						wResultCode;
 	CHARACTERID					charId;
 	TBLIDX						dojoTblidx;
-	WCHAR						wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// ï¿½ï¿½ï¿½ï¿½ï¿½ character
+	WCHAR						wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// µî·ÏÇÒ character
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(QT_DOJO_BUDOKAI_SEED_DEL_RES)	
 	WORD						wResultCode;
 	CHARACTERID					charId;
 	TBLIDX						dojoTblidx;
-	WCHAR						wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ character
+	WCHAR						wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// »èÁ¦ÇÒ character
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL( QT_DOJO_SCRAMBLE_REWARD_RES )			

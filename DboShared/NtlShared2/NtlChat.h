@@ -6,7 +6,7 @@
 #define NTL_SHOUT_MESSAGE_RANGE_IN_METER		(320.0f)
 
 
-// Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È­Ã¢ Å¸ï¿½ï¿½
+// Ä³¸¯ÅÍ ´ëÈ­Ã¢ Å¸ÀÔ
 enum eCHAR_DIALOG_TYPE
 {
 	CHAR_DIALOG_SAY,

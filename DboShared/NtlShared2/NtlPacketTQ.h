@@ -14,24 +14,24 @@ enum eOPCODE_TQ
 
 	TQ_GUILD_CREATE_REQ = TQ_OPCODE_BEGIN,
 	TQ_GUILD_DATA_REQ,
-	TQ_GUILD_DISBAND_REQ,				// ï¿½ï¿½å¸¦ ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
-	TQ_GUILD_DISBAND_CANCEL_REQ,		// ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½ï¿½ï¿½ï¿½Ï±ï¿½
-	TQ_GUILD_DESTROY_REQ,				// ï¿½ï¿½å¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½
+	TQ_GUILD_DISBAND_REQ,				// ±æµå¸¦ ÇØÃ¼ ´ë±â »óÅÂ·Î ¸¸µé±â
+	TQ_GUILD_DISBAND_CANCEL_REQ,		// ±æµå ÇØÃ¼ ´ë±â »óÅÂ¸¦ Ãë¼ÒÇÏ±â
+	TQ_GUILD_DESTROY_REQ,				// ±æµå¸¦ ½ÇÁ¦·Î »èÁ¦ÇÏ±â
 
-	TQ_GUILD_INVITE_REQ,				// ï¿½ï¿½ï¿½ ï¿½Ê´ï¿½
-	TQ_GUILD_LEAVE_REQ,					// ï¿½ï¿½ï¿½ Å»ï¿½ï¿½
-	TQ_GUILD_KICK_OUT_REQ,				// ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å»ï¿½ï¿½
+	TQ_GUILD_INVITE_REQ,				// ±æµå ÃÊ´ë
+	TQ_GUILD_LEAVE_REQ,					// ±æµå Å»Åð
+	TQ_GUILD_KICK_OUT_REQ,				// ±æµå ¸â¹ö °­Á¦ Å»Åð
 
-	TQ_GUILD_APPOINT_SECOND_MASTER_REQ,		// ï¿½ï¿½ï¿½ Second Master ï¿½Ó¸ï¿½
-	TQ_GUILD_DISMISS_SECOND_MASTER_REQ,		// ï¿½ï¿½ï¿½ Second Master ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-	TQ_GUILD_CHANGE_GUILD_MASTER_REQ,		// ï¿½ï¿½ï¿½ Masterï¿½ï¿½ ï¿½Ì¾ï¿½
+	TQ_GUILD_APPOINT_SECOND_MASTER_REQ,		// ±æµå Second Master ÀÓ¸í
+	TQ_GUILD_DISMISS_SECOND_MASTER_REQ,		// ±æµå Second Master Á÷À§ ÇØÁ¦
+	TQ_GUILD_CHANGE_GUILD_MASTER_REQ,		// ±æµå MasterÀÇ ÀÌ¾ç
 
-	TQ_FRIEND_ADD_REQ,			// Ä£ï¿½ï¿½ ï¿½ß°ï¿½
-	TQ_FRIEND_DEL_REQ,			// Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-	TQ_FRIEND_MOVE_REQ,			// Ä£ï¿½ï¿½ -> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ìµï¿½
-	TQ_FRIEND_LIST_LOAD_REQ,	// Ä£ï¿½ï¿½ ï¿½Îµï¿½
-	TQ_FRIEND_BLACK_ADD_REQ,		// Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ß°ï¿½
-	TQ_FRIEND_BLACK_DEL_REQ,		// Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
+	TQ_FRIEND_ADD_REQ,			// Ä£±¸ Ãß°¡
+	TQ_FRIEND_DEL_REQ,			// Ä£±¸ »èÁ¦
+	TQ_FRIEND_MOVE_REQ,			// Ä£±¸ -> ºí·¢¸®½ºÆ®·Î ÀÌµ¿
+	TQ_FRIEND_LIST_LOAD_REQ,	// Ä£±¸ ·Îµå
+	TQ_FRIEND_BLACK_ADD_REQ,		// Ä£±¸ ºí·¢ ¸®½ºÆ® Ãß°¡
+	TQ_FRIEND_BLACK_DEL_REQ,		// Ä£±¸ ºí·¢ ¸®½ºÆ® »èÁ¦
 
 	TQ_RANKBATTLE_RANK_LIST_REQ,			//
 	TQ_RANKBATTLE_RANK_FIND_CHARACTER_REQ,	//
@@ -102,7 +102,7 @@ BEGIN_PROTOCOL(TQ_GUILD_CREATE_REQ)
 	// 'memberCharId[0]' is a leader's CHARACTERID.
 	BYTE				byMemberCount;
 	CHARACTERID			memberCharId[NTL_MAX_MEMBER_IN_PARTY];
-	DWORD				dwMaxGuildPointEver;		// ï¿½ï¿½Æ¼ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ + ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	DWORD				dwMaxGuildPointEver;		// ÆÄÆ¼¿øÀÇ ¸í¼ºÄ¡ ÇÕ + ±æµå¸í¼º
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(TQ_GUILD_DATA_REQ)
@@ -153,55 +153,55 @@ BEGIN_PROTOCOL(TQ_GUILD_CHANGE_GUILD_MASTER_REQ)
 	CHARACTERID			targetMemberCharId;
 END_PROTOCOL()
 //------------------------------------------------------------------
-BEGIN_PROTOCOL(TQ_FRIEND_ADD_REQ)	// Ä£ï¿½ï¿½ ï¿½ß°ï¿½
+BEGIN_PROTOCOL(TQ_FRIEND_ADD_REQ)	// Ä£±¸ Ãß°¡
 	CHARACTERID			charID;
 	ACCOUNTID			accountID;
 	WCHAR				wchName[NTL_MAX_SIZE_CHAR_NAME + 1];
 END_PROTOCOL()
 //------------------------------------------------------------------
-BEGIN_PROTOCOL(TQ_FRIEND_DEL_REQ)	// Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+BEGIN_PROTOCOL(TQ_FRIEND_DEL_REQ)	// Ä£±¸ »èÁ¦
 	CHARACTERID			charID;
 	CHARACTERID			targetID;
 	ACCOUNTID			accountID;
 	WCHAR				wchFriendName[NTL_MAX_SIZE_CHAR_NAME + 1];
 END_PROTOCOL()
 //------------------------------------------------------------------
-BEGIN_PROTOCOL(TQ_FRIEND_MOVE_REQ)	// Ä£ï¿½ï¿½ -> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ìµï¿½
+BEGIN_PROTOCOL(TQ_FRIEND_MOVE_REQ)	// Ä£±¸ -> ºí·¢¸®½ºÆ®·Î ÀÌµ¿
 	CHARACTERID			charID;
 	CHARACTERID			targetID;
 	ACCOUNTID			accountID;
 END_PROTOCOL()
 //------------------------------------------------------------------
-BEGIN_PROTOCOL(TQ_FRIEND_LIST_LOAD_REQ)	// Ä£ï¿½ï¿½ ï¿½Îµï¿½
+BEGIN_PROTOCOL(TQ_FRIEND_LIST_LOAD_REQ)	// Ä£±¸ ·Îµù
 	ACCOUNTID			accountID;
 	CHARACTERID			charID;
 END_PROTOCOL()
 //------------------------------------------------------------------
-BEGIN_PROTOCOL(TQ_FRIEND_BLACK_ADD_REQ)	// Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ß°ï¿½
+BEGIN_PROTOCOL(TQ_FRIEND_BLACK_ADD_REQ)	// Ä£±¸ ºí·¢ ¸®½ºÆ® Ãß°¡
 	CHARACTERID			charID;
 	ACCOUNTID			accountID;
 	WCHAR				wchName[NTL_MAX_SIZE_CHAR_NAME + 1];	
 END_PROTOCOL()
 //------------------------------------------------------------------
-BEGIN_PROTOCOL(TQ_FRIEND_BLACK_DEL_REQ)	// Ä£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
+BEGIN_PROTOCOL(TQ_FRIEND_BLACK_DEL_REQ)	// Ä£±¸ ºí·¢ ¸®½ºÆ® »èÁ¦
 	CHARACTERID			charID;
 	CHARACTERID			targetID;
 	ACCOUNTID			accountID;
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(TQ_RANKBATTLE_RANK_LIST_REQ)
-	CHARACTERID			charId;					// -- Ä¿ï¿½Â´ï¿½Æ¼ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
-	BYTE				byCompareDay;			// ï¿½ï¿½ï¿½ï¿½ -- Ä¿ï¿½Â´ï¿½Æ¼ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
-	bool				bIsCompareRankReq;		// CompareRank ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã»ï¿½Î°ï¿½? -- Ä¿ï¿½Â´ï¿½Æ¼ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+	CHARACTERID			charId;					// -- Ä¿¹Â´ÏÆ¼ ¼­¹ö¿¡¼­ »ç¿ë
+	BYTE				byCompareDay;			// ºñ±³ÀÏ -- Ä¿¹Â´ÏÆ¼ ¼­¹ö¿¡¼­ »ç¿ë
+	bool				bIsCompareRankReq;		// CompareRank º¯°æÀ» À§ÇÑ ¿äÃ»ÀÎ°¡? -- Ä¿¹Â´ÏÆ¼ ¼­¹ö¿¡¼­ »ç¿ë
 
 	DWORD				dwPage;
 END_PROTOCOL()
 //------------------------------------------------------------------
-BEGIN_PROTOCOL(TQ_RANKBATTLE_RANK_FIND_CHARACTER_REQ)	// Ä£ï¿½ï¿½ ï¿½Îµï¿½
-	CHARACTERID			charId;										// ï¿½ï¿½Ã»ï¿½ï¿½ character	-- Ä¿ï¿½Â´ï¿½Æ¼ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
-	BYTE				byCompareDay;								// ï¿½ï¿½ï¿½ï¿½ -- Ä¿ï¿½Â´ï¿½Æ¼ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+BEGIN_PROTOCOL(TQ_RANKBATTLE_RANK_FIND_CHARACTER_REQ)	// Ä£±¸ ·Îµù
+	CHARACTERID			charId;										// ¿äÃ»ÇÑ character	-- Ä¿¹Â´ÏÆ¼ ¼­¹ö¿¡¼­ »ç¿ë
+	BYTE				byCompareDay;								// ºñ±³ÀÏ -- Ä¿¹Â´ÏÆ¼ ¼­¹ö¿¡¼­ »ç¿ë
 
-	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// Ã£ï¿½ï¿½ character
+	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// Ã£À» character
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(TQ_GUILD_FUNCTION_ADD_REQ)
@@ -351,7 +351,7 @@ END_PROTOCOL()
 BEGIN_PROTOCOL(TQ_DOJO_SCRAMBLE_REQ)
 	BYTE				byServerChannelIndex;
 	BYTE				byServerIndex;
-	GUILDID				guildId;			// ï¿½ï¿½Ã»ï¿½ï¿½ï¿½
+	GUILDID				guildId;			// ½ÅÃ»±æµå
 	CHARACTERID			charId;
 	TBLIDX				dojoTblidx;		
 	DWORD				dwReqZenny;
@@ -360,7 +360,7 @@ END_PROTOCOL()
 BEGIN_PROTOCOL(TQ_DOJO_SCRAMBLE_REJECT_REQ)
 	BYTE				byServerChannelIndex;
 	BYTE				byServerIndex;
-	GUILDID				guildId;			// ï¿½ï¿½Ã»ï¿½ï¿½ï¿½
+	GUILDID				guildId;			// ½ÅÃ»±æµå
 	TBLIDX				dojoTblidx;		
 	DWORD				dwReqZenny;
 	CHARACTERID			leader;
@@ -373,13 +373,13 @@ END_PROTOCOL()
 BEGIN_PROTOCOL(TQ_DOJO_BUDOKAI_SEED_ADD_REQ)
 	CHARACTERID			charId;
 	TBLIDX				dojoTblidx;
-	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// ï¿½ï¿½ï¿½ï¿½ï¿½ character
+	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// µî·ÏÇÒ character
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(TQ_DOJO_BUDOKAI_SEED_DEL_REQ)	
 	CHARACTERID			charId;
 	TBLIDX				dojoTblidx;
-	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ character
+	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// »èÁ¦ÇÒ character
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL( TQ_DOJO_SCRAMBLE_REWARD_REQ )				

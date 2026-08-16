@@ -419,7 +419,7 @@ BEGIN_PROTOCOL(TU_RANKBATTLE_RANK_COMPARE_DAY_RES)
 	WORD						wResultCode;
 	DWORD						dwPage;
 	BYTE						byCompareDay;
-	bool						bIsFullList;	// true = wRankInfo ï¿½ï¿½ï¿½ï¿½ | false = wCompareInfo ï¿½ï¿½ï¿½ï¿½
+	bool						bIsFullList;	// true = wRankInfo ÂüÁ¶ | false = wCompareInfo ÂüÁ¶
 	BYTE						byInfoCount;
 	union
 	{
@@ -460,7 +460,7 @@ BEGIN_PROTOCOL( TU_TMQ_RECORD_LIST_RES )
 	TBLIDX						tmqTblidx;
 	BYTE						byDifficult;
 	BYTE						byTeamCount;
-	sTIMEQUEST_TEAM_RANK_DATA	asTeam[DBO_TIMEQUEST_DEFAULT_TOTAL_RANK_COUNT];		// ï¿½ë·® ï¿½ï¿½ï¿½ï¿½
+	sTIMEQUEST_TEAM_RANK_DATA	asTeam[DBO_TIMEQUEST_DEFAULT_TOTAL_RANK_COUNT];		// ¿ë·® ÁÖÀÇ
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL( TU_TMQ_MEMBER_LIST_RES )
@@ -476,10 +476,10 @@ BEGIN_PROTOCOL(TU_BUDOKAI_NOTICE_NFY)
 
 	union
 	{
-		// byNoticeType == BUDOKAI_NOTICE_SYSTEM ï¿½ï¿½ï¿½
+		// byNoticeType == BUDOKAI_NOTICE_SYSTEM »ç¿ë
 		TBLIDX		tblidxNotice;		
 
-		// byNoticeType == BUDOKAI_NOTICE_GM ï¿½ï¿½ï¿½
+		// byNoticeType == BUDOKAI_NOTICE_GM »ç¿ë
 		struct sGM_NOTICE
 		{
 			BYTE		byNoticeLength;
@@ -582,12 +582,12 @@ END_PROTOCOL()
 BEGIN_PROTOCOL(TU_DOJO_BUDOKAI_SEED_ADD_RES)
 	WORD				wResultCode;
 	TBLIDX				dojoTblidx;
-	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// ï¿½ï¿½ï¿½ï¿½ï¿½ character
+	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// µî·ÏÇÒ character
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(TU_DOJO_BUDOKAI_SEED_DEL_RES)	
 	WORD				wResultCode;
-	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ character
+	WCHAR				wszCharName[NTL_MAX_SIZE_CHAR_NAME + 1];// »èÁ¦ÇÒ character
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL( TU_DOJO_SCRAMBLE_POINT_NFY )
