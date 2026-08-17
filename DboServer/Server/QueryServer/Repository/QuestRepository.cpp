@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "QuestRepository.h"
-#include "QueryServer.h"
+#include "../QueryServer.h"
 
 
 void CQuestRepository::DeleteQuestItems(CHARACTERID charId)

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "QuickSlotRepository.h"
-#include "QueryServer.h"
+#include "../QueryServer.h"
 
 
 void CQuickSlotRepository::DeleteQuickSlots(CHARACTERID charId)

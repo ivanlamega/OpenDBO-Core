@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "SkillRepository.h"
-#include "QueryServer.h"
+#include "../QueryServer.h"
 
 
 void CSkillRepository::InsertSkill(DWORD skillId, CHARACTERID ownerId, int slotId)

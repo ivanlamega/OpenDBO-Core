@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "MascotRepository.h"
-#include "QueryServer.h"
+#include "../QueryServer.h"
 
 
 void CMascotRepository::DeleteMascots(CHARACTERID charId)

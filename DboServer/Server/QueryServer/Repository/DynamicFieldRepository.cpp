@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "DynamicFieldRepository.h"
-#include "QueryServer.h"
+#include "../QueryServer.h"
 
 
 smart_ptr<QueryResult> CDynamicFieldRepository::GetCount()

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "CharacterRepository.h"
-#include "QueryServer.h"
-#include "PlayerCache.h"
-#include "GameServerSession.h"
+#include "../QueryServer.h"
+#include "../PlayerCache.h"
+#include "../GameServerSession.h"
 
 
 smart_ptr<QueryResult> CCharacterRepository::GetMaxCharId()

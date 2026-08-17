@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MailRepository.h"
-#include "QueryServer.h"
-#include "PlayerCache.h"
+#include "../QueryServer.h"
+#include "../PlayerCache.h"
 
 
 void CMailRepository::DeleteMailByChar(CHARACTERID charId)

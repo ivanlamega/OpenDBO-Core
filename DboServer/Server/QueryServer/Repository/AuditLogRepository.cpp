@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "AuditLogRepository.h"
-#include "QueryServer.h"
+#include "../QueryServer.h"
 
 
 void CAuditLogRepository::InsertCharacterDeleteLog(ACCOUNTID accountId, CHARACTERID charId)

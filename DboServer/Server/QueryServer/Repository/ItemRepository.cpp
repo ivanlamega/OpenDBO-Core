@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ItemRepository.h"
-#include "QueryServer.h"
-#include "PlayerCache.h"
+#include "../QueryServer.h"
+#include "../PlayerCache.h"
 
 
 smart_ptr<QueryResult> CItemRepository::GetMaxId()

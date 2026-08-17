@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "RecipeRepository.h"
-#include "QueryServer.h"
+#include "../QueryServer.h"
 
 
 void CRecipeRepository::DeleteRecipes(CHARACTERID charId)

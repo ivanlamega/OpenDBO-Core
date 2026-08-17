@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FriendRepository.h"
-#include "QueryServer.h"
+#include "../QueryServer.h"
 
 
 void CFriendRepository::DeleteFriendList(CHARACTERID charId)

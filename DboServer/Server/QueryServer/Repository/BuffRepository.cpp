@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "BuffRepository.h"
-#include "QueryServer.h"
+#include "../QueryServer.h"
 
 
 void CBuffRepository::DeleteBuffs(CHARACTERID charId)

@@ -2,6 +2,7 @@
 
 #include "NtlSingleton.h"
 #include "DatabaseEnv.h"
+#include "NtlSharedType.h"
 
 class CSkillRepository : public CNtlSingleton<CSkillRepository>
 {

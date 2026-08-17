@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "AuctionHouseRepository.h"
-#include "QueryServer.h"
+#include "../QueryServer.h"
 
 
 smart_ptr<QueryResult> CAuctionHouseRepository::LoadAuctionHouse()

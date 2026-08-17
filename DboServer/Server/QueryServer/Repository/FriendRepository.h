@@ -2,6 +2,7 @@
 
 #include "NtlSingleton.h"
 #include "DatabaseEnv.h"
+#include "NtlSharedType.h"
 
 class CFriendRepository : public CNtlSingleton<CFriendRepository>
 {

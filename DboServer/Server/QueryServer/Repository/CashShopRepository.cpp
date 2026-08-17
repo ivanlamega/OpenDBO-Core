@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "CashShopRepository.h"
-#include "QueryServer.h"
+#include "../QueryServer.h"
 
 
 smart_ptr<QueryResult> CCashShopRepository::GetMaxProductId()

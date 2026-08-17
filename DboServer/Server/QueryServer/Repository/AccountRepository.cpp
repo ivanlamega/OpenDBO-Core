@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "AccountRepository.h"
-#include "QueryServer.h"
-#include "PlayerCache.h"
+#include "../QueryServer.h"
+#include "../PlayerCache.h"
 #include "NtlPacketQG.h"
-#include "GameServerSession.h"
+#include "../GameServerSession.h"
 
 
 void CAccountRepository::LoadAccountDataAsync(CAccountCache* pAccount, ACCOUNTID accountId)
