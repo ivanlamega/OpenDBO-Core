@@ -2036,6 +2036,7 @@ BEGIN_PROTOCOL(QG_PC_DATA_LOAD_RES)
 	sRANKBATTLE_SCORE_INFO		sRankBattleScore;
 	BYTE						TitleIndexFlag[NTL_MAX_CHAR_TITLE_COUNT_IN_FLAG];
 	WORD						wWaguCoins;
+	WORD						wEventCoins;
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(QG_PC_ITEM_LOAD_RES)
