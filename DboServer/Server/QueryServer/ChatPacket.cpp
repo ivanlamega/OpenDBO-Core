@@ -11,6 +11,15 @@
 #include "Utils.h"
 #include "CashshopManager.h"
 #include "ItemManager.h"
+#include "Repository/GuildRepository.h"
+#include "Repository/DojoRepository.h"
+#include "Repository/CharacterRepository.h"
+#include "Repository/ItemRepository.h"
+#include "Repository/AuctionHouseRepository.h"
+#include "Repository/MailRepository.h"
+#include "Repository/AuditLogRepository.h"
+#include "Repository/CashShopRepository.h"
+#include "Repository/AccountRepository.h"
 
 
 
@@ -38,7 +47,7 @@ void CChatServerSession::RecvGuildCreateReq(CNtlPacket * pPacket, CQueryServer *
 			memcpy(&res->guildData, pGuildData, sizeof(sDBO_GUILD_DATA));
 
 			pCache->SetZeni(pCache->GetZeni() - req->dwRequiredZenny);
-			GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->memberCharId[0]);
+			g_pCharacterRepository->UpdateMoney(req->memberCharId[0], pCache->GetZeni());
 
 			//add guild members
 			for (BYTE i = 0; i < req->byMemberCount; i++)
@@ -103,7 +112,7 @@ void CChatServerSession::RecvGuildDisbandReq(CNtlPacket * pPacket, CQueryServer 
 		delete pGuildData;
 
 		if (g_pDojo->DeleteDojo(req->guildId))
-			GetCharDB.Execute("DELETE FROM dojos WHERE GuildId=%u", req->guildId);
+			g_pDojoRepository->DeleteByGuildId(req->guildId);
 	}
 	else res->wResultCode = QUERY_FAIL;
 
@@ -187,7 +196,7 @@ void CChatServerSession::RecvGuildLeaveReq(CNtlPacket * pPacket, CQueryServer * 
 							if (i > 0)
 								rowName.Format("GuildSecondMaster%i", i + 1);
 
-							GetCharDB.Execute("UPDATE guilds SET %s=%u WHERE GuildID=%u", rowName.c_str(), INVALID_CHARACTERID, pCache->GetGuildID());
+							g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), INVALID_CHARACTERID, pCache->GetGuildID());
 
 							break;
 						}
@@ -239,7 +248,7 @@ void CChatServerSession::RecvGuildKickOutReq(CNtlPacket * pPacket, CQueryServer 
 							if (i > 0)
 								rowName.Format("GuildSecondMaster%i", i + 1);
 
-							GetCharDB.Execute("UPDATE guilds SET %s=%u WHERE GuildID=%u", rowName.c_str(), INVALID_CHARACTERID, pCache->GetGuildID());
+							g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), INVALID_CHARACTERID, pCache->GetGuildID());
 
 							break;
 						}
@@ -255,7 +264,7 @@ void CChatServerSession::RecvGuildKickOutReq(CNtlPacket * pPacket, CQueryServer 
 	}
 	else
 	{
-		if (smart_ptr<QueryResult> result = GetCharDB.Query("SELECT GuildID FROM characters WHERE CharID=%u", req->kickedOutMemberCharId))
+		if (smart_ptr<QueryResult> result = g_pCharacterRepository->GetGuildIdByCharId(req->kickedOutMemberCharId))
 		{
 			Field* f = result->Fetch();
 
@@ -278,7 +287,7 @@ void CChatServerSession::RecvGuildKickOutReq(CNtlPacket * pPacket, CQueryServer 
 								if (i > 0)
 									rowName.Format("GuildSecondMaster%i", i + 1);
 
-								GetCharDB.Execute("UPDATE guilds SET %s=%u WHERE GuildID=%u", rowName.c_str(), INVALID_CHARACTERID, req->guildId);
+								g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), INVALID_CHARACTERID, req->guildId);
 
 								break;
 							}
@@ -321,7 +330,7 @@ void CChatServerSession::RecvGuildAppointSecondMasterReq(CNtlPacket * pPacket, C
 				if (secondMasterSpot > 0)
 					rowName.Format("GuildSecondMaster%i", secondMasterSpot + 1);
 
-				GetCharDB.Execute("UPDATE guilds SET %s=%u WHERE GuildID=%u", rowName.c_str(), req->targetMemberCharId, req->guildId);
+				g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), req->targetMemberCharId, req->guildId);
 
 				res->wResultCode = CHAT_SUCCESS;
 				break;
@@ -358,7 +367,7 @@ void CChatServerSession::RecvGuildDismissSecondMasterReq(CNtlPacket * pPacket, C
 				if (secondMasterSpot > 0)
 					rowName.Format("GuildSecondMaster%i", secondMasterSpot + 1);
 
-				GetCharDB.Execute("UPDATE guilds SET %s=%u WHERE GuildID=%u", rowName.c_str(), INVALID_CHARACTERID, req->guildId);
+				g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), INVALID_CHARACTERID, req->guildId);
 
 				res->wResultCode = CHAT_SUCCESS;
 				break;
@@ -386,7 +395,7 @@ void CChatServerSession::RecvGuildChangeGuildMasterReq(CNtlPacket * pPacket, CQu
 	if (sDBO_GUILD_DATA* pGuildData = g_pGuild->GetGuildData(req->guildId))
 	{
 		pGuildData->guildMaster = req->targetMemberCharId;
-		GetCharDB.Execute("UPDATE guilds SET GuildMaster=%u WHERE GuildID=%u", req->targetMemberCharId, req->guildId);
+		g_pGuildRepository->UpdateGuildMaster(req->targetMemberCharId, req->guildId);
 	}
 	else res->wResultCode = QUERY_FAIL;
 
@@ -422,12 +431,12 @@ void CChatServerSession::RecvGuildFunctionAddReq(CNtlPacket * pPacket, CQuerySer
 				pGuildData->dwGuildReputation = UnsignedSafeDecrease<DWORD>(pGuildData->dwGuildReputation, Dbo_GetGuildFunctionInfo(static_cast<eDBO_GUILD_FUNCTION>(req->byFunction))->dwRequiredPoint);
 				pGuildData->qwGuildFunctionFlag = req->qwGuildFunctionFlag;
 
-				GetCharDB.Execute("UPDATE guilds SET GuildReputation=%u, FunctionFlag=%I64u WHERE GuildID=%u", pGuildData->dwGuildReputation, pGuildData->qwGuildFunctionFlag, req->guildId);
+				g_pGuildRepository->UpdateReputationAndFunctionFlag(pGuildData->dwGuildReputation, pGuildData->qwGuildFunctionFlag, req->guildId);
 
 				if (req->dwZenny > 0)
 				{
 					pCache->SetZeni(pCache->GetZeni() - req->dwZenny);
-					GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->masterCharId);
+					g_pCharacterRepository->UpdateMoney(req->masterCharId, pCache->GetZeni());
 				}
 			}
 			else res->wResultCode = QUERY_FAIL;
@@ -463,12 +472,12 @@ void CChatServerSession::RecvGuildGiveZeniReq(CNtlPacket * pPacket, CQueryServer
 			if (sDBO_GUILD_DATA* pGuild = g_pGuild->GetGuildData(req->guildId))
 			{
 				pCache->SetZeni(pCache->GetZeni() - req->dwZenny);
-				GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charId);
+				g_pCharacterRepository->UpdateMoney(req->charId, pCache->GetZeni());
 
 				pGuild->dwGuildReputation = UnsignedSafeIncrease<DWORD>(pGuild->dwGuildReputation, res->dwAddReputaion);
 				pGuild->dwMaxGuildPointEver = UnsignedSafeIncrease<DWORD>(pGuild->dwMaxGuildPointEver, res->dwAddReputaion);
 
-				GetCharDB.Execute("UPDATE guilds SET GuildReputation=%u, GuildPointEver=%u WHERE GuildID=%u", pGuild->dwGuildReputation, pGuild->dwMaxGuildPointEver, req->guildId);
+				g_pGuildRepository->UpdateReputationAndPointEver(pGuild->dwGuildReputation, pGuild->dwMaxGuildPointEver, req->guildId);
 			}
 			else res->wResultCode = QUERY_FAIL;
 		}
@@ -502,7 +511,7 @@ void CChatServerSession::RecvGuildChangeNoticeReq(CNtlPacket * pPacket, CQuerySe
 
 		char* message = Ntl_WC2MB(req->awchNotice);
 
-		GetCharDB.Execute("UPDATE guilds SET NoticeBy=\"%ls\", GuildNotice=\"%s\" WHERE GuildID=%u", pGuild->awchName, GetCharDB.EscapeString(message).c_str(), req->guildId);
+		g_pGuildRepository->UpdateNotice(pGuild->awchName, message, req->guildId);
 
 		Ntl_CleanUpHeapString(message);
 	}
@@ -530,8 +539,7 @@ void CChatServerSession::RecvGuildCreateMarkReq(CNtlPacket * pPacket, CQueryServ
 	{
 		memcpy(&pGuild->sMark, &req->sMark, sizeof(sDBO_GUILD_MARK));
 
-		GetCharDB.Execute("UPDATE guilds SET MarkInColor=%u, MarkInLine=%u, MarkMain=%u, MarkMainColor=%u, MarkOutColor=%u, MarkOutLine=%u WHERE GuildID=%u",
-			req->sMark.byMarkInColor, req->sMark.byMarkInLine, req->sMark.byMarkMain, req->sMark.byMarkMainColor, req->sMark.byMarkOutColor, req->sMark.byMarkOutLine, req->guildId);
+		g_pGuildRepository->UpdateMark(req->sMark, req->guildId);
 	}
 	else res->wResultCode = QUERY_FAIL;
 
@@ -561,12 +569,11 @@ void CChatServerSession::RecvGuildChangeMarkReq(CNtlPacket * pPacket, CQueryServ
 			if (sDBO_GUILD_DATA* pGuild = g_pGuild->GetGuildData(req->guildId))
 			{
 				pCache->SetZeni(pCache->GetZeni() - req->dwZenny);
-				GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charId);
+				g_pCharacterRepository->UpdateMoney(req->charId, pCache->GetZeni());
 
 				memcpy(&pGuild->sMark, &req->sMark, sizeof(sDBO_GUILD_MARK));
 
-				GetCharDB.Execute("UPDATE guilds SET MarkInColor=%u, MarkInLine=%u, MarkMain=%u, MarkMainColor=%u, MarkOutColor=%u, MarkOutLine=%u WHERE GuildID=%u",
-					req->sMark.byMarkInColor, req->sMark.byMarkInLine, req->sMark.byMarkMain, req->sMark.byMarkMainColor, req->sMark.byMarkOutColor, req->sMark.byMarkOutLine, req->guildId);
+				g_pGuildRepository->UpdateMark(req->sMark, req->guildId);
 			}
 			else res->wResultCode = QUERY_FAIL;
 		}
@@ -600,18 +607,18 @@ void CChatServerSession::RecvGuildChangeNameRes(CNtlPacket * pPacket, CQueryServ
 		{
 			if (pCache->RemoveItem(req->itemId))
 			{
-				GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->itemId);
+				g_pItemRepository->DeleteById(req->itemId);
 
-				GetLogDB.Execute("INSERT INTO guild_name_change_log (GuildID,CurrentName,NewName) VALUES (%u,\"%ls\",\"%ls\")", req->guildId, pGuild->wszName, req->wszGuildName);
+				g_pGuildRepository->InsertNameChangeLog(req->guildId, pGuild->wszName, req->wszGuildName);
 
 				NTL_SAFE_WCSCPY(pGuild->wszName, req->wszGuildName);
 
-				GetCharDB.WaitExecute("UPDATE guilds SET GuildName=\"%ls\" WHERE GuildID=%u", req->wszGuildName, req->guildId); //must be wait to avoid 2 people creating the same name in the same time
-				GetCharDB.Execute("UPDATE characters SET GuildName=\"%ls\" WHERE GuildID=%u", req->wszGuildName, req->guildId);
+				g_pGuildRepository->UpdateGuildNameWait(req->wszGuildName, req->guildId);
+				g_pCharacterRepository->UpdateGuildNameForMembers(req->guildId, req->wszGuildName);
 
 				if (sDBO_DOJO_DATA* pDojoData = g_pDojo->GetDojoData(req->guildId))
 				{
-					GetCharDB.Execute("UPDATE dojos SET GuildName=\"%ls\" WHERE GuildID=%u", req->wszGuildName, req->guildId);
+					g_pDojoRepository->UpdateGuildName(req->guildId, req->wszGuildName);
 					NTL_SAFE_WCSCPY(pDojoData->wszName, req->wszGuildName);
 				}
 			}
@@ -653,7 +660,7 @@ void CChatServerSession::RecvDojoCreateReq(CNtlPacket * pPacket, CQueryServer * 
 	if (sDBO_GUILD_DATA* pGuild = g_pGuild->GetGuildData(req->guildId))
 	{
 		g_pDojo->CreateDojo(req->guildId, req->dojoTblidx, pGuild->wszName);
-		GetCharDB.Execute("INSERT INTO dojos (GuildId, DojoTblidx, GuildName) VALUES (%u,%u,\"%ls\")", req->guildId, req->dojoTblidx, pGuild->wszName);
+		g_pDojoRepository->InsertDojo(req->guildId, req->dojoTblidx, pGuild->wszName);
 	}
 	else res->wResultCode = QUERY_FAIL;
 
@@ -678,8 +685,7 @@ void CChatServerSession::RecvDojoUpdateReq(CNtlPacket * pPacket, CQueryServer * 
 
 		memcpy(pDojo, &req->sDojoData, sizeof(sDBO_DOJO_DATA));
 
-		GetCharDB.Execute("UPDATE dojos SET GuildId=%u, Level=0, PeaceStatus=0, PeacePoints=0, GuildName=\"%ls\", LeaderName=(null), Notice=(null), ChallengeGuildId=%u, SeedCharName=(null) WHERE DojoTblidx=%u", 
-			pDojo->guildId, pDojo->wszName, INVALID_GUILDID, pDojo->dojoTblidx);
+		g_pDojoRepository->ResetDojo(pDojo->guildId, pDojo->wszName, INVALID_GUILDID, pDojo->dojoTblidx);
 
 		g_pDojo->RemoveDojo(res->guildId);
 		g_pDojo->InsertDojo(req->sDojoData.guildId, pDojo);
@@ -705,7 +711,7 @@ void CChatServerSession::RecvDojoDeleteReq(CNtlPacket * pPacket, CQueryServer * 
 	res->guildId = req->guildId;
 	
 	if (g_pDojo->DeleteDojo(req->guildId, req->dojoTblidx))
-		GetCharDB.Execute("DELETE FROM dojos WHERE DojoTblidx=%u", req->dojoTblidx);
+		g_pDojoRepository->DeleteByTblidx(req->dojoTblidx);
 	else
 		res->wResultCode = QUERY_FAIL;
 
@@ -740,7 +746,7 @@ void CChatServerSession::RecvDojoFunctionAddReq(CNtlPacket * pPacket, CQueryServ
 				pGuildData->dwGuildReputation = UnsignedSafeDecrease<DWORD>(pGuildData->dwGuildReputation, Dbo_GetGuildFunctionInfo(static_cast<eDBO_GUILD_FUNCTION>(req->byFunction))->dwRequiredPoint);
 				pGuildData->qwGuildFunctionFlag = req->qwGuildFunctionFlag;
 
-				GetCharDB.Execute("UPDATE guilds SET GuildReputation=%u, FunctionFlag=%I64u WHERE GuildID=%u", pGuildData->dwGuildReputation, pGuildData->qwGuildFunctionFlag, req->guildId);
+				g_pGuildRepository->UpdateReputationAndFunctionFlag(pGuildData->dwGuildReputation, pGuildData->qwGuildFunctionFlag, req->guildId);
 
 				BYTE byNewDojoLevel = Dbo_GetDojoLevel(req->byFunction);
 				if (byNewDojoLevel > 0)
@@ -748,14 +754,14 @@ void CChatServerSession::RecvDojoFunctionAddReq(CNtlPacket * pPacket, CQueryServ
 					if (sDBO_DOJO_DATA* pDojoData = g_pDojo->GetDojoData(req->guildId))
 					{
 						pDojoData->byLevel = byNewDojoLevel;
-						GetCharDB.Execute("UPDATE dojos SET Level=%u WHERE GuildID=%u", byNewDojoLevel, req->guildId);
+						g_pDojoRepository->UpdateLevel(byNewDojoLevel, req->guildId);
 					}
 				}
 
 				if (req->dwZenny > 0)
 				{
 					pCache->SetZeni(pCache->GetZeni() - req->dwZenny);
-					GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->masterCharId);
+					g_pCharacterRepository->UpdateMoney(req->masterCharId, pCache->GetZeni());
 				}
 			}
 			else res->wResultCode = QUERY_FAIL;
@@ -786,7 +792,7 @@ void CChatServerSession::RecvDojoBudokaiSeedAddReq(CNtlPacket * pPacket, CQueryS
 	if (pDojo)
 	{
 		NTL_SAFE_WCSCPY(pDojo->wszSeedCharName, req->wszCharName);
-		GetCharDB.Execute("UPDATE dojos SET SeedCharName=\"%ls\" WHERE DojoTblidx=%u", pDojo->wszSeedCharName, req->dojoTblidx);
+		g_pDojoRepository->UpdateSeedCharName(pDojo->wszSeedCharName, req->dojoTblidx);
 	}
 	else res->wResultCode = COMMUNITY_DOJO_FIND_FAIL;
 
@@ -809,7 +815,7 @@ void CChatServerSession::RecvDojoBudokaiSeedDelReq(CNtlPacket * pPacket, CQueryS
 	if (pDojo)
 	{
 		memset(pDojo->wszSeedCharName, 0, sizeof(pDojo->wszSeedCharName));
-		GetCharDB.Execute("UPDATE dojos SET SeedCharName=(Null) WHERE DojoTblidx=%u", req->dojoTblidx);
+		g_pDojoRepository->ClearSeedCharName(req->dojoTblidx);
 	}
 	else res->wResultCode = COMMUNITY_DOJO_FIND_FAIL;
 
@@ -838,7 +844,7 @@ void CChatServerSession::RecvDojoScrambleRewardReq(CNtlPacket * pPacket, CQueryS
 		pGuildData->dwGuildReputation = UnsignedSafeIncrease<DWORD>(pGuildData->dwGuildReputation, req->dwAddGuildReputation);
 		pGuildData->dwMaxGuildPointEver = UnsignedSafeIncrease<DWORD>(pGuildData->dwMaxGuildPointEver, req->dwAddGuildReputation);
 
-		GetCharDB.Execute("UPDATE guilds SET GuildReputation=%u, GuildPointEver=%u WHERE GuildID=%u", pGuildData->dwGuildReputation, pGuildData->dwMaxGuildPointEver, req->guildId);
+		g_pGuildRepository->UpdateReputationAndPointEver(pGuildData->dwGuildReputation, pGuildData->dwMaxGuildPointEver, req->guildId);
 
 		//create item and put into guild bank
 		//TODO
@@ -873,7 +879,7 @@ void CChatServerSession::RecvDojoChangeNoticeReq(CNtlPacket * pPacket, CQuerySer
 		{
 			char* message = Ntl_WC2MB(req->awchNotice);
 
-			GetCharDB.Execute("UPDATE dojos SET LeaderName=\"%ls\", Notice=\"%s\" WHERE GuildId=%u", req->awchCharName, GetCharDB.EscapeString(message).c_str(), req->guildId);
+			g_pDojoRepository->UpdateNotice(req->awchCharName, message, req->guildId);
 
 			NTL_SAFE_WCSCPY(pDojoData->wchLeaderName, req->awchCharName);
 			NTL_SAFE_WCSCPY(pDojoData->wchNotice, req->awchNotice);
@@ -949,17 +955,16 @@ void CChatServerSession::RecvAuctionHouseSellReq(CNtlPacket * pPacket, CQuerySer
 					g_pAH->InsertItem(pData);
 
 					//add to db
-					GetCharDB.Execute("INSERT INTO auctionhouse (id,CharID,TabType,ItemName,Seller,Price,ItemID,TimeStart,TimeEnd,ItemLevel,NeedClass,ItemType) VALUES (%I64u, %u, %u,\"%ls\",\"%ls\", %u, %I64u, %I64u, %u, %u, %u, %u)",
-						pData->nItem, req->charId, req->byTabType, req->awchItemName, pData->awchSeller, req->dwPrice, rItemData.itemId, req->nStartSellTime, req->nEndSellTime, req->byItemLevel, req->dwClassBitFlag, req->byItemType);
+					g_pAuctionHouseRepository->InsertListing(pData->nItem, req->charId, req->byTabType, req->awchItemName, pData->awchSeller, req->dwPrice, rItemData.itemId, req->nStartSellTime, req->nEndSellTime, req->byItemLevel, req->dwClassBitFlag, req->byItemType);
 
 
 					// update stack count from original item
 					pItem->byStackcount -= req->byCount;
-					GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pItem->byStackcount, pItem->itemId);
+					g_pItemRepository->UpdateCount(pItem->itemId, pItem->byStackcount);
 
 					//update player zeni & db
 					pCache->SetZeni(pCache->GetZeni() - req->dwFee);
-					GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charId);
+					g_pCharacterRepository->UpdateMoney(req->charId, pCache->GetZeni());
 
 					// packet
 					memcpy(&res->sData, pData, sizeof(sTENKAICHIDAISIJYOU_DATA));
@@ -996,15 +1001,14 @@ void CChatServerSession::RecvAuctionHouseSellReq(CNtlPacket * pPacket, CQuerySer
 					pCache->RemoveItem(req->itemId);
 
 					//unset owner
-					GetCharDB.Execute("UPDATE items SET owner_id=0 WHERE id=%I64u", req->itemId);
+					g_pItemRepository->ClearOwner(req->itemId);
 
 					//add to db
-					GetCharDB.Execute("INSERT INTO auctionhouse (id,CharID,TabType,ItemName,Seller,Price,ItemID,TimeStart,TimeEnd,ItemLevel,NeedClass,ItemType) VALUES (%I64u, %u, %u,\"%ls\",\"%ls\", %u, %I64u, %I64u, %u, %u, %u, %u)",
-						pData->nItem, req->charId, req->byTabType, req->awchItemName, pData->awchSeller, req->dwPrice, req->itemId, req->nStartSellTime, req->nEndSellTime, req->byItemLevel, req->dwClassBitFlag, req->byItemType);
+					g_pAuctionHouseRepository->InsertListing(pData->nItem, req->charId, req->byTabType, req->awchItemName, pData->awchSeller, req->dwPrice, req->itemId, req->nStartSellTime, req->nEndSellTime, req->byItemLevel, req->dwClassBitFlag, req->byItemType);
 
 					//update player zeni & db
 					pCache->SetZeni(pCache->GetZeni() - req->dwFee);
-					GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charId);
+					g_pCharacterRepository->UpdateMoney(req->charId, pCache->GetZeni());
 
 					// packet
 					memcpy(&res->sData, pData, sizeof(sTENKAICHIDAISIJYOU_DATA));
@@ -1045,13 +1049,12 @@ void CChatServerSession::RecvAuctionHouseSellCancelReq(CNtlPacket * pPacket, CQu
 			GetLocalTime(&ti);
 
 			//enter email to database
-			GetCharDB.Execute("INSERT INTO mail (CharID, SenderType, MailType, TextSize, Text, itemId, FromName, CreateTime, EndTime, RemainDay,year,month,day,hour,minute,second) VALUES (%u,%u,%u,%u,\"%ls\",%I64u,'System',%I64u,%I64u,%u,%u,%u,%u,%u,%u,%u)",
-				req->charId, eMAIL_SENDER_TYPE_SYSTEM, eMAIL_TYPE_ITEM, mailtextsize, req->wchText, pData->itemId, createtime, endtime, 10, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
+			g_pMailRepository->InsertItemMail(req->charId, eMAIL_SENDER_TYPE_SYSTEM, eMAIL_TYPE_ITEM, mailtextsize, req->wchText, pData->itemId, createtime, endtime, 10, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
 
 			//delete & remove from AH & DB
 			delete pData;
 			g_pAH->EraseItem(req->nItem);
-			GetCharDB.Execute("DELETE FROM auctionhouse WHERE id=%I64u", req->nItem);
+			g_pAuctionHouseRepository->DeleteListing(req->nItem);
 		}
 		else res->wResultCode = TENKAICHIDAISIJYOU_CANNOT_NOT_EXIST;
 	}
@@ -1080,7 +1083,7 @@ void CChatServerSession::RecvAuctionHouseBuyReq(CNtlPacket * pPacket, CQueryServ
 		{
 			if (sTENKAICHIDAISIJYOU_DATA* pData = g_pAH->GetItem(req->nItem))
 			{
-				GetLogDB.Execute("INSERT INTO auctionhouse_log (Seller,Buyer,Price,ItemTblidx,ItemID) VALUES (%u,%u,%u,%u,%I64u)", req->sellcharId, res->charId, req->dwMoney, pData->itemNo, pData->itemId);
+				g_pAuctionHouseRepository->InsertLog(req->sellcharId, res->charId, req->dwMoney, pData->itemNo, pData->itemId);
 
 				//insert into log
 
@@ -1094,21 +1097,19 @@ void CChatServerSession::RecvAuctionHouseBuyReq(CNtlPacket * pPacket, CQueryServ
 				int sellTextSize = (int)wcslen(req->wchSellText);
 
 				//enter email to database <buyer>
-				GetCharDB.Execute("INSERT INTO mail (CharID, SenderType, MailType, TextSize, Text, itemId, FromName, CreateTime, EndTime, RemainDay,year,month,day,hour,minute,second) VALUES (%u,%u,%u,%u,\"%ls\",%I64u,'System',%I64u,%I64u,%u,%u,%u,%u,%u,%u,%u)",
-					req->charId, eMAIL_SENDER_TYPE_SYSTEM, eMAIL_TYPE_ITEM, buyTextSize, req->wchBuyText, pData->itemId, createtime, endtime, 10, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
+				g_pMailRepository->InsertItemMail(req->charId, eMAIL_SENDER_TYPE_SYSTEM, eMAIL_TYPE_ITEM, buyTextSize, req->wchBuyText, pData->itemId, createtime, endtime, 10, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
 
 				//enter email to database <seller>
-				GetCharDB.Execute("INSERT INTO mail (CharID, SenderType, MailType, TextSize, Text, Zenny, FromName, CreateTime, EndTime, RemainDay,year,month,day,hour,minute,second) VALUES (%u,%u,%u,%u,\"%ls\",%u,'System',%I64u,%I64u,%u,%u,%u,%u,%u,%u,%u)",
-					req->sellcharId, eMAIL_SENDER_TYPE_SYSTEM, eMAIL_TYPE_ZENNY, sellTextSize, req->wchSellText, req->dwMoney, createtime, endtime, 10, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
+				g_pMailRepository->InsertZennyMail(req->sellcharId, eMAIL_SENDER_TYPE_SYSTEM, eMAIL_TYPE_ZENNY, sellTextSize, req->wchSellText, req->dwMoney, createtime, endtime, 10, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
 
 				//delete & remove from AH & DB
 				delete pData;
 				g_pAH->EraseItem(req->nItem);
-				GetCharDB.Execute("DELETE FROM auctionhouse WHERE id=%I64u", req->nItem);
+				g_pAuctionHouseRepository->DeleteListing(req->nItem);
 
 				//remove & update zeni from buyer
 				pCache->SetZeni(pCache->GetZeni() - req->dwMoney);
-				GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charId);
+				g_pCharacterRepository->UpdateMoney(req->charId, pCache->GetZeni());
 			}
 			else res->wResultCode = TENKAICHIDAISIJYOU_CANNOT_NOT_EXIST;
 		}
@@ -1181,14 +1182,13 @@ void CChatServerSession::RecvAuctionHousePeriodEndReq(CNtlPacket * pPacket, CQue
 		GetLocalTime(&ti);
 
 		//enter email to database
-		GetCharDB.Execute("INSERT INTO mail (CharID, SenderType, MailType, TextSize, Text, itemId, FromName, CreateTime, EndTime, RemainDay,year,month,day,hour,minute,second) VALUES (%u,%u,%u,%u,\"%ls\",%I64u,'System',%I64u,%I64u,%u,%u,%u,%u,%u,%u,%u)",
-			pData->charId, eMAIL_SENDER_TYPE_SYSTEM, eMAIL_TYPE_ITEM, (int)wcslen(req->wchText), req->wchText, pData->itemId, createtime, endtime, 10, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
+		g_pMailRepository->InsertItemMail(pData->charId, eMAIL_SENDER_TYPE_SYSTEM, eMAIL_TYPE_ITEM, (int)wcslen(req->wchText), req->wchText, pData->itemId, createtime, endtime, 10, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
 
 
 		//delete & remove from AH & DB
 		delete pData;
 		g_pAH->EraseItem(req->nItem);
-		GetCharDB.Execute("DELETE FROM auctionhouse WHERE id=%I64u", req->nItem);
+		g_pAuctionHouseRepository->DeleteListing(req->nItem);
 	}
 	else res->wResultCode = TENKAICHIDAISIJYOU_CANNOT_NOT_EXIST;
 
@@ -1216,7 +1216,7 @@ void CChatServerSession::RecvMutePlayerNfy(CNtlPacket * pPacket, CQueryServer * 
 
 		if (charid == INVALID_CHARACTERID)
 		{
-			smart_ptr<QueryResult> result = GetCharDB.Query("SELECT CharID FROM characters WHERE CharName=\"%ls\"", req->awchCharName);
+			smart_ptr<QueryResult> result = g_pCharacterRepository->GetCharIdByName(req->awchCharName);
 			if (result)
 			{
 				Field* f = result->Fetch();
@@ -1231,16 +1231,14 @@ void CChatServerSession::RecvMutePlayerNfy(CNtlPacket * pPacket, CQueryServer * 
 
 
 		//enter log
-		GetLogDB.Execute("INSERT INTO mute_log (CharID,GmAccountID,DurationInMinutes,Reason,muteUntil) values (%u, %u, %u, \"%ls\", %I64u)",
-			charid, req->accountId, req->dwDurationInMinute, req->wchReason, muteDuration);
+		g_pAuditLogRepository->InsertMuteLog(charid, req->accountId, req->dwDurationInMinute, req->wchReason, muteDuration);
 
 		//enter mail
-		GetCharDB.Execute("INSERT INTO mail (CharID, SenderType, MailType, TextSize, Text, FromName, CreateTime, EndTime, RemainDay,year,month,day,hour,minute,second) VALUES (%u,%u,%u,%u, \"%ls\", \"%ls\", %I64u,%I64u,%u,%u,%u,%u,%u,%u,%u)",
-			charid, eMAIL_SENDER_TYPE_SYSTEM, eMAIL_TYPE_BASIC, (int)wcslen(req->wchReason), req->wchReason, req->awchGmCharName, createtime, endtime, 10, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
+		g_pMailRepository->InsertBasicMail(charid, eMAIL_SENDER_TYPE_SYSTEM, eMAIL_TYPE_BASIC, (int)wcslen(req->wchReason), req->wchReason, req->awchGmCharName, createtime, endtime, 10, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
 	}
 	else // unmute
 	{
-		GetLogDB.Execute("DELETE FROM mute_log WHERE CharID=%u", req->charId);
+		g_pAuditLogRepository->DeleteMuteLog(req->charId);
 	}
 }
 
@@ -1295,28 +1293,26 @@ void CChatServerSession::RecvHlsSlotMachineExtractReq(CNtlPacket * pPacket, CQue
 					pBrief->tRegTime.year = ti.wYear;
 					pCache->InsertCashItem(pBrief);
 
-					GetAccDB.Execute("INSERT INTO cashshop_storage (ProductId,AccountID,HLSitemTblidx,StackCount,year,month,day,hour,minute,second,millisecond,Buyer,price)VALUES(%I64u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u)",
-						res->aProductId[i], req->accountId, pBrief->HLSitemTblidx, pBrief->byStackCount, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond, ti.wMilliseconds, req->accountId, 1);
+					g_pCashShopRepository->InsertStorageItem(res->aProductId[i], req->accountId, pBrief->HLSitemTblidx, pBrief->byStackCount, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond, ti.wMilliseconds, req->accountId, 1);
 				}
 
-				GetLogDB.Execute("INSERT INTO slot_machine_log (accountid,charid,extractCount,type,coin,currentPoints,newPoints,ProductId1,ProductId2,ProductId3,ProductId4,ProductId5,ProductId6,ProductId7,ProductId8,ProductId9,ProductId10)VALUES(%u,%u,%u,%u,%u,%u,%u,%I64u,%I64u,%I64u,%I64u,%I64u,%I64u,%I64u,%I64u,%I64u,%I64u)",
-					req->accountId, req->charId, req->byExtractCount, req->byHlsMachineType, req->wCoin, dwCurCoin, dwCurCoin - (DWORD)req->wCoin, res->aProductId[0], res->aProductId[1], res->aProductId[2], res->aProductId[3], res->aProductId[4], res->aProductId[5], res->aProductId[6], res->aProductId[7], res->aProductId[8], res->aProductId[9]);
+				g_pAuditLogRepository->InsertSlotMachineLog(req->accountId, req->charId, req->byExtractCount, req->byHlsMachineType, req->wCoin, dwCurCoin, dwCurCoin - (DWORD)req->wCoin, res->aProductId[0], res->aProductId[1], res->aProductId[2], res->aProductId[3], res->aProductId[4], res->aProductId[5], res->aProductId[6], res->aProductId[7], res->aProductId[8], res->aProductId[9]);
 
 				if (bIsEvent)
 				{
 					pCache->SetEventCoin(dwCurCoin - (DWORD)req->wCoin);
-					GetAccDB.WaitExecute("UPDATE accounts SET EventCoins=%u WHERE AccountID=%u", pCache->GetEventCoin(), req->accountId); //if player bought cash and did not update his cash in game.. This is why we do like this
+					g_pAccountRepository->UpdateEventCoinsWait(req->accountId, pCache->GetEventCoin());
 				}
 				else
 				{
 					pCache->SetWaguCoin(dwCurCoin - (DWORD)req->wCoin);
-					GetAccDB.WaitExecute("UPDATE accounts SET WaguCoins=%u WHERE AccountID=%u", pCache->GetWaguCoin(), req->accountId); //if player bought cash and did not update his cash in game.. This is why we do like this
+					g_pAccountRepository->UpdateWaguCoinsWait(req->accountId, pCache->GetWaguCoin());
 
 					if (req->waguPoint > 0)
 					{
 						DWORD dwNewWaguPoints = min(pCharCache->GetWaguPoints() + (DWORD)req->waguPoint, 2000);
 						pCharCache->SetWaguPoints(dwNewWaguPoints);
-						GetCharDB.Execute("UPDATE characters SET WaguPoint=%u WHERE CharID=%u", dwNewWaguPoints, req->charId);
+						g_pCharacterRepository->UpdateWaguPoint(req->charId, dwNewWaguPoints);
 					}
 				}
 

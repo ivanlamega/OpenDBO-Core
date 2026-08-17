@@ -10,6 +10,23 @@
 #include "Guild.h"
 #include "DynamicFieldSystem.h"
 #include "BudokaiManager.h"
+#include "Repository/CharacterRepository.h"
+#include "Repository/ItemRepository.h"
+#include "Repository/SkillRepository.h"
+#include "Repository/BuffRepository.h"
+#include "Repository/MailRepository.h"
+#include "Repository/QuestRepository.h"
+#include "Repository/QuickSlotRepository.h"
+#include "Repository/MascotRepository.h"
+#include "Repository/RecipeRepository.h"
+#include "Repository/CashShopRepository.h"
+#include "Repository/AccountRepository.h"
+#include "Repository/GuildRepository.h"
+#include "Repository/DynamicFieldRepository.h"
+#include "Repository/BudokaiRepository.h"
+#include "Repository/AuditLogRepository.h"
+#include "Repository/FriendRepository.h"
+#include "Repository/AuctionHouseRepository.h"
 
 
 void CGameServerSession::OnAccountCheck(QueryResultVector & results, CHARACTERID charId, ACCOUNTID accountId)
@@ -25,10 +42,7 @@ void CGameServerSession::OnAccountCheck(QueryResultVector & results, CHARACTERID
 
 		if (accstatus != "block")
 		{
-			SQLCallbackBase* pCallBack3 = new SQLClassCallbackP2<CGameServerSession, CHARACTERID, ACCOUNTID>(this, &CGameServerSession::OnLoadPcCheck, charId, accountId);
-			AsyncQuery * q3 = new AsyncQuery(pCallBack3);
-			q3->AddQuery("SELECT AccountID FROM characters WHERE CharID=%u", charId);
-			GetCharDB.QueueAsyncQuery(q3);
+			g_pCharacterRepository->CheckAccountForCharacterAsync(this, charId, accountId);
 
 			return;
 		}
@@ -85,30 +99,8 @@ void CGameServerSession::OnLoadPcCheck(QueryResultVector & results, CHARACTERID 
 
 				g_pPlayerCache->InsertCharacter(charId, pPlayerCache);
 
-				SQLCallbackBase* pCallBack = new SQLClassCallbackP0<CPlayerCache>(pPlayerCache, &CPlayerCache::OnLoadPcData);
-				AsyncQuery * q = new AsyncQuery(pCallBack);
-				q->AddQuery("SELECT * FROM characters WHERE CharID=%u", charId);
-				q->AddQuery("SELECT * FROM bind WHERE CharID=%u", charId);
-				q->AddQuery("SELECT id, SenderType, IsRead FROM mail WHERE CharID=%u", charId); //NO NEED LIMIT HERE. IT WILL RELOAD ALL
-				q->AddQuery("SELECT * FROM rank_battle WHERE CharID=%u", charId);
-				q->AddQuery("SELECT TitleTblidx FROM titles WHERE CharID=%u LIMIT 64", charId); // LIMIT NTL_MAX_CHAR_TITLE_COUNT_IN_FLAG
-				q->AddQuery("SELECT WarFog FROM warfog WHERE CharID=%u", charId);
-				GetCharDB.QueueAsyncQuery(q);
-
-				SQLCallbackBase* pCallBack2 = new SQLClassCallbackP0<CPlayerCache>(pPlayerCache, &CPlayerCache::OnLoadPcData2);
-				AsyncQuery * q2 = new AsyncQuery(pCallBack2);
-				q2->AddQuery("SELECT * FROM items WHERE owner_id=%u AND place < 7 LIMIT 166", charId); // NTL_MAX_BAGSLOT_COUNT + NTL_MAX_ITEM_SLOT + (NTL_MAX_BAG_ITEM_SLOT * 4) + EQUIP_SLOT_TYPE_COUNT | 7 = CONTAINER_TYPE_BANKSLOT
-				q2->AddQuery("SELECT * FROM skills WHERE owner_id=%u LIMIT 60", charId);
-				q2->AddQuery("SELECT * FROM htb_skills WHERE owner_id=%u LIMIT 2", charId); // limit NTL_HTB_MAX_PC_HAVE_HTB_SKILL
-				q2->AddQuery("SELECT * FROM buffs WHERE CharID=%u LIMIT 49", charId);
-				q2->AddQuery("SELECT * FROM questitems WHERE CharID=%u LIMIT 30", charId);// LIMIT NTL_QUEST_INVENTORY_SLOT_COUNT
-				q2->AddQuery("SELECT * FROM quests WHERE CharID=%u", charId);
-				q2->AddQuery("SELECT * FROM quickslot WHERE CharID=%u LIMIT 48", charId);
-				q2->AddQuery("SELECT * FROM mascots WHERE CharID=%u LIMIT 40", charId);
-				q2->AddQuery("SELECT * FROM hoipoi_recipe WHERE CharID=%u LIMIT 200", charId);
-				q2->AddQuery("SELECT * FROM items_cd WHERE CharID=%u LIMIT 19", charId);
-				q2->AddQuery("SELECT Point FROM portals WHERE CharID=%u LIMIT 100", charId);
-				GetCharDB.QueueAsyncQuery(q2);
+				g_pCharacterRepository->LoadCharacterCoreDataAsync(pPlayerCache, charId);
+				g_pCharacterRepository->LoadCharacterExtendedDataAsync(pPlayerCache, charId);
 			}
 
 			return;
@@ -188,7 +180,7 @@ void CGameServerSession::RecvItemMoveReq(CNtlPacket* pPacket, CQueryServer* app)
 					pDstItem->byPlace = req->bySrcPlace;
 					pDstItem->byPosition = req->bySrcPos;
 
-					GetCharDB.Execute("UPDATE items SET place=%u, pos=%u WHERE id=%I64u", req->bySrcPlace, req->bySrcPos, req->dstItemId);
+					g_pItemRepository->UpdatePlace(req->dstItemId, req->bySrcPlace, req->bySrcPos);
 				}
 				else
 				{
@@ -199,13 +191,13 @@ void CGameServerSession::RecvItemMoveReq(CNtlPacket* pPacket, CQueryServer* app)
 
 			if (req->bRestrictUpdate)
 			{
-				GetCharDB.Execute("UPDATE items SET place=%u, pos=%u, RestrictState=%u WHERE id=%I64u", req->byDstPlace, req->byDstPos, req->bySrcRestrictState, req->srcItemId);
+				g_pItemRepository->UpdatePlaceWithRestrict(req->srcItemId, req->byDstPlace, req->byDstPos, req->bySrcRestrictState);
 
 				pSrcItem->byRestrictState = req->bySrcRestrictState;
 			}
 			else
 			{
-				GetCharDB.Execute("UPDATE items SET place=%u, pos=%u WHERE id=%I64u", req->byDstPlace, req->byDstPos, req->srcItemId);
+				g_pItemRepository->UpdatePlace(req->srcItemId, req->byDstPlace, req->byDstPos);
 			}
 
 			pSrcItem->byPlace = req->byDstPlace;
@@ -251,7 +243,7 @@ void CGameServerSession::RecvItemMoveStackReq(CNtlPacket * pPacket, CQueryServer
 		{
 			if (req->hDstItem == INVALID_HOBJECT)	//unstack item -> create new item, update stackcount from src item
 			{
-				GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount1, req->srcItemId);//update stack count from source item
+				g_pItemRepository->UpdateCount(req->srcItemId, req->byStackCount1);//update stack count from source item
 				pSrcItem->byStackcount = req->byStackCount1;
 
 				res->splitItemId = g_pItemManager->IncLastItemID();
@@ -265,8 +257,7 @@ void CGameServerSession::RecvItemMoveStackReq(CNtlPacket * pPacket, CQueryServer
 
 				pCache->InsertItem(pDstItem);
 
-				GetCharDB.Execute("INSERT INTO items (id,tblidx,owner_id,place,pos,count,`rank`,Maker,RestrictState) SELECT %I64u,tblidx,owner_id,%u,%u,%u,`rank`,Maker,RestrictState FROM items WHERE id=%I64u",
-					res->splitItemId, req->byDstPlace, req->byDstPos, req->byStackCount2, req->srcItemId);//update stack count from source item
+				g_pItemRepository->InsertSplitFromSource(res->splitItemId, req->byDstPlace, req->byDstPos, req->byStackCount2, req->srcItemId);//update stack count from source item
 			}
 			else //if source stack count is zero then delete else update the count. Updte count of dest item
 			{
@@ -275,16 +266,16 @@ void CGameServerSession::RecvItemMoveStackReq(CNtlPacket * pPacket, CQueryServer
 				{
 					if (req->byStackCount1 == 0)
 					{
-						GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->srcItemId); //delete source item
+						g_pItemRepository->DeleteById(req->srcItemId); //delete source item
 						pCache->RemoveItem(req->srcItemId);
 					}
 					else
 					{
-						GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount1, req->srcItemId);//update stack count from source item
+						g_pItemRepository->UpdateCount(req->srcItemId, req->byStackCount1);//update stack count from source item
 						pSrcItem->byStackcount = req->byStackCount1;
 					}
 
-					GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount2, req->dstItemId);	//update stack count from dest item
+					g_pItemRepository->UpdateCount(req->dstItemId, req->byStackCount2);	//update stack count from dest item
 					pDstItem->byStackcount = req->byStackCount2;
 				}
 				else res->wResultCode = QUERY_FAIL;
@@ -312,7 +303,7 @@ void CGameServerSession::RecvItemUpdateReq(CNtlPacket * pPacket, CQueryServer * 
 			pItem->byGrade = req->sItem.byGrade;
 			pItem->byRank = req->sItem.byRank;
 
-			GetCharDB.Execute("UPDATE items SET `rank`=%u, grade=%u WHERE id=%I64u", req->sItem.byRank, req->sItem.byGrade, req->sItem.itemId);
+			g_pItemRepository->UpdateRankGrade(req->sItem.itemId, req->sItem.byRank, req->sItem.byGrade);
 		}
 	}
 }
@@ -328,7 +319,7 @@ void CGameServerSession::RecvDeleteItemReq(CNtlPacket* pPacket, CQueryServer* ap
 	{
 		pCache->RemoveItem(req->itemId);
 
-		GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->itemId);
+		g_pItemRepository->DeleteById(req->itemId);
 	}
 }
 
@@ -345,14 +336,14 @@ void CGameServerSession::RecvItemEquipRepairReq(CNtlPacket* pPacket, CQueryServe
 		if (pCache->GetZeni() >= req->dwZenny)
 		{
 			pCache->SetZeni(pCache->GetZeni() - req->dwZenny);
-			GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charId);
+			g_pCharacterRepository->UpdateMoney(req->charId, pCache->GetZeni());
 
 			for (BYTE byPos = 0; byPos < EQUIP_SLOT_TYPE_COUNT; byPos++)
 			{
 				if (req->asItemData[byPos].itemID != 0)
 				{
 					pCache->UpdateItemDur(req->asItemData[byPos].itemID, req->asItemData[byPos].byDur);
-					GetCharDB.Execute("UPDATE items SET durability=%u WHERE id=%I64u", req->asItemData[byPos].byDur, req->asItemData[byPos].itemID);
+					g_pItemRepository->UpdateDurability(req->asItemData[byPos].itemID, req->asItemData[byPos].byDur);
 				}
 			}
 		}
@@ -371,10 +362,10 @@ void CGameServerSession::RecvItemRepairReq(CNtlPacket * pPacket, CQueryServer * 
 		if (pCache->GetZeni() >= req->dwZenny)
 		{
 			pCache->SetZeni(pCache->GetZeni() - req->dwZenny);
-			GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charId);
+			g_pCharacterRepository->UpdateMoney(req->charId, pCache->GetZeni());
 
 			pCache->UpdateItemDur(req->sItemData.itemID, req->sItemData.byDur);
-			GetCharDB.Execute("UPDATE items SET durability=%u WHERE id=%I64u", req->sItemData.byDur, req->sItemData.itemID);
+			g_pItemRepository->UpdateDurability(req->sItemData.itemID, req->sItemData.byDur);
 		}
 	}
 }
@@ -394,7 +385,7 @@ void CGameServerSession::RecvItemDurDown(CNtlPacket* pPacket, CQueryServer* app)
 			if (req->byDur[byPos] != INVALID_BYTE)
 			{
 				if(pCache->UpdateEquipItemDur(byPos, req->byDur[byPos]))
-					GetCharDB.Execute("UPDATE items SET durability=%u WHERE owner_id=%u AND place=%u AND pos=%u", req->byDur[byPos], req->charId, CONTAINER_TYPE_EQUIP, byPos);
+					g_pItemRepository->UpdateDurabilityByOwnerPlacePos(req->byDur[byPos], req->charId, CONTAINER_TYPE_EQUIP, byPos);
 			}
 		}
 	}
@@ -415,8 +406,8 @@ void CGameServerSession::RecvItemIdentifyReq(CNtlPacket* pPacket, CQueryServer* 
 			pCache->SetZeni(pCache->GetZeni() - req->dwZeni);
 			pCache->UpdateIdentifyItem(req->itemId);
 
-			GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charId);
-			GetCharDB.Execute("UPDATE items SET NeedToIdentify=false WHERE id=%I64u", req->itemId);
+			g_pCharacterRepository->UpdateMoney(req->charId, pCache->GetZeni());
+			g_pItemRepository->ClearNeedToIdentify(req->itemId);
 		}
 	}
 }
@@ -458,11 +449,11 @@ void CGameServerSession::RecvSkillAddReq(CNtlPacket* pPacket, CQueryServer* app)
 		pCache->AddSkillData(req->bySlot, req->skillId, DBO_RP_BONUS_TYPE_INVALID, false);
 
 		if(pCache->GetSkillPoints() != req->dwSP)
-			GetCharDB.Execute("UPDATE characters SET SpPoint=%u WHERE CharID=%u", req->dwSP, req->charId);
+			g_pCharacterRepository->UpdateSpPoint(req->dwSP, req->charId);
 
 		pCache->SetSkillPoints(req->dwSP);
 
-		GetCharDB.Execute("INSERT INTO skills (skill_id,owner_id,SlotID) VALUES (%u,%u,%u)", req->skillId, req->charId, req->bySlot);
+		g_pSkillRepository->InsertSkill(req->skillId, req->charId, req->bySlot);
 	}
 }
 
@@ -477,7 +468,7 @@ void CGameServerSession::RecvSkillUpdateReq(CNtlPacket * pPacket, CQueryServer *
 	if (pCache)
 	{
 		pCache->UpdateSkillData(req->sSkill);
-		GetCharDB.Execute("UPDATE skills SET skill_id=%u, RpBonusAuto=%u, RpBonusType=%u, TimeRemaining=%u WHERE owner_id=%u AND SlotID=%u", req->sSkill.skillId, req->sSkill.bIsRpBonusAuto, req->sSkill.byRpBonusType, req->sSkill.nRemainSec, req->charId, req->sSkill.skillIndex);
+		g_pSkillRepository->UpdateSkill(req->sSkill.skillId, req->sSkill.bIsRpBonusAuto, req->sSkill.byRpBonusType, req->sSkill.nRemainSec, req->charId, req->sSkill.skillIndex);
 	}
 }
 
@@ -494,8 +485,8 @@ void CGameServerSession::RecvSkillUpgradeReq(CNtlPacket* pPacket, CQueryServer* 
 		pCache->UpdateSkillData(req->bySlot, req->newSkillId);
 		pCache->SetSkillPoints(req->dwSP);
 
-		GetCharDB.Execute("UPDATE skills SET skill_id=%u WHERE owner_id=%u and SlotID=%u", req->newSkillId, req->charId, req->bySlot);
-		GetCharDB.Execute("UPDATE characters SET SpPoint=%u WHERE CharID=%u", req->dwSP, req->charId);
+		g_pSkillRepository->UpdateSkillId(req->newSkillId, req->charId, req->bySlot);
+		g_pCharacterRepository->UpdateSpPoint(req->dwSP, req->charId);
 	}
 }
 
@@ -510,8 +501,7 @@ void CGameServerSession::RecvBuffAddReq(CNtlPacket * pPacket, CQueryServer * app
 	{
 		if (pCache->AddBuffData(req->sBuff))
 		{
-			GetCharDB.Execute("INSERT INTO buffs (CharID,SourceTblidx,SourceType,BuffIndex,BuffGroup,InitialDuration,TimeRemaining,effectValue1,effectValue2,Argument1_0,Argument1_1,Argument1_2,Argument2_0,Argument2_1,Argument2_2) VALUES (%u,%u,%u,%u,%u,%u,%u,%f,%f,%u,%u,%u,%u,%u,%u)",
-				req->charId, req->sBuff.sourceTblidx, req->sBuff.bySourceType, req->sBuff.buffIndex, req->sBuff.byBuffGroup, req->sBuff.dwInitialDuration, req->sBuff.dwTimeRemaining,
+			g_pBuffRepository->InsertBuff(req->charId, req->sBuff.sourceTblidx, req->sBuff.bySourceType, req->sBuff.buffIndex, req->sBuff.byBuffGroup, req->sBuff.dwInitialDuration, req->sBuff.dwTimeRemaining,
 				req->sBuff.effectValue1, req->sBuff.effectValue2,
 				req->sBuff.anArgument1[0], req->sBuff.anArgument1[1], req->sBuff.anArgument1[2],
 				req->sBuff.anArgument2[0], req->sBuff.anArgument2[1], req->sBuff.anArgument2[2]);
@@ -530,7 +520,7 @@ void CGameServerSession::RecvBuffDelReq(CNtlPacket * pPacket, CQueryServer * app
 	{
 		if (pCache->DelBuffData(req->buffIndex))
 		{
-			GetCharDB.Execute("DELETE FROM buffs WHERE CharID=%u AND BuffIndex=%u", req->charId, req->buffIndex);
+			g_pBuffRepository->DeleteBuff(req->charId, req->buffIndex);
 		}
 	}
 }
@@ -546,7 +536,7 @@ void CGameServerSession::RecvHtbSkillAddReq(CNtlPacket* pPacket, CQueryServer* a
 	if (pCache)
 	{
 		pCache->AddHtbSkillData(req->skillId);
-		GetCharDB.Execute("INSERT INTO htb_skills (skill_id,owner_id,SlotID) VALUES (%u,%u,%u)", req->skillId, req->charId, req->skillIndex);
+		g_pSkillRepository->InsertHtbSkill(req->skillId, req->charId, req->skillIndex);
 	}
 }
 
@@ -570,7 +560,7 @@ void CGameServerSession::RecvPcUpdateLevelReq(CNtlPacket * pPacket, CQueryServer
 				pMember->byLevel = req->byLevel;
 		}
 
-		GetCharDB.Execute("UPDATE characters SET Level=%u,Exp=%u,SpPoint=%u WHERE CharID=%u", req->byLevel, req->dwEXP, req->dwSP, req->charId);
+		g_pCharacterRepository->UpdateLevelExpSp(req->byLevel, req->dwEXP, req->dwSP, req->charId);
 	}
 }
 
@@ -586,8 +576,7 @@ void CGameServerSession::RecvSavePcDataReq(CNtlPacket * pPacket, CQueryServer * 
 		pCache->SavePcData(req->sPcData);
 		pCache->SaveServerChangeInfo(req->serverChangeInfo);
 
-		GetCharDB.Execute("UPDATE characters SET Exp=%u,CurLocX=%f,CurLocY=%f,CurLocZ=%f,CurDirX=%f,CurDirZ=%f,WorldID=%u,WorldTable=%u,MapInfoIndex=%u,TutorialHint=%u,CurLP=%u,CurEP=%u,CurRP=%u,CurAP=%u,Title=%u,Mascot=%u,RpBall=%u,IP=\"%s\",AirState=%u,PlayTime=PlayTime+%u WHERE CharID=%u",
-			req->sPcData.dwEXP, req->sPcData.fPositionX, req->sPcData.fPositionY, req->sPcData.fPositionZ, req->sPcData.fDirX, req->sPcData.fDirZ, req->sPcData.worldId, req->sPcData.worldTblidx, req->sPcData.dwMapInfoIndex,
+		g_pCharacterRepository->SavePcData(req->sPcData.dwEXP, req->sPcData.fPositionX, req->sPcData.fPositionY, req->sPcData.fPositionZ, req->sPcData.fDirX, req->sPcData.fDirZ, req->sPcData.worldId, req->sPcData.worldTblidx, req->sPcData.dwMapInfoIndex,
 			req->sPcData.dwTutorialHint, req->sPcData.charLp, req->sPcData.wEP, req->sPcData.wRP, req->sPcData.charAP,
 			req->sPcData.charTitle, req->sPcData.mascotTblidx, req->sPcData.byCurRPBall, req->IP, req->sPcData.eAirState, req->dwAddPlayTime,
 			req->sPcData.charId);
@@ -608,7 +597,7 @@ void CGameServerSession::RecvSaveSkillDataReq(CNtlPacket * pPacket, CQueryServer
 		{
 			if (pCache->UpdateSkillTime(req->asSkill[i]))
 			{
-				GetCharDB.Execute("UPDATE skills SET TimeRemaining=%u WHERE owner_id=%u AND SlotID=%u", req->asSkill[i].nRemainSec, req->charId, req->asSkill[i].skillIndex);
+				g_pSkillRepository->UpdateSkillTimeRemaining(req->asSkill[i].nRemainSec, req->charId, req->asSkill[i].skillIndex);
 			}
 		}
 	}
@@ -627,7 +616,7 @@ void CGameServerSession::RecvSaveHtbDataReq(CNtlPacket * pPacket, CQueryServer *
 		{
 			if (pCache->UpdateHtbSkillTime(req->asHTBSkill[i]))
 			{
-				GetCharDB.Execute("UPDATE htb_skills SET TimeRemaining=%u WHERE skill_id=%u AND owner_id=%u", req->asHTBSkill[i].dwSkillTime, req->asHTBSkill[i].skillId, req->charId);
+				g_pSkillRepository->UpdateHtbSkillTimeRemaining(req->asHTBSkill[i].dwSkillTime, req->asHTBSkill[i].skillId, req->charId);
 			}
 		}
 	}
@@ -646,14 +635,13 @@ void CGameServerSession::RecvSaveBuffDataReq(CNtlPacket * pPacket, CQueryServer 
 		{
 			if (pCache->UpdateBuffTime(req->asBuff[i]))
 			{
-				GetCharDB.Execute("UPDATE buffs SET TimeRemaining=%u,Argument1_1=%u,Argument1_2=%u WHERE CharID=%u AND BuffIndex=%u",
-					req->asBuff[i].dwTimeRemaining,
+				g_pBuffRepository->UpdateBuffTime(req->asBuff[i].dwTimeRemaining,
 					req->asBuff[i].anArgument1[1], req->asBuff[i].anArgument1[2],
 					req->charId, req->asBuff[i].buffIndex);
 			}
 			else
 			{
-				GetCharDB.Execute("DELETE FROM buffs WHERE CharID=%u AND BuffIndex=%u", req->charId, req->asBuff[i].buffIndex);
+				g_pBuffRepository->DeleteBuff(req->charId, req->asBuff[i].buffIndex);
 			}
 		}
 	}
@@ -686,7 +674,7 @@ void CGameServerSession::RecvShopBuyReq(CNtlPacket * pPacket, CQueryServer * app
 			}
 
 			pCache->SetZeni(pCache->GetZeni() - req->dwMoney);
-			GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charId);
+			g_pCharacterRepository->UpdateMoney(req->charId, pCache->GetZeni());
 		}
 		else res->wResultCode = GAME_ZENNY_NOT_ENOUGH;
 	}
@@ -712,9 +700,9 @@ void CGameServerSession::RecvShopSellReq(CNtlPacket * pPacket, CQueryServer * ap
 			if (pCache->DecreaseItemCount(req->sInven[i].itemID, req->sInven[i].byStack, bDelete))
 			{
 				if(bDelete)
-					GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->sInven[i].itemID);
+					g_pItemRepository->DeleteById(req->sInven[i].itemID);
 				else
-					GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->sInven[i].byStack, req->sInven[i].itemID);
+					g_pItemRepository->UpdateCount(req->sInven[i].itemID, req->sInven[i].byStack);
 			}
 			else
 			{
@@ -727,7 +715,7 @@ void CGameServerSession::RecvShopSellReq(CNtlPacket * pPacket, CQueryServer * ap
 		if (bError == false)
 		{
 			pCache->SetZeni(UnsignedSafeIncrease<DWORD>(pCache->GetZeni(), req->dwMoney));
-			GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charId);
+			g_pCharacterRepository->UpdateMoney(req->charId, pCache->GetZeni());
 		}
 	}
 }
@@ -756,20 +744,13 @@ void CGameServerSession::RecvLoadBankDataReq(CNtlPacket* pPacket, CQueryServer* 
 
 			if (pCache->IsBankLoaded() == false && pAccount->IsBankLoaded() == false) //load normal & bank from query
 			{
-				SQLCallbackBase* pCallBack = new SQLClassCallbackP4<CPlayerCache, CAccountCache*, bool, HOBJECT, HOBJECT>(pCache, &CPlayerCache::OnLoadBank, pAccount, false, req->handle, req->npchandle);
-				AsyncQuery * q = new AsyncQuery(pCallBack);
-				q->AddQuery("SELECT * FROM items WHERE owner_id=%u AND (place >= 7 AND place <=10) ORDER BY place ASC LIMIT 68", req->charId); // 7 = CONTAINER_TYPE_BANKSLOT
-				q->AddQuery("SELECT * FROM items WHERE AccountID=%u ORDER BY place ASC LIMIT 68", req->accountId);
-				GetCharDB.QueueAsyncQuery(q);
+				g_pItemRepository->LoadBankDataAsync(pCache, pAccount, false, req->handle, req->npchandle, req->charId, req->accountId);
 
 				return;
 			}
 			else if (pCache->IsBankLoaded() == false && pAccount->IsBankLoaded() == true) //load normal bank from db & acc from cache
 			{
-				SQLCallbackBase* pCallBack = new SQLClassCallbackP4<CPlayerCache, CAccountCache*, bool, HOBJECT, HOBJECT>(pCache, &CPlayerCache::OnLoadBank, pAccount, true, req->handle, req->npchandle);
-				AsyncQuery * q = new AsyncQuery(pCallBack);
-				q->AddQuery("SELECT * FROM items WHERE owner_id=%u AND (place >= 7 AND place <=10) ORDER BY place ASC LIMIT 68", req->charId);
-				GetCharDB.QueueAsyncQuery(q);
+				g_pItemRepository->LoadBankDataAsync(pCache, pAccount, true, req->handle, req->npchandle, req->charId, req->accountId);
 
 				return;
 			}
@@ -826,7 +807,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 										//put dest item on source place/pos
 										pDstItem->byPlace = req->bySrcPlace;
 										pDstItem->byPosition = req->bySrcPos;
-										GetCharDB.Execute("UPDATE items SET place=%u, pos=%u WHERE id=%I64u", req->bySrcPlace, req->bySrcPos, req->dstItemId);
+										g_pItemRepository->UpdatePlace(req->dstItemId, req->bySrcPlace, req->bySrcPos);
 									}
 									else res->wResultCode = QUERY_FAIL;
 								}
@@ -835,7 +816,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 								{
 									pSrcItem->byPlace = req->byDstPlace;
 									pSrcItem->byPosition = req->byDstPos;
-									GetCharDB.Execute("UPDATE items SET place=%u, pos=%u WHERE id=%I64u", req->byDstPlace, req->byDstPos, req->srcItemId);
+									g_pItemRepository->UpdatePlace(req->srcItemId, req->byDstPlace, req->byDstPos);
 								}
 							}
 							break;
@@ -854,7 +835,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 										pAccount->EraseBankItem(req->dstItemId); //erase from shared bank
 										pCache->InsertBankItem(pDstItem); //insert into bank
 
-										GetCharDB.Execute("UPDATE items SET owner_id=%u, place=%u, pos=%u, AccountID=0 WHERE id=%I64u", req->charId, req->bySrcPlace, req->bySrcPos, req->dstItemId);
+										g_pItemRepository->MoveToPersonalBank(req->dstItemId, req->charId, req->bySrcPlace, req->bySrcPos);
 									}
 									else res->wResultCode = QUERY_FAIL;
 								}
@@ -867,7 +848,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 									pCache->EraseBankItem(req->srcItemId); //erase item from bank
 									pAccount->InsertBankItem(pSrcItem); //insert item into shared bank
 
-									GetCharDB.Execute("UPDATE items SET owner_id=0, place=%u, pos=%u, AccountID=%u WHERE id=%I64u", req->byDstPlace, req->byDstPos, req->accountId, req->srcItemId);
+									g_pItemRepository->MoveToSharedBank(req->srcItemId, req->byDstPlace, req->byDstPos, req->accountId);
 								}
 							}
 							break;
@@ -886,7 +867,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 										pCache->EraseItem(req->dstItemId); //erase from inventory
 										pCache->InsertBankItem(pDstItem); //insert into bank
 
-										GetCharDB.Execute("UPDATE items SET place=%u, pos=%u WHERE id=%I64u", req->bySrcPlace, req->bySrcPos, req->dstItemId);
+										g_pItemRepository->UpdatePlace(req->dstItemId, req->bySrcPlace, req->bySrcPos);
 									}
 									else res->wResultCode = QUERY_FAIL;
 								}
@@ -899,7 +880,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 									pCache->EraseBankItem(req->srcItemId); //erase from bank
 									pCache->InsertItem(pSrcItem); //insert into inventory
 									
-									GetCharDB.Execute("UPDATE items SET place=%u, pos=%u WHERE id=%I64u", req->byDstPlace, req->byDstPos, req->srcItemId);
+									g_pItemRepository->UpdatePlace(req->srcItemId, req->byDstPlace, req->byDstPos);
 								}
 							}
 							break;
@@ -932,7 +913,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 										pCache->EraseBankItem(req->dstItemId); //erase from bank
 										pAccount->InsertBankItem(pDstItem); //insert into shared bank
 
-										GetCharDB.Execute("UPDATE items SET owner_id=0, place=%u, pos=%u, AccountID=%u WHERE id=%I64u", req->bySrcPlace, req->bySrcPos, req->accountId, req->dstItemId);
+										g_pItemRepository->MoveToSharedBank(req->dstItemId, req->bySrcPlace, req->bySrcPos, req->accountId);
 									}
 									else res->wResultCode = QUERY_FAIL;
 								}
@@ -945,7 +926,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 									pAccount->EraseBankItem(req->srcItemId); //erase item from shared bank
 									pCache->InsertBankItem(pSrcItem); //insert item into bank
 
-									GetCharDB.Execute("UPDATE items SET owner_id=%u, place=%u, pos=%u, AccountID=0 WHERE id=%I64u", req->charId, req->byDstPlace, req->byDstPos, req->srcItemId);
+									g_pItemRepository->MoveToPersonalBank(req->srcItemId, req->charId, req->byDstPlace, req->byDstPos);
 								}
 							}
 							break;
@@ -960,7 +941,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 										//put dest item on source place/pos
 										pDstItem->byPlace = req->bySrcPlace;
 										pDstItem->byPosition = req->bySrcPos;
-										GetCharDB.Execute("UPDATE items SET place=%u, pos=%u WHERE id=%I64u", req->bySrcPlace, req->bySrcPos, req->dstItemId);
+										g_pItemRepository->UpdatePlace(req->dstItemId, req->bySrcPlace, req->bySrcPos);
 									}
 									else res->wResultCode = QUERY_FAIL;
 								}
@@ -969,7 +950,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 								{
 									pSrcItem->byPlace = req->byDstPlace;
 									pSrcItem->byPosition = req->byDstPos;
-									GetCharDB.Execute("UPDATE items SET place=%u, pos=%u WHERE id=%I64u", req->byDstPlace, req->byDstPos, req->srcItemId);
+									g_pItemRepository->UpdatePlace(req->srcItemId, req->byDstPlace, req->byDstPos);
 								}
 							}
 							break;
@@ -988,7 +969,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 										pCache->EraseItem(req->dstItemId); //erase from inventory
 										pAccount->InsertBankItem(pDstItem); //insert into shared bank
 
-										GetCharDB.Execute("UPDATE items SET owner_id=0, place=%u, pos=%u, AccountID=%u WHERE id=%I64u", req->bySrcPlace, req->bySrcPos, req->accountId, req->dstItemId);
+										g_pItemRepository->MoveToSharedBank(req->dstItemId, req->bySrcPlace, req->bySrcPos, req->accountId);
 									}
 									else res->wResultCode = QUERY_FAIL;
 								}
@@ -1001,7 +982,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 									pAccount->EraseBankItem(req->srcItemId); //erase item from shared bank
 									pCache->InsertItem(pSrcItem); //insert item into inventory
 
-									GetCharDB.Execute("UPDATE items SET owner_id=%u, place=%u, pos=%u, AccountID=0 WHERE id=%I64u", req->charId, req->byDstPlace, req->byDstPos, req->srcItemId);
+									g_pItemRepository->MoveToPersonalBank(req->srcItemId, req->charId, req->byDstPlace, req->byDstPos);
 								}
 							}
 							break;
@@ -1034,7 +1015,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 										pCache->EraseBankItem(req->dstItemId); //erase from bank
 										pCache->InsertItem(pDstItem); //insert into inventory
 
-										GetCharDB.Execute("UPDATE items SET place=%u, pos=%u WHERE id=%I64u", req->bySrcPlace, req->bySrcPos, req->dstItemId);
+										g_pItemRepository->UpdatePlace(req->dstItemId, req->bySrcPlace, req->bySrcPos);
 									}
 									else res->wResultCode = QUERY_FAIL;
 								}
@@ -1047,7 +1028,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 									pCache->EraseItem(req->srcItemId); //erase item from inventory
 									pCache->InsertBankItem(pSrcItem); //insert item into bank
 
-									GetCharDB.Execute("UPDATE items SET place=%u, pos=%u WHERE id=%I64u", req->byDstPlace, req->byDstPos, req->srcItemId);
+									g_pItemRepository->UpdatePlace(req->srcItemId, req->byDstPlace, req->byDstPos);
 								}
 							}
 							break;
@@ -1066,7 +1047,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 										pAccount->EraseBankItem(req->dstItemId); //erase from shared bank
 										pCache->InsertItem(pDstItem); //insert into inventory
 
-										GetCharDB.Execute("UPDATE items SET owner_id=%u, place=%u, pos=%u, AccountID=0 WHERE id=%I64u", req->charId, req->bySrcPlace, req->bySrcPos, req->dstItemId);
+										g_pItemRepository->MoveToPersonalBank(req->dstItemId, req->charId, req->bySrcPlace, req->bySrcPos);
 									}
 									else res->wResultCode = QUERY_FAIL;
 								}
@@ -1079,7 +1060,7 @@ void CGameServerSession::RecvBankMoveReq(CNtlPacket * pPacket, CQueryServer * ap
 									pCache->EraseItem(req->srcItemId); //erase from inventory
 									pAccount->InsertBankItem(pSrcItem); //insert into shared bank
 
-									GetCharDB.Execute("UPDATE items SET owner_id=0, place=%u, pos=%u, AccountID=%u WHERE id=%I64u", req->byDstPlace, req->byDstPos, req->accountId, req->srcItemId);
+									g_pItemRepository->MoveToSharedBank(req->srcItemId, req->byDstPlace, req->byDstPos, req->accountId);
 								}
 							}
 							break;
@@ -1165,7 +1146,7 @@ void CGameServerSession::RecvBankMoveStackReq(CNtlPacket * pPacket, CQueryServer
 										{
 											//update dest stack count
 											pDstItem->byStackcount = req->byStackCount2;
-											GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount2, req->dstItemID);
+											g_pItemRepository->UpdateCount(req->dstItemID, req->byStackCount2);
 										}
 										else res->wResultCode = QUERY_FAIL;
 									}
@@ -1193,7 +1174,7 @@ void CGameServerSession::RecvBankMoveStackReq(CNtlPacket * pPacket, CQueryServer
 										{
 											//update dest stack count
 											pDstItem->byStackcount = req->byStackCount2;
-											GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount2, req->dstItemID);
+											g_pItemRepository->UpdateCount(req->dstItemID, req->byStackCount2);
 										}
 										else res->wResultCode = QUERY_FAIL;
 									}
@@ -1221,7 +1202,7 @@ void CGameServerSession::RecvBankMoveStackReq(CNtlPacket * pPacket, CQueryServer
 										{
 											//update dest stack count
 											pDstItem->byStackcount = req->byStackCount2;
-											GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount2, req->dstItemID);
+											g_pItemRepository->UpdateCount(req->dstItemID, req->byStackCount2);
 										}
 										else res->wResultCode = QUERY_FAIL;
 									}
@@ -1248,14 +1229,14 @@ void CGameServerSession::RecvBankMoveStackReq(CNtlPacket * pPacket, CQueryServer
 							{
 								if (req->byStackCount1 == 0)
 								{
-									GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->srcItemID); //delete source item
+									g_pItemRepository->DeleteById(req->srcItemID); //delete source item
 									delete pSrcItem;
 									pCache->EraseBankItem(req->srcItemID);
 								}
 								else
 								{
 									pSrcItem->byStackcount = req->byStackCount1;
-									GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount1, req->srcItemID);
+									g_pItemRepository->UpdateCount(req->srcItemID, req->byStackCount1);
 								}
 							}
 
@@ -1282,7 +1263,7 @@ void CGameServerSession::RecvBankMoveStackReq(CNtlPacket * pPacket, CQueryServer
 										{
 											//update dest stack count
 											pDstItem->byStackcount = req->byStackCount2;
-											GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount2, req->dstItemID);
+											g_pItemRepository->UpdateCount(req->dstItemID, req->byStackCount2);
 										}
 										else res->wResultCode = QUERY_FAIL;
 									}
@@ -1310,7 +1291,7 @@ void CGameServerSession::RecvBankMoveStackReq(CNtlPacket * pPacket, CQueryServer
 										{
 											//update dest stack count
 											pDstItem->byStackcount = req->byStackCount2;
-											GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount2, req->dstItemID);
+											g_pItemRepository->UpdateCount(req->dstItemID, req->byStackCount2);
 										}
 										else res->wResultCode = QUERY_FAIL;
 									}
@@ -1338,7 +1319,7 @@ void CGameServerSession::RecvBankMoveStackReq(CNtlPacket * pPacket, CQueryServer
 										{
 											//update dest stack count
 											pDstItem->byStackcount = req->byStackCount2;
-											GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount2, req->dstItemID);
+											g_pItemRepository->UpdateCount(req->dstItemID, req->byStackCount2);
 										}
 										else res->wResultCode = QUERY_FAIL;
 									}
@@ -1364,14 +1345,14 @@ void CGameServerSession::RecvBankMoveStackReq(CNtlPacket * pPacket, CQueryServer
 							{
 								if (req->byStackCount1 == 0)
 								{
-									GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->srcItemID); //delete source item
+									g_pItemRepository->DeleteById(req->srcItemID); //delete source item
 									delete pSrcItem;
 									pAccount->EraseBankItem(req->srcItemID);
 								}
 								else
 								{
 									pSrcItem->byStackcount = req->byStackCount1;
-									GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount1, req->srcItemID);
+									g_pItemRepository->UpdateCount(req->srcItemID, req->byStackCount1);
 								}
 							}
 						}
@@ -1397,7 +1378,7 @@ void CGameServerSession::RecvBankMoveStackReq(CNtlPacket * pPacket, CQueryServer
 										{
 											//update dest stack count
 											pDstItem->byStackcount = req->byStackCount2;
-											GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount2, req->dstItemID);
+											g_pItemRepository->UpdateCount(req->dstItemID, req->byStackCount2);
 										}
 										else res->wResultCode = QUERY_FAIL;
 									}
@@ -1425,7 +1406,7 @@ void CGameServerSession::RecvBankMoveStackReq(CNtlPacket * pPacket, CQueryServer
 										{
 											//update dest stack count
 											pDstItem->byStackcount = req->byStackCount2;
-											GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount2, req->dstItemID);
+											g_pItemRepository->UpdateCount(req->dstItemID, req->byStackCount2);
 										}
 										else res->wResultCode = QUERY_FAIL;
 									}
@@ -1456,14 +1437,14 @@ void CGameServerSession::RecvBankMoveStackReq(CNtlPacket * pPacket, CQueryServer
 							{
 								if (req->byStackCount1 == 0)
 								{
-									GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->srcItemID); //delete source item
+									g_pItemRepository->DeleteById(req->srcItemID); //delete source item
 									delete pSrcItem;
 									pCache->EraseItem(req->srcItemID);
 								}
 								else
 								{
 									pSrcItem->byStackcount = req->byStackCount1;
-									GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount1, req->srcItemID);
+									g_pItemRepository->UpdateCount(req->srcItemID, req->byStackCount1);
 								}
 							}
 						}
@@ -1500,7 +1481,7 @@ void CGameServerSession::RecvBankBuyReq(CNtlPacket* pPacket, CQueryServer* app)
 			if (pCache->GetZeni() >= req->dwZenny)
 			{
 				pCache->SetZeni(pCache->GetZeni() - req->dwZenny);
-				GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charId);
+				g_pCharacterRepository->UpdateMoney(req->charId, pCache->GetZeni());
 
 				res->itemID = g_pItemManager->CreateBank(req->charId, req->itemNo, req->byPlace, req->byPosition, req->byRank, req->byDurationType, req->nUseStartTime, req->nUseStartTime);
 
@@ -1608,8 +1589,7 @@ void CGameServerSession::RecvPcUpdateBindReq(CNtlPacket * pPacket, CQueryServer 
 	{
 		pPlayerCache->UpdateBind(req->bindWorldId, req->bindObjectTblidx, req->byBindType, req->vBindLoc, req->vBindDir);
 
-		GetCharDB.Execute("UPDATE bind SET WorldID=%u,BindObjectTblIdx=%u,LocX=%f,LocY=%f,LocZ=%f,DirX=%f,DirY=%f,DirZ=%f,Type=%u WHERE CharID=%u",
-			req->bindWorldId, req->bindObjectTblidx, req->vBindLoc.x, req->vBindLoc.y, req->vBindLoc.z, req->vBindDir.x, req->vBindDir.y, req->vBindDir.z, req->byBindType, req->charId);
+		g_pCharacterRepository->UpdateBind(req->bindWorldId, req->bindObjectTblidx, req->byBindType, req->vBindLoc.x, req->vBindLoc.y, req->vBindLoc.z, req->vBindDir.x, req->vBindDir.y, req->vBindDir.z, req->charId);
 	}
 }
 
@@ -1630,7 +1610,7 @@ void CGameServerSession::RecvCharConvertClassReq(CNtlPacket * pPacket, CQuerySer
 				pMember->byClass = req->byClass;
 		}
 
-		GetCharDB.Execute("UPDATE characters SET Class=%u WHERE CharID=%u", req->byClass, req->charId);
+		g_pCharacterRepository->UpdateClass(req->byClass, req->charId);
 	}
 }
 
@@ -1645,7 +1625,7 @@ void CGameServerSession::RecvCharConvertGenderNfy(CNtlPacket * pPacket, CQuerySe
 	{
 		pPlayerCache->SetGender(req->byGender);
 
-		GetCharDB.Execute("UPDATE characters SET Gender=%u WHERE CharID=%u", req->byGender, req->charId);
+		g_pCharacterRepository->UpdateGender(req->byGender, req->charId);
 	}
 }
 
@@ -1663,7 +1643,7 @@ void CGameServerSession::RecvUpdateCharZennyReq(CNtlPacket * pPacket, CQueryServ
 		else
 			pBuyer->SetZeni(UnsignedSafeDecrease<DWORD>(pBuyer->GetZeni(), req->dwZenny));
 
-		GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pBuyer->GetZeni(), req->charId);
+		g_pCharacterRepository->UpdateMoney(req->charId, pBuyer->GetZeni());
 	}
 }
 
@@ -1677,7 +1657,7 @@ void CGameServerSession::RecvUpdateCharNetpyReq(CNtlPacket * pPacket, CQueryServ
 	if (pPlayerCache)
 	{
 		pPlayerCache->SetNetPy(req->dwPoints);
-		GetCharDB.Execute("UPDATE characters SET Netpy=%u WHERE CharID=%u", req->dwPoints, req->charId);
+		g_pCharacterRepository->UpdateNetpy(req->dwPoints, req->charId);
 	}
 }
 
@@ -1693,12 +1673,12 @@ void CGameServerSession::RecvQuestItemCreateReq(CNtlPacket * pPacket, CQueryServ
 		if (req->aItems.byUpdateType == eQUEST_ITEM_UPDATE_TYPE_UPDATE)
 		{
 			if(pPlayerCache->UpdateQuestItem(req->aItems.byPos, req->aItems.byCurCount))
-				GetCharDB.Execute("UPDATE questitems SET amount=%u WHERE CharID=%u AND pos=%u", req->aItems.byCurCount, req->charId, req->aItems.byPos);
+				g_pQuestRepository->UpdateQuestItemAmount(req->aItems.byCurCount, req->charId, req->aItems.byPos);
 		}
 		else
 		{
 			if(pPlayerCache->CreateQuestItem(req->aItems.itemTblidx, req->aItems.byPos, req->aItems.byCurCount))
-				GetCharDB.Execute("INSERT INTO questitems (CharID,tblidx,amount,pos) VALUES (%u,%u,%u,%u)", req->charId, req->aItems.itemTblidx, req->aItems.byCurCount, req->aItems.byPos);
+				g_pQuestRepository->InsertQuestItem(req->charId, req->aItems.itemTblidx, req->aItems.byCurCount, req->aItems.byPos);
 		}
 	}
 }
@@ -1713,7 +1693,7 @@ void CGameServerSession::RecvQuestItemDeleteReq(CNtlPacket * pPacket, CQueryServ
 	if (pPlayerCache)
 	{
 		if (pPlayerCache->DeleteQuestItem(req->aItems.byPos))
-			GetCharDB.Execute("DELETE FROM questitems WHERE CharID=%u AND pos=%u", req->charId, req->aItems.byPos);
+			g_pQuestRepository->DeleteQuestItem(req->charId, req->aItems.byPos);
 	}
 }
 
@@ -1729,14 +1709,14 @@ void CGameServerSession::RecvQuestItemMoveReq(CNtlPacket * pPacket, CQueryServer
 		if (req->dwDestTblidx == INVALID_TBLIDX) //move item
 		{
 			if(pPlayerCache->MoveQuestItem(req->bySrcPos, req->byDestPos))
-				GetCharDB.Execute("UPDATE questitems SET pos=%u WHERE CharID=%u AND pos=%u", req->byDestPos, req->charId, req->bySrcPos);
+				g_pQuestRepository->UpdateQuestItemPos(req->byDestPos, req->charId, req->bySrcPos);
 		}
 		else //switch item
 		{
 			if(pPlayerCache->SwitchQuestItem(req->bySrcPos, req->byDestPos))
 			{
-				GetCharDB.Execute("UPDATE questitems SET pos=%u WHERE CharID=%u AND tblidx=%u AND pos=%u", req->byDestPos, req->charId, req->dwSrcTblidx, req->bySrcPos);
-				GetCharDB.Execute("UPDATE questitems SET pos=%u WHERE CharID=%u AND tblidx=%u AND pos=%u", req->bySrcPos, req->charId, req->dwDestTblidx, req->byDestPos);
+				g_pQuestRepository->UpdateQuestItemPosByTblidx(req->byDestPos, req->charId, req->dwSrcTblidx, req->bySrcPos);
+				g_pQuestRepository->UpdateQuestItemPosByTblidx(req->bySrcPos, req->charId, req->dwDestTblidx, req->byDestPos);
 			}
 		}
 	}
@@ -1755,12 +1735,7 @@ void CGameServerSession::RecvQuestProgressCreateReq(CNtlPacket * pPacket, CQuery
 		{
 			if (pPlayerCache->CompleteQuest(req->progressInfo.tId))
 			{
-				GetCharDB.Execute("INSERT INTO quests (CharID,QuestID,tcQuestInfo,taQuestInfo,tgExcCGroup,tcPreId,tcCurId,tcId,taId,evtUserData,evtUserData2,evtUserData3,evtUserData4,tcTimeInfo,taTimeInfo,TimeLeft,QState)"
-					"VALUES(%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u)"
-					"ON DUPLICATE KEY UPDATE "
-					"CharID=VALUES(CharID),QuestID=VALUES(QuestID),tcQuestInfo=VALUES(tcQuestInfo),taQuestInfo=VALUES(taQuestInfo),tgExcCGroup=VALUES(tgExcCGroup),tcPreId=VALUES(tcPreId),tcCurId=VALUES(tcCurId),tcId=VALUES(tcId),taId=VALUES(taId),"
-					"evtUserData=VALUES(evtUserData),evtUserData2=VALUES(evtUserData2),evtUserData3=VALUES(evtUserData3),evtUserData4=VALUES(evtUserData4),tcTimeInfo=VALUES(tcTimeInfo),taTimeInfo=VALUES(taTimeInfo),TimeLeft=VALUES(TimeLeft),QState=VALUES(QState)",
-					req->charId, req->progressInfo.tId,
+				g_pQuestRepository->UpsertQuestProgress(req->charId, req->progressInfo.tId,
 					254, 255, req->progressInfo.uData.sQInfoV0.tgExcCGroup,
 					254, 255, 255, 255,
 					req->progressInfo.uData.sQInfoV0.sSToCEvtData.m_aUserData[0], req->progressInfo.uData.sQInfoV0.sSToCEvtData.m_aUserData[1], req->progressInfo.uData.sQInfoV0.sSToCEvtData.m_aUserData[2], req->progressInfo.uData.sQInfoV0.sSToCEvtData.m_aUserData[3],
@@ -1771,12 +1746,7 @@ void CGameServerSession::RecvQuestProgressCreateReq(CNtlPacket * pPacket, CQuery
 		{
 			pPlayerCache->StoreQuestProgress(req->progressInfo);
 
-			GetCharDB.Execute("INSERT INTO quests (CharID,QuestID,tcQuestInfo,taQuestInfo,tgExcCGroup,tcPreId,tcCurId,tcId,taId,evtUserData,evtUserData2,evtUserData3,evtUserData4,tcTimeInfo,taTimeInfo,TimeLeft,QState)"
-				"VALUES(%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u)"
-				"ON DUPLICATE KEY UPDATE "
-				"CharID=VALUES(CharID),QuestID=VALUES(QuestID),tcQuestInfo=VALUES(tcQuestInfo),taQuestInfo=VALUES(taQuestInfo),tgExcCGroup=VALUES(tgExcCGroup),tcPreId=VALUES(tcPreId),tcCurId=VALUES(tcCurId),tcId=VALUES(tcId),taId=VALUES(taId),"
-				"evtUserData=VALUES(evtUserData),evtUserData2=VALUES(evtUserData2),evtUserData3=VALUES(evtUserData3),evtUserData4=VALUES(evtUserData4),tcTimeInfo=VALUES(tcTimeInfo),taTimeInfo=VALUES(taTimeInfo),TimeLeft=VALUES(TimeLeft),QState=VALUES(QState)",
-				req->charId, req->progressInfo.tId,
+			g_pQuestRepository->UpsertQuestProgress(req->charId, req->progressInfo.tId,
 				req->progressInfo.uData.sQInfoV0.tcQuestInfo, req->progressInfo.uData.sQInfoV0.taQuestInfo, req->progressInfo.uData.sQInfoV0.tgExcCGroup,
 				req->progressInfo.uData.sQInfoV0.sMainTSP.tcPreId, req->progressInfo.uData.sQInfoV0.sMainTSP.tcCurId, req->progressInfo.uData.sQInfoV0.sSToCEvtData.tcId, req->progressInfo.uData.sQInfoV0.sSToCEvtData.taId,
 				req->progressInfo.uData.sQInfoV0.sSToCEvtData.m_aUserData[0], req->progressInfo.uData.sQInfoV0.sSToCEvtData.m_aUserData[1], req->progressInfo.uData.sQInfoV0.sSToCEvtData.m_aUserData[2], req->progressInfo.uData.sQInfoV0.sSToCEvtData.m_aUserData[3],
@@ -1795,7 +1765,7 @@ void CGameServerSession::RecvQuestProgressDataDeleteReq(CNtlPacket * pPacket, CQ
 	if (pPlayerCache)
 	{
 		if (pPlayerCache->DeleteQuestProgressData(req->questID))
-			GetCharDB.Execute("DELETE FROM quests WHERE CharID=%u AND QuestID=%u", req->charId, req->questID);
+			g_pQuestRepository->DeleteQuestProgress(req->charId, req->questID);
 	}
 }
 
@@ -1821,15 +1791,11 @@ void CGameServerSession::RecvQuickSlotUpdateReq(CNtlPacket* pPacket, CQueryServe
 
 		if (req->byType == QUICK_SLOT_TYPE_ITEM)
 		{
-			GetCharDB.Execute("INSERT INTO quickslot (CharID,Tblidx,Slot,Type,Item)VALUES(%u,%u,%u,%u,%I64u)"
-				"ON DUPLICATE KEY UPDATE CharID=VALUES(CharID),Tblidx=VALUES(Tblidx),Slot=VALUES(Slot),Type=VALUES(Type),Item=VALUES(Item)",
-				req->charId, req->tblidx, req->bySlotID, req->byType, req->itemID);
+			g_pQuickSlotRepository->UpsertQuickSlot(req->charId, req->tblidx, req->bySlotID, req->byType, req->itemID);
 		}
 		else
 		{
-			GetCharDB.Execute("INSERT INTO quickslot (CharID,Tblidx,Slot,Type,Item)VALUES(%u,%u,%u,%u,%I64u)"
-				"ON DUPLICATE KEY UPDATE CharID=VALUES(CharID),Tblidx=VALUES(Tblidx),Slot=VALUES(Slot),Type=VALUES(Type),Item=VALUES(Item)",
-				req->charId, req->tblidx, req->bySlotID, req->byType, 0);
+			g_pQuickSlotRepository->UpsertQuickSlot(req->charId, req->tblidx, req->bySlotID, req->byType, 0);
 		}
 	}
 }
@@ -1846,7 +1812,7 @@ void CGameServerSession::RecvQuickSlotDelReq(CNtlPacket* pPacket, CQueryServer* 
 	{
 		pPlayerCache->DeleteQuickSlot(req->bySlotID);
 
-		GetCharDB.Execute("DELETE FROM quickslot WHERE CharID=%u AND Slot=%u", req->charId, req->bySlotID);
+		g_pQuickSlotRepository->DeleteQuickSlot(req->charId, req->bySlotID);
 	}
 }
 
@@ -1883,10 +1849,10 @@ void CGameServerSession::RecvTradeReq(CNtlPacket * pPacket, CQueryServer * app)
 				if (req->dwGiveZenny > 0)
 				{
 					pOwner->SetZeni(UnsignedSafeDecrease<DWORD>(pOwner->GetZeni(), req->dwGiveZenny));
-					GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pOwner->GetZeni(), req->charID);
+					g_pCharacterRepository->UpdateMoney(req->charID, pOwner->GetZeni());
 
 					pTarget->SetZeni(UnsignedSafeIncrease<DWORD>(pTarget->GetZeni(), req->dwTakeZenny));
-					GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pTarget->GetZeni(), req->dstcharID);
+					g_pCharacterRepository->UpdateMoney(req->dstcharID, pTarget->GetZeni());
 				}
 
 				//add items to target
@@ -1913,14 +1879,14 @@ void CGameServerSession::RecvTradeReq(CNtlPacket * pPacket, CQueryServer * app)
 					if (req->asTakeData[i].byDstCount == 0)
 					{
 						if (pOwner->RemoveItem(req->asTakeData[i].itemSerial))
-							GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->asTakeData[i].itemSerial);
+							g_pItemRepository->DeleteById(req->asTakeData[i].itemSerial);
 					}
 					else
 					{
 						if (sITEM_DATA* pItem = pOwner->GetItemData(req->asTakeData[i].itemSerial))
 						{
 							pItem->byStackcount = req->asTakeData[i].byDstCount;
-							GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pItem->byStackcount, req->asTakeData[i].itemSerial);
+							g_pItemRepository->UpdateCount(req->asTakeData[i].itemSerial, pItem->byStackcount);
 						}
 					}
 				}
@@ -1931,10 +1897,7 @@ void CGameServerSession::RecvTradeReq(CNtlPacket * pPacket, CQueryServer * app)
 	}
 	else res->wResultCode = QUERY_FAIL;
 
-	GetLogDB.Execute("INSERT INTO TradeLogs (CharID, TargetCharID, Zeni, ItemCount, ItemID_1,ItemTblidx_1, ItemID_2,ItemTblidx_2, ItemID_3,ItemTblidx_3, ItemID_4,ItemTblidx_4, ItemID_5,ItemTblidx_5, ItemID_6,ItemTblidx_6"
-		", ItemID_7,ItemTblidx_7, ItemID_8,ItemTblidx_8, ItemID_9,ItemTblidx_9, ItemID_10,ItemTblidx_10, ItemID_11, ItemTblidx_11, ItemID_12,ItemTblidx_12)"
-		"VALUES(%u,%u,%u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u)",
-		req->charID, req->dstcharID, req->dwGiveZenny, req->byGiveCount,
+	g_pAuditLogRepository->InsertTradeLog(req->charID, req->dstcharID, req->dwGiveZenny, req->byGiveCount,
 		res->asRecvData[0].itemNewSerial, res->asRecvData[0].itemTblidx, res->asRecvData[1].itemNewSerial, res->asRecvData[1].itemTblidx, res->asRecvData[2].itemNewSerial, res->asRecvData[2].itemTblidx,
 		res->asRecvData[3].itemNewSerial, res->asRecvData[3].itemTblidx, res->asRecvData[4].itemNewSerial, res->asRecvData[4].itemTblidx, res->asRecvData[5].itemNewSerial, res->asRecvData[5].itemTblidx,
 		res->asRecvData[6].itemNewSerial, res->asRecvData[6].itemTblidx, res->asRecvData[7].itemNewSerial, res->asRecvData[7].itemTblidx, res->asRecvData[8].itemNewSerial, res->asRecvData[8].itemTblidx,
@@ -1968,7 +1931,7 @@ void CGameServerSession::RecvPrivateShopItemBuyReq(CNtlPacket * pPacket, CQueryS
 
 				if (itemIdx[i] != INVALID_TBLIDX)
 				{
-					GetCharDB.Execute("UPDATE items SET owner_id=%u, place=%u, pos=%u WHERE id=%I64u", req->charID_To, req->asEmpty[i].byPlace, req->asEmpty[i].byPos, req->asEmpty[i].itemID);
+					g_pItemRepository->UpdateOwnerPlace(req->asEmpty[i].itemID, req->charID_To, req->asEmpty[i].byPlace, req->asEmpty[i].byPos);
 				}
 				else
 				{
@@ -1984,8 +1947,8 @@ void CGameServerSession::RecvPrivateShopItemBuyReq(CNtlPacket * pPacket, CQueryS
 				pBuyer->SetZeni(UnsignedSafeDecrease<DWORD>(pBuyer->GetZeni(), req->dwAllZenny));
 				pSeller->SetZeni(UnsignedSafeIncrease<DWORD>(pSeller->GetZeni(), req->dwAllZenny));
 
-				GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pBuyer->GetZeni(), req->charID_To);
-				GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pSeller->GetZeni(), req->charID_From);
+				g_pCharacterRepository->UpdateMoney(req->charID_To, pBuyer->GetZeni());
+				g_pCharacterRepository->UpdateMoney(req->charID_From, pSeller->GetZeni());
 			}
 		}
 		else
@@ -2000,10 +1963,7 @@ void CGameServerSession::RecvPrivateShopItemBuyReq(CNtlPacket * pPacket, CQueryS
 		strIssue = "Buyer or Seller not found in database";
 	}
 
-	GetLogDB.Execute("INSERT INTO PrivateShopLogs (SellerCharID, BuyerCharID, Zeni, ItemCount, ItemID_1,ItemTblidx_1, ItemID_2,ItemTblidx_2, ItemID_3,ItemTblidx_3, ItemID_4,ItemTblidx_4, ItemID_5,ItemTblidx_5, ItemID_6,ItemTblidx_6"
-		", ItemID_7,ItemTblidx_7, ItemID_8,ItemTblidx_8, ItemID_9,ItemTblidx_9, ItemID_10,ItemTblidx_10, ItemID_11, ItemTblidx_11, ItemID_12,ItemTblidx_12, HasIssues,IssueReason)"
-		"VALUES(%u,%u,%u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%I64u,%u,%u,'%s')",
-		req->charID_From, req->charID_To, req->dwAllZenny, req->byCount,
+	g_pAuditLogRepository->InsertPrivateShopLog(req->charID_From, req->charID_To, req->dwAllZenny, req->byCount,
 		req->asEmpty[0].itemID, itemIdx[0], req->asEmpty[1].itemID, itemIdx[1], req->asEmpty[2].itemID, itemIdx[2],
 		req->asEmpty[3].itemID, itemIdx[3], req->asEmpty[4].itemID, itemIdx[4], req->asEmpty[5].itemID, itemIdx[5],
 		req->asEmpty[6].itemID, itemIdx[6], req->asEmpty[7].itemID, itemIdx[7], req->asEmpty[8].itemID, itemIdx[8],
@@ -2024,11 +1984,9 @@ void CGameServerSession::RecvRankBattleScoreUpdateReq(CNtlPacket * pPacket, CQue
 		pCache->SetRankBattleScoreInfo(req->sScoreInfo);
 
 		if (req->dwMudosaPoint > 0)
-			GetCharDB.Execute("UPDATE characters SET MudosaPoint=%u WHERE CharID=%u", pCache->GetMudusaPoints(), req->charID);
+			g_pCharacterRepository->UpdateMudosaPoint(pCache->GetMudusaPoints(), req->charID);
 
-		GetCharDB.Execute("INSERT INTO rank_battle (CharID,Win,Draw,Lose,StraightKOWin,MaxStraightKOWin,MaxStraightWin,StraightWin,Points) VALUES (%u,%u,%u,%u,%u,%u,%u,%u,%f) ON DUPLICATE KEY UPDATE "
-			"Win=VALUES(Win),Draw=VALUES(Draw),Lose=VALUES(Lose),StraightKOWin=VALUES(StraightKOWin),MaxStraightKOWin=VALUES(MaxStraightKOWin),MaxStraightWin=VALUES(MaxStraightWin),StraightWin=VALUES(StraightWin),Points=VALUES(Points)",
-			req->charID, req->sScoreInfo.dwWin, req->sScoreInfo.dwDraw, req->sScoreInfo.dwLose, req->sScoreInfo.wStraightKOWin, req->sScoreInfo.wMaxStraightKOWin, req->sScoreInfo.wMaxStraightWin, req->sScoreInfo.wStraightWin, req->sScoreInfo.fPoint);
+		g_pCharacterRepository->UpsertRankBattle(req->charID, req->sScoreInfo.dwWin, req->sScoreInfo.dwDraw, req->sScoreInfo.dwLose, req->sScoreInfo.wStraightKOWin, req->sScoreInfo.wMaxStraightKOWin, req->sScoreInfo.wMaxStraightWin, req->sScoreInfo.wStraightWin, req->sScoreInfo.fPoint);
 	}
 }
 
@@ -2042,7 +2000,7 @@ void CGameServerSession::RecvTutorialDataUpdateReq(CNtlPacket * pPacket, CQueryS
 	CPlayerCache* pCache = g_pPlayerCache->GetCharacter(req->charId);
 	if (pCache)
 	{
-		GetCharDB.Execute("UPDATE characters SET TutorialFlag=%i WHERE CharID=%u", req->bTutorialFlag, req->charId);
+		g_pCharacterRepository->UpdateTutorialFlag(req->bTutorialFlag, req->charId);
 
 		if (req->bTutorialFlag == false)
 			pCache->SetTutorialFlag(true);
@@ -2064,10 +2022,7 @@ void CGameServerSession::RecvMailStartReq(CNtlPacket * pPacket, CQueryServer * a
 	{
 		pCache->SetSession(GetHandle());
 
-		SQLCallbackBase* pCallBack = new SQLClassCallbackP2<CPlayerCache, HOBJECT, HOBJECT>(pCache, &CPlayerCache::StartMailResult, req->handle, req->hObject);
-		AsyncQuery * q = new AsyncQuery(pCallBack);
-		q->AddQuery("SELECT * FROM mail WHERE CharID=%u LIMIT 30", req->charID); // LIMIT NTL_MAX_MAIL_SLOT_COUNT
-		GetCharDB.QueueAsyncQuery(q);
+		g_pMailRepository->LoadMailboxAsync(pCache, req->charID, req->handle, req->hObject);
 	}
 }
 
@@ -2103,7 +2058,7 @@ void CGameServerSession::RecvMailSendReq(CNtlPacket* pPacket, CQueryServer* app)
 		{
 			char* chTargetName = Ntl_WC2MB(req->wszTargetName);
 
-			smart_ptr<QueryResult> result = GetCharDB.Query("SELECT CharID, MailIsAway FROM characters WHERE CharName=\"%s\"", GetCharDB.EscapeString(chTargetName).c_str());
+			smart_ptr<QueryResult> result = g_pCharacterRepository->GetCharIdAndAwayByName(chTargetName);
 			if (result)
 			{
 				Field* f = result->Fetch();
@@ -2122,7 +2077,7 @@ void CGameServerSession::RecvMailSendReq(CNtlPacket* pPacket, CQueryServer* app)
 						goto END;
 					}
 
-					GetCharDB.Execute("UPDATE items SET owner_id=0 WHERE id=%I64u", req->sItemData.itemID);
+					g_pItemRepository->ClearOwner(req->sItemData.itemID);
 				}
 
 				res->targetCharID = f[0].GetUInt32();
@@ -2131,14 +2086,12 @@ void CGameServerSession::RecvMailSendReq(CNtlPacket* pPacket, CQueryServer* app)
 				GetLocalTime(&ti);
 				char* message = Ntl_WC2MB(req->wszText);
 
-				GetCharDB.Execute("INSERT INTO mail (CharID,SenderType,MailType,TextSize,Text,Zenny,itemId,TargetName,FromName,RemainDay,year,month,day,hour,minute,second)"
-					"VALUES(%u,%u,%u,%u,\"%s\",%u, %I64u,\"%s\",\"%ls\",%u,%u,%u,%u,%u,%u,%u)",
-					res->targetCharID, eMAIL_SENDER_TYPE_BASIC, req->byMailType, req->byTextSize, GetCharDB.EscapeString(message).c_str(), req->dwZenny, req->sItemData.itemID, chTargetName, req->wszName, req->byDay, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
+				g_pMailRepository->InsertTargetedMail(res->targetCharID, eMAIL_SENDER_TYPE_BASIC, req->byMailType, req->byTextSize, GetCharDB.EscapeString(message).c_str(), req->dwZenny, req->sItemData.itemID, chTargetName, req->wszName, req->byDay, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
 
 				Ntl_CleanUpHeapString(message);
 
 				pCache->SetZeni(UnsignedSafeDecrease<DWORD>(pCache->GetZeni(), dwFee));
-				GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charID);
+				g_pCharacterRepository->UpdateMoney(req->charID, pCache->GetZeni());
 
 			}
 			else res->wResultCode = GAME_MAIL_NOT_EXISTING_PLAYER;
@@ -2170,7 +2123,7 @@ void CGameServerSession::RecvMailReadReq(CNtlPacket* pPacket, CQueryServer* app)
 		if (pMail)
 		{
 			pMail->bIsRead = true;
-			GetCharDB.Execute("UPDATE mail SET IsRead=1 WHERE id=%u", req->mailID);
+			g_pMailRepository->UpdateReadFlag(req->mailID);
 
 			if (pMail->bySenderType == eMAIL_SENDER_TYPE_BASIC || pMail->bySenderType == eMAIL_SENDER_TYPE_REPLY || pMail->bySenderType == eMAIL_SENDER_TYPE_RETURN)
 				pCache->DecreaseMailUnreadNormal();
@@ -2195,14 +2148,12 @@ void CGameServerSession::RecvMailDelReq(CNtlPacket* pPacket, CQueryServer* app)
 		{
 			char* message = Ntl_WC2MB(pMail->wszText);
 
-			GetLogDB.Execute("INSERT INTO mail_deleted (id,CharID,SenderType,MailType,TextSize,Text,Zenny,itemId,FromName,IsAccept,IsLock,IsRead,EndTime, year, month, day, hour, minute, second)"
-				"VALUES(%u,%u,%u,%u,%u,\"%s\",%u, %I64u,\"%ls\",%i,%i,%i,%I64u,%u,%u,%u,%u,%u,%u)",
-				pMail->mailID, req->charID, pMail->bySenderType, pMail->byMailType, pMail->byTextSize, GetCharDB.EscapeString(message).c_str(), pMail->dwZenny, pMail->sItemData.itemId, pMail->wszFromName, pMail->bIsAccept, pMail->bIsLock, pMail->bIsRead, pMail->endTime
+			g_pAuditLogRepository->InsertMailDeletedLog(pMail->mailID, req->charID, pMail->bySenderType, pMail->byMailType, pMail->byTextSize, GetCharDB.EscapeString(message).c_str(), pMail->dwZenny, pMail->sItemData.itemId, pMail->wszFromName, pMail->bIsAccept, pMail->bIsLock, pMail->bIsRead, pMail->endTime
 			, pMail->tCreateTime.year, pMail->tCreateTime.month, pMail->tCreateTime.day, pMail->tCreateTime.hour, pMail->tCreateTime.minute, pMail->tCreateTime.second);
 
 			pCache->DeleteMail(req->mailID);
 
-			GetCharDB.Execute("DELETE FROM mail WHERE id=%u", req->mailID);
+			g_pMailRepository->DeleteMailById(req->mailID);
 
 			Ntl_CleanUpHeapString(message);
 		}
@@ -2233,18 +2184,18 @@ void CGameServerSession::RecvMailReturnReq(CNtlPacket* pPacket, CQueryServer* ap
 			{
 				if (pMail->bIsLock == false)
 				{
-					smart_ptr<QueryResult> qrGetFromName = GetCharDB.Query("SELECT FromName FROM mail WHERE id=%u LIMIT 1", pMail->mailID); //we have to do this, in case the sender changed his char name
+					smart_ptr<QueryResult> qrGetFromName = g_pMailRepository->GetFromNameById(pMail->mailID); //we have to do this, in case the sender changed his char name
 					if (qrGetFromName)
 					{
 						Field* fGetFromName = qrGetFromName->Fetch();
 
 						const char* chFromName = fGetFromName->GetString();
 
-						smart_ptr<QueryResult> result = GetCharDB.Query("SELECT CharID FROM characters WHERE CharName=\"%s\" LIMIT 1", chFromName);
+						smart_ptr<QueryResult> result = g_pCharacterRepository->GetCharIdByNameUtf8(chFromName);
 						if (result)
 						{
 							Field* f = result->Fetch();
-							GetCharDB.Execute("UPDATE mail SET CharID=%u,SenderType=2,TargetName=\"%s\",FromName=\"%ls\",IsLock=0,IsRead=0 WHERE id=%u  LIMIT 1", f[0].GetUInt32(), chFromName, pCache->GetCharName(), req->mailID);
+							g_pMailRepository->UpdateReturnToSender(f[0].GetUInt32(), chFromName, pCache->GetCharName(), req->mailID);
 
 							//delete mail from owner
 							pCache->DeleteMail(req->mailID);
@@ -2278,17 +2229,11 @@ void CGameServerSession::RecvMailReloadReq(CNtlPacket * pPacket, CQueryServer * 
 
 		if (req->bIsSchedule)
 		{
-			SQLCallbackBase* pCallBack = new SQLClassCallbackP2<CPlayerCache, HOBJECT, bool>(pCache, &CPlayerCache::ScheduleReloadMailsResult, req->handle, true);
-			AsyncQuery * q = new AsyncQuery(pCallBack);
-			q->AddQuery("SELECT id,MailType,Zenny,IsAccept,IsLock,IsRead,SenderType,EndTime FROM mail WHERE CharID=%u LIMIT 30", req->charID); // LIMIT NTL_MAX_MAIL_SLOT_COUNT
-			GetCharDB.QueueAsyncQuery(q);
+			g_pMailRepository->ReloadMailboxAsync(pCache, req->charID, req->handle, true);
 		}
 		else
 		{
-			SQLCallbackBase* pCallBack = new SQLClassCallbackP2<CPlayerCache, HOBJECT, bool>(pCache, &CPlayerCache::ScheduleReloadMailsResult, req->handle, false);
-			AsyncQuery * q = new AsyncQuery(pCallBack);
-			q->AddQuery("SELECT id,MailType,Zenny,IsAccept,IsLock,IsRead,SenderType,EndTime FROM mail WHERE CharID=%u LIMIT 30", req->charID); // LIMIT NTL_MAX_MAIL_SLOT_COUNT
-			GetCharDB.QueueAsyncQuery(q);
+			g_pMailRepository->ReloadMailboxAsync(pCache, req->charID, req->handle, false);
 		}
 	}
 }
@@ -2302,10 +2247,7 @@ void CGameServerSession::RecvMailLoadReq(CNtlPacket * pPacket, CQueryServer * ap
 	{
 		pCache->SetSession(GetHandle());
 
-		SQLCallbackBase* pCallBack = new SQLClassCallbackP2<CPlayerCache, HOBJECT, HOBJECT>(pCache, &CPlayerCache::LoadMailResult, req->handle, req->hObject);
-		AsyncQuery * q = new AsyncQuery(pCallBack);
-		q->AddQuery("SELECT * FROM mail WHERE CharID=%u LIMIT 30", req->charID); // LIMIT NTL_MAX_MAIL_SLOT_COUNT
-		GetCharDB.QueueAsyncQuery(q);
+		g_pMailRepository->LoadMailDetailAsync(pCache, req->charID, req->handle, req->hObject);
 	}
 	else
 	{
@@ -2352,14 +2294,14 @@ void CGameServerSession::RecvMailItemReceiveReq(CNtlPacket* pPacket, CQueryServe
 						{
 							if (pCache->GetZeni() >= pMail->dwZenny)
 							{
-								smart_ptr<QueryResult> qrGetFromName = GetCharDB.Query("SELECT FromName FROM mail WHERE id=%u LIMIT 1", pMail->mailID); //we have to do this, in case the sender changed his char name
+								smart_ptr<QueryResult> qrGetFromName = g_pMailRepository->GetFromNameById(pMail->mailID); //we have to do this, in case the sender changed his char name
 								if (qrGetFromName)
 								{
 									Field* fGetFromName = qrGetFromName->Fetch();
 
 									const char* chFromName = fGetFromName->GetString();
 
-									smart_ptr<QueryResult> receiver = GetCharDB.Query("SELECT CharID FROM characters WHERE CharName=\"%s\" LIMIT 1", chFromName);
+									smart_ptr<QueryResult> receiver = g_pCharacterRepository->GetCharIdByNameUtf8(chFromName);
 									if (receiver)
 									{
 										Field* r = receiver->Fetch();
@@ -2368,14 +2310,12 @@ void CGameServerSession::RecvMailItemReceiveReq(CNtlPacket* pPacket, CQueryServe
 										SYSTEMTIME ti;
 										GetLocalTime(&ti);
 
-										GetCharDB.Execute("INSERT INTO mail (CharID,SenderType,MailType,TextSize,Text,Zenny,itemId,TargetName,FromName,RemainDay,year,month,day,hour,minute,second)"
-											"VALUES(%u,%u,%u,%u,\"%s\",%u, %I64u,\"%s\",\"%ls\",%u,%u,%u,%u,%u,%u,%u)",
-											res->fromCharId, eMAIL_SENDER_TYPE_SYSTEM, eMAIL_TYPE_ZENNY, 17, "You received Zeni", pMail->dwZenny, 0, chFromName, pCache->GetCharName(), 10, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
+										g_pMailRepository->InsertTargetedMail(res->fromCharId, eMAIL_SENDER_TYPE_SYSTEM, eMAIL_TYPE_ZENNY, 17, "You received Zeni", pMail->dwZenny, 0, chFromName, pCache->GetCharName(), 10, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond);
 
 										res->dwZenny = pMail->dwZenny;
 
 										pCache->SetZeni(pCache->GetZeni() - pMail->dwZenny);
-										GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charID);
+										g_pCharacterRepository->UpdateMoney(req->charID, pCache->GetZeni());
 									}
 									else res->wResultCode = GAME_MAIL_NOT_EXISTING_PLAYER;
 								}
@@ -2387,7 +2327,7 @@ void CGameServerSession::RecvMailItemReceiveReq(CNtlPacket* pPacket, CQueryServe
 					else if (req->byMailType == eMAIL_TYPE_ZENNY || req->byMailType == eMAIL_TYPE_ITEM_ZENNY) //add zeni to the receiver
 					{
 						pCache->SetZeni(UnsignedSafeIncrease<DWORD>(pCache->GetZeni(), pMail->dwZenny));
-						GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charID);
+						g_pCharacterRepository->UpdateMoney(req->charID, pCache->GetZeni());
 						res->dwZenny = pMail->dwZenny;
 					}
 				}
@@ -2398,7 +2338,7 @@ void CGameServerSession::RecvMailItemReceiveReq(CNtlPacket* pPacket, CQueryServe
 
 					if (pMail->sItemData.itemId > 0 && pMail->sItemData.itemId != INVALID_ITEMID) //if has item attached
 					{
-						GetCharDB.Execute("UPDATE items SET owner_id=%u,place=%u,pos=%u WHERE id=%I64u", req->charID, req->sInven.byPlace, req->sInven.byPos, pMail->sItemData.itemId);
+						g_pItemRepository->UpdateOwnerPlacePos(pMail->sItemData.itemId, req->charID, req->sInven.byPlace, req->sInven.byPos);
 
 						memcpy(&res->sItemData, &pMail->sItemData, sizeof(sITEM_DATA));
 						res->sItemData.charId = req->charID;
@@ -2409,7 +2349,7 @@ void CGameServerSession::RecvMailItemReceiveReq(CNtlPacket* pPacket, CQueryServe
 						pCache->AddItem(res->sItemData);
 					}
 
-					GetCharDB.Execute("UPDATE mail SET IsAccept=1 WHERE id=%u", req->mailID);
+					g_pMailRepository->UpdateAcceptFlag(req->mailID);
 				}
 			}
 			else res->wResultCode = GAME_MAIL_INVALID_ACCEPT;
@@ -2435,7 +2375,7 @@ void CGameServerSession::RecvMailLockReq(CNtlPacket* pPacket, CQueryServer* app)
 		if (pMail)
 		{
 			pMail->bIsLock = req->bIsLock;
-			GetCharDB.Execute("UPDATE mail SET IsLock=%i WHERE id=%u", req->bIsLock, req->mailID);
+			g_pMailRepository->UpdateLockFlag(req->bIsLock, req->mailID);
 		}
 	}
 }
@@ -2451,7 +2391,7 @@ void CGameServerSession::RecvCharAwayReq(CNtlPacket* pPacket, CQueryServer* app)
 	if (pCache)
 	{
 		pCache->SetIsMailAway(req->bIsAway);
-		GetCharDB.Execute("UPDATE characters SET MailIsAway=%i WHERE CharID=%u", req->bIsAway, req->charID);
+		g_pCharacterRepository->UpdateIsMailAway(req->bIsAway, req->charID);
 	}
 }
 
@@ -2470,17 +2410,17 @@ void CGameServerSession::RecvCharKeyUpdateReq(CNtlPacket* pPacket, CQueryServer*
 			if (req->asData[i].byType == eSHORTCUT_CHANGE_TYPE_ADD)
 			{
 				pCache->AddShortcut(req->asData[i].wActionID, req->asData[i].wKey);
-				GetAccDB.Execute("INSERT INTO shortcuts (AccountID,ActionID,wKey) VALUES (%u,%u,%u)", req->accountID, req->asData[i].wActionID, req->asData[i].wKey);
+				g_pAccountRepository->InsertShortcut(req->accountID, req->asData[i].wActionID, req->asData[i].wKey);
 			}
 			else if (req->asData[i].byType == eSHORTCUT_CHANGE_TYPE_DEL)
 			{
 				pCache->DeleteShortcut(req->asData[i].wActionID);
-				GetAccDB.Execute("DELETE FROM shortcuts WHERE AccountID=%u AND ActionID=%u", req->accountID, req->asData[i].wActionID);
+				g_pAccountRepository->DeleteShortcut(req->accountID, req->asData[i].wActionID);
 			}
 			else if (req->asData[i].byType == eSHORTCUT_CHANGE_TYPE_UPDATE)
 			{
 				if(pCache->UpdateShortcut(req->asData[i].wActionID, req->asData[i].wKey))
-					GetAccDB.Execute("UPDATE shortcuts SET wKey=%u WHERE AccountID=%u AND ActionID=%u", req->asData[i].wKey, req->accountID, req->asData[i].wActionID);
+					g_pAccountRepository->UpdateShortcutKey(req->asData[i].wKey, req->accountID, req->asData[i].wActionID);
 			}
 		}
 	}
@@ -2499,7 +2439,7 @@ void CGameServerSession::RecvPortalAddReq(CNtlPacket * pPacket, CQueryServer * a
 		pPlayerCache->AddPortal(req->PortalID);
 	}
 
-	GetCharDB.Execute("INSERT INTO portals (CharID,Point) VALUES (%u,%u)", req->charID, req->PortalID);
+	g_pCharacterRepository->InsertPortal(req->charID, req->PortalID);
 }
 
 void CGameServerSession::RecvWarFogUpdateReq(CNtlPacket * pPacket, CQueryServer * app)
@@ -2514,7 +2454,7 @@ void CGameServerSession::RecvWarFogUpdateReq(CNtlPacket * pPacket, CQueryServer 
 		pPlayerCache->UpdateWarFog(req->sInfo.achWarFogFlag);
 	}
 
-	GetCharDB.Execute("INSERT INTO warfog VALUES (%u,%u)", req->charID, req->contentsTblidx);
+	g_pCharacterRepository->InsertWarFog(req->charID, req->contentsTblidx);
 }
 
 
@@ -2548,7 +2488,7 @@ void CGameServerSession::RecvGuildBankLoadReq(CNtlPacket * pPacket, CQueryServer
 
 		if (bGuildBankCreated) //if new bank created, then we do query.
 		{
-			if (smart_ptr<QueryResult> result = GetCharDB.Query("SELECT * FROM items WHERE GuildID=%u ORDER BY place ASC LIMIT 96", req->guildID)) //NTL_MAX_COUNT_GUILD_HAVE_TOTAL_ITEM
+			if (smart_ptr<QueryResult> result = g_pItemRepository->GetItemsByGuildId(req->guildID))
 			{
 				do
 				{
@@ -2596,7 +2536,7 @@ void CGameServerSession::RecvGuildBankLoadReq(CNtlPacket * pPacket, CQueryServer
 				} while (result->NextRow());
 			}
 
-			if (smart_ptr<QueryResult> result2 = GetCharDB.Query("SELECT Zeni FROM guilds WHERE GuildID=%u LIMIT 1", req->guildID))
+			if (smart_ptr<QueryResult> result2 = g_pGuildRepository->GetZeniByGuildId(req->guildID))
 			{
 				Field* f = result2->Fetch();
 
@@ -2694,7 +2634,7 @@ void CGameServerSession::RecvGuildBankMoveReq(CNtlPacket * pPacket, CQueryServer
 					if (req->bySrcPlace >= CONTAINER_TYPE_INVEN_FIRST && req->bySrcPlace <= CONTAINER_TYPE_INVEN_LAST) //if move from inventory into guild bank
 					{
 						//src item to guild container
-						GetCharDB.Execute("UPDATE items SET owner_id=0, place=%u, pos=%u, GuildID=%u WHERE id=%I64u", req->byDstPlace, req->byDstPos, req->guildID, req->srcItemID);
+						g_pItemRepository->MoveToGuildBank(req->srcItemID, req->byDstPlace, req->byDstPos, req->guildID);
 						pPlayer->EraseItem(req->srcItemID); //remove from inventory
 						pBank->m_mapItems.insert(std::make_pair(req->srcItemID, pSrcItem)); //insert to guild bank
 						pSrcItem->byPlace = req->byDstPlace; //set pSrcItem place to dest place
@@ -2703,7 +2643,7 @@ void CGameServerSession::RecvGuildBankMoveReq(CNtlPacket * pPacket, CQueryServer
 						//if dest item exist, then move dest item from guild bank to inventory
 						if (pDstItem)
 						{
-							GetCharDB.Execute("UPDATE items SET owner_id=%u, place=%u, pos=%u, GuildID=0 WHERE id=%I64u", req->charId, req->bySrcPlace, req->bySrcPos, req->dstItemId);
+							g_pItemRepository->MoveFromGuildBankToOwner(req->dstItemId, req->charId, req->bySrcPlace, req->bySrcPos);
 							pBank->m_mapItems.erase(req->dstItemId); //remove from guild bank
 							pPlayer->InsertItem(pDstItem); //insert from inventory
 							pDstItem->byPlace = req->bySrcPlace;//set pDstItem place to src place
@@ -2713,13 +2653,13 @@ void CGameServerSession::RecvGuildBankMoveReq(CNtlPacket * pPacket, CQueryServer
 					}
 					else //else move inside guild bank <-> guild bank
 					{
-						GetCharDB.Execute("UPDATE items SET place=%u, pos=%u WHERE id=%I64u", req->byDstPlace, req->byDstPos, req->srcItemID);
+						g_pItemRepository->UpdatePlace(req->srcItemID, req->byDstPlace, req->byDstPos);
 						pSrcItem->byPlace = req->byDstPlace; //set pSrcItem place to dest place
 						pSrcItem->byPosition = req->byDstPos; //set pSrcItem pos to dest pos
 
 						if (pDstItem) //if dest item exist then move dest item to source item place
 						{
-							GetCharDB.Execute("UPDATE items SET place=%u, pos=%u WHERE id=%I64u", req->bySrcPlace, req->bySrcPos, req->dstItemId);
+							g_pItemRepository->UpdatePlace(req->dstItemId, req->bySrcPlace, req->bySrcPos);
 							pDstItem->byPlace = req->bySrcPlace;//set pDstItem place to src place
 							pDstItem->byPosition = req->bySrcPos;//set pDstItem pos to src pos
 						}
@@ -2729,7 +2669,7 @@ void CGameServerSession::RecvGuildBankMoveReq(CNtlPacket * pPacket, CQueryServer
 				{
 					if (IsGuildContainer(req->bySrcPlace)) //if move from guild bank into inventory
 					{
-						GetCharDB.Execute("UPDATE items SET owner_id=%u, place=%u, pos=%u, GuildID=0 WHERE id=%I64u", req->charId, req->byDstPlace, req->byDstPos, req->srcItemID);
+						g_pItemRepository->MoveFromGuildBankToOwner(req->srcItemID, req->charId, req->byDstPlace, req->byDstPos);
 						pPlayer->InsertItem(pSrcItem); //insert to inventory
 						pBank->m_mapItems.erase(req->srcItemID); //remove from guild bank
 						pSrcItem->byPlace = req->byDstPlace; //set srcitem place to dest place
@@ -2740,7 +2680,7 @@ void CGameServerSession::RecvGuildBankMoveReq(CNtlPacket * pPacket, CQueryServer
 						if (pDstItem)
 						{
 							//src item to guild container
-							GetCharDB.Execute("UPDATE items SET owner_id=0, place=%u, pos=%u, GuildID=%u WHERE id=%I64u", req->bySrcPlace, req->bySrcPos, req->guildID, req->srcItemID);
+							g_pItemRepository->MoveToGuildBank(req->srcItemID, req->bySrcPlace, req->bySrcPos, req->guildID);
 							pPlayer->EraseItem(req->dstItemId); //remove from inventory
 							pBank->m_mapItems.insert(std::make_pair(req->dstItemId, pDstItem)); //insert to guild bank
 							pDstItem->byPlace = req->bySrcPlace; //set pDstItem place to src place
@@ -2807,7 +2747,7 @@ void CGameServerSession::RecvGuildBankMoveStackReq(CNtlPacket * pPacket, CQueryS
 						if (req->hDstItem == INVALID_HOBJECT)	//unstack item -> create new item, update stackcount from src item
 						{
 							//update pSrcItem stack count from
-							GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount1, req->srcItemID);
+							g_pItemRepository->UpdateCount(req->srcItemID, req->byStackCount1);
 							pSrcItem->byStackcount = req->byStackCount1;
 
 							//create pDstItem and insert into guild
@@ -2832,16 +2772,16 @@ void CGameServerSession::RecvGuildBankMoveStackReq(CNtlPacket * pPacket, CQueryS
 								{
 									pPlayer->EraseItem(req->srcItemID);
 									delete pSrcItem;
-									GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->srcItemID); //delete source item
+									g_pItemRepository->DeleteById(req->srcItemID); //delete source item
 								}
 								else
 								{
 									pSrcItem->byStackcount = req->byStackCount1;
-									GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount1, req->srcItemID);//update stack count from source item
+									g_pItemRepository->UpdateCount(req->srcItemID, req->byStackCount1);//update stack count from source item
 								}
 
 								pDstItem->byStackcount = req->byStackCount2;
-								GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount2, req->dstItemID);	//update stack count from dest item
+								g_pItemRepository->UpdateCount(req->dstItemID, req->byStackCount2);	//update stack count from dest item
 							}
 							else res->wResultCode = QUERY_FAIL;
 						}
@@ -2855,7 +2795,7 @@ void CGameServerSession::RecvGuildBankMoveStackReq(CNtlPacket * pPacket, CQueryS
 						if (req->hDstItem == INVALID_HOBJECT)	//unstack item -> create new item, update stackcount from src item
 						{
 							//update pSrcItem stack count from
-							GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount1, req->srcItemID);
+							g_pItemRepository->UpdateCount(req->srcItemID, req->byStackCount1);
 							pSrcItem->byStackcount = req->byStackCount1;
 
 							//create pDstItem and insert into guild
@@ -2880,16 +2820,16 @@ void CGameServerSession::RecvGuildBankMoveStackReq(CNtlPacket * pPacket, CQueryS
 								{
 									pBank->m_mapItems.erase(req->srcItemID);
 									delete pSrcItem;
-									GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->srcItemID); //delete source item
+									g_pItemRepository->DeleteById(req->srcItemID); //delete source item
 								}
 								else
 								{
 									pSrcItem->byStackcount = req->byStackCount1;
-									GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount1, req->srcItemID);//update stack count from source item
+									g_pItemRepository->UpdateCount(req->srcItemID, req->byStackCount1);//update stack count from source item
 								}
 
 								pDstItem->byStackcount = req->byStackCount2;
-								GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount2, req->dstItemID);	//update stack count from dest item
+								g_pItemRepository->UpdateCount(req->dstItemID, req->byStackCount2);	//update stack count from dest item
 							}
 							else res->wResultCode = QUERY_FAIL;
 						}
@@ -2906,7 +2846,7 @@ void CGameServerSession::RecvGuildBankMoveStackReq(CNtlPacket * pPacket, CQueryS
 						if (req->hDstItem == INVALID_HOBJECT)	//unstack item -> create new item, update stackcount from src item
 						{
 							//update pSrcItem stack count from
-							GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount1, req->srcItemID);
+							g_pItemRepository->UpdateCount(req->srcItemID, req->byStackCount1);
 							pSrcItem->byStackcount = req->byStackCount1;
 
 							//create pDstItem and insert into inventory
@@ -2931,16 +2871,16 @@ void CGameServerSession::RecvGuildBankMoveStackReq(CNtlPacket * pPacket, CQueryS
 								{
 									pBank->m_mapItems.erase(req->srcItemID);
 									delete pSrcItem;
-									GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->srcItemID); //delete source item
+									g_pItemRepository->DeleteById(req->srcItemID); //delete source item
 								}
 								else
 								{
 									pSrcItem->byStackcount = req->byStackCount1;
-									GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount1, req->srcItemID);//update stack count from source item
+									g_pItemRepository->UpdateCount(req->srcItemID, req->byStackCount1);//update stack count from source item
 								}
 
 								pDstItem->byStackcount = req->byStackCount2;
-								GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount2, req->dstItemID);	//update stack count from dest item
+								g_pItemRepository->UpdateCount(req->dstItemID, req->byStackCount2);	//update stack count from dest item
 							}
 							else res->wResultCode = QUERY_FAIL;
 						}
@@ -2984,8 +2924,8 @@ void CGameServerSession::RecvGuildBankZeniReq(CNtlPacket * pPacket, CQueryServer
 					pPlayer->SetZeni(pPlayer->GetZeni() - req->dwZenny);
 					pBank->dwZeni = UnsignedSafeIncrease<DWORD>(pBank->dwZeni, req->dwZenny);
 
-					GetCharDB.Execute("UPDATE guilds SET Zeni=%u WHERE GuildID=%u", pBank->dwZeni, req->guildID);
-					GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pPlayer->GetZeni(), req->charId);
+					g_pGuildRepository->UpdateZeni(pBank->dwZeni, req->guildID);
+					g_pCharacterRepository->UpdateMoney(req->charId, pPlayer->GetZeni());
 				}
 				else res->wResultCode = QUERY_FAIL;
 			}
@@ -2996,8 +2936,8 @@ void CGameServerSession::RecvGuildBankZeniReq(CNtlPacket * pPacket, CQueryServer
 					pBank->dwZeni -= req->dwZenny;
 					pPlayer->SetZeni(UnsignedSafeIncrease<DWORD>(pPlayer->GetZeni(), req->dwZenny));
 
-					GetCharDB.Execute("UPDATE guilds SET Zeni=%u WHERE GuildID=%u", pBank->dwZeni, req->guildID);
-					GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pPlayer->GetZeni(), req->charId);
+					g_pGuildRepository->UpdateZeni(pBank->dwZeni, req->guildID);
+					g_pCharacterRepository->UpdateMoney(req->charId, pPlayer->GetZeni());
 				}
 				else res->wResultCode = QUERY_FAIL;
 			}
@@ -3126,7 +3066,7 @@ void CGameServerSession::RecvShopEventItemBuyReq(CNtlPacket * pPacket, CQuerySer
 			for (BYTE i = 0; i < req->byDeleteItemCount; i++)
 			{
 				if (pCache->RemoveItem(req->asDeleteItem[i].itemId))
-					GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->asDeleteItem[i].itemId);
+					g_pItemRepository->DeleteById(req->asDeleteItem[i].itemId);
 				else
 				{
 					res->wResultCode = GAME_FAIL;
@@ -3144,7 +3084,7 @@ void CGameServerSession::RecvShopEventItemBuyReq(CNtlPacket * pPacket, CQuerySer
 						if (sITEM_DATA* pData = pCache->GetItemData(req->aUpdateItem[i].nItemID))
 						{
 							pData->byStackcount = req->aUpdateItem[i].byStack;
-							GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->aUpdateItem[i].byStack, req->aUpdateItem[i].nItemID);
+							g_pItemRepository->UpdateCount(req->aUpdateItem[i].nItemID, req->aUpdateItem[i].byStack);
 						}
 						else
 						{
@@ -3165,7 +3105,7 @@ void CGameServerSession::RecvShopEventItemBuyReq(CNtlPacket * pPacket, CQuerySer
 					}
 
 					pCache->SetMudusaPoints(UnsignedSafeDecrease<DWORD>(pCache->GetMudusaPoints(), req->dwMudosaPoint));
-					GetCharDB.Execute("UPDATE characters SET MudosaPoint=%u WHERE CharID=%u", pCache->GetMudusaPoints(), req->charId);
+					g_pCharacterRepository->UpdateMudosaPoint(pCache->GetMudusaPoints(), req->charId);
 				}
 			}
 		}
@@ -3198,7 +3138,7 @@ void CGameServerSession::RecvShopGambleBuyReq(CNtlPacket* pPacket, CQueryServer*
 				res->sInven.itemId = g_pItemManager->CreateItem(req->sInven);
 
 				pPlayerCache->SetZeni(pPlayerCache->GetZeni() - req->dwPoint);
-				GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pPlayerCache->GetZeni(), req->charId);
+				g_pCharacterRepository->UpdateMoney(req->charId, pPlayerCache->GetZeni());
 
 				pPlayerCache->AddItem(res->sInven);
 			}
@@ -3214,7 +3154,7 @@ void CGameServerSession::RecvShopGambleBuyReq(CNtlPacket* pPacket, CQueryServer*
 
 					pPlayerCache->SetMudusaPoints(pPlayerCache->GetMudusaPoints() - req->dwPoint);
 					pPlayerCache->SetZeni(pPlayerCache->GetZeni() - ZENI_GAMBLE_FEE);
-					GetCharDB.Execute("UPDATE characters SET Money=%u,MudosaPoint=%u WHERE CharID=%u", pPlayerCache->GetZeni(), pPlayerCache->GetMudusaPoints(), req->charId);
+					g_pCharacterRepository->UpdateMoneyAndMudosa(pPlayerCache->GetZeni(), pPlayerCache->GetMudusaPoints(), req->charId);
 
 					pPlayerCache->AddItem(res->sInven);
 				}
@@ -3243,7 +3183,7 @@ void CGameServerSession::RecvUpdateMudosaPointReq(CNtlPacket * pPacket, CQuerySe
 	if (pPlayerCache)
 	{
 		pPlayerCache->SetMudusaPoints(req->dwMudosaPoint);
-		GetCharDB.Execute("UPDATE characters SET MudosaPoint=%u WHERE CharID=%u", req->dwMudosaPoint, req->charId);
+		g_pCharacterRepository->UpdateMudosaPoint(req->dwMudosaPoint, req->charId);
 	}
 }
 
@@ -3287,11 +3227,11 @@ void CGameServerSession::RecvSkillInitReq(CNtlPacket* pPacket, CQueryServer* app
 				if (pItem->byStackcount == 0)
 				{
 					pCache->RemoveItem(req->itemId);
-					GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->itemId);
+					g_pItemRepository->DeleteById(req->itemId);
 				}
 				else
 				{
-					GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pItem->byStackcount, req->itemId);
+					g_pItemRepository->UpdateCount(req->itemId, pItem->byStackcount);
 				}
 			}
 			else res->wResultCode = GAME_NEEDITEM_NOT_FOUND;
@@ -3305,8 +3245,8 @@ void CGameServerSession::RecvSkillInitReq(CNtlPacket* pPacket, CQueryServer* app
 			pCache->InitSkills();
 			pCache->SetSkillPoints(req->dwSP);
 
-			GetCharDB.Execute("DELETE FROM skills WHERE owner_id=%u", req->charId);
-			GetCharDB.Execute("UPDATE characters SET SpPoint=%u WHERE CharID=%u", req->dwSP, req->charId);
+			g_pSkillRepository->DeleteSkills(req->charId);
+			g_pCharacterRepository->UpdateSpPoint(req->dwSP, req->charId);
 
 			return;
 		}
@@ -3335,20 +3275,20 @@ void CGameServerSession::RecvSkillOneResetReq(CNtlPacket* pPacket, CQueryServer*
 			if (pItem->byStackcount == 0)
 			{
 				pCache->RemoveItem(req->itemId);
-				GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->itemId);
+				g_pItemRepository->DeleteById(req->itemId);
 			}
 			else
 			{
-				GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pItem->byStackcount, req->itemId);
+				g_pItemRepository->UpdateCount(req->itemId, pItem->byStackcount);
 			}
 
 			pCache->SetSkillPoints(req->dwAddSP + pCache->GetSkillPoints());
-			GetCharDB.Execute("UPDATE characters SET SpPoint=SpPoint+%u WHERE CharID=%u", req->dwAddSP, req->charId);
+			g_pCharacterRepository->UpdateSpPointAdd(req->dwAddSP, req->charId);
 
 			if (req->newSkillTblidx == 0)
 			{
 				if (pCache->DeleteSkill(req->skillIndex))
-					GetCharDB.Execute("DELETE FROM skills WHERE SlotID=%u AND owner_id=%u", req->skillIndex, req->charId);
+					g_pSkillRepository->DeleteSkillBySlot(req->skillIndex, req->charId);
 			}
 			else
 			{
@@ -3358,7 +3298,7 @@ void CGameServerSession::RecvSkillOneResetReq(CNtlPacket* pPacket, CQueryServer*
 					pData->bIsRpBonusAuto = req->bRpBonusAuto;
 					pData->byRpBonusType = req->byRpBonusType;
 
-					GetCharDB.Execute("UPDATE skills SET skill_id=%u, RpBonusAuto=%i, RpBonusType=%u WHERE SlotID=%u AND owner_id=%u", req->newSkillTblidx, req->bRpBonusAuto, req->byRpBonusType, req->skillIndex, req->charId);
+					g_pSkillRepository->UpdateSkillIdAndBonus(req->newSkillTblidx, req->bRpBonusAuto, req->byRpBonusType, req->skillIndex, req->charId);
 				}
 			}
 		}
@@ -3378,7 +3318,7 @@ void CGameServerSession::RecvRecipeRegisterReq(CNtlPacket * pPacket, CQueryServe
 		pPlayerCache->RegisterRecipe(req->recipeTblidx, req->byRecipeType);
 	}
 
-	GetCharDB.Execute("INSERT INTO hoipoi_recipe (CharID,RecipeTblidx,RecipeType) VALUES (%u,%u,%u)", req->charId, req->recipeTblidx, req->byRecipeType);
+	g_pRecipeRepository->InsertRecipe(req->charId, req->recipeTblidx, req->byRecipeType);
 }
 
 
@@ -3415,19 +3355,19 @@ void CGameServerSession::RecvHoipoiItemMakeReq(CNtlPacket* pPacket, CQueryServer
 					if (req->asData[i].byStack == 0)
 					{
 						pCache->RemoveItem(req->asData[i].nItemID);
-						GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", pItem->itemId);
+						g_pItemRepository->DeleteById(pItem->itemId);
 					}
 					else
 					{
 						pItem->byStackcount = req->asData[i].byStack;
-						GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pItem->byStackcount, pItem->itemId);
+						g_pItemRepository->UpdateCount(pItem->itemId, pItem->byStackcount);
 					}
 				}
 			}
 
 			pCache->SetHoipoiMix(req->byMixLevel, req->dwMixExp);
 			pCache->SetZeni(UnsignedSafeDecrease<DWORD>(pCache->GetZeni(), req->dwSpendZenny));
-			GetCharDB.Execute("UPDATE characters SET Money=%u, Hoipoi_MixLevel=%u, Hoipoi_MixExp=%u WHERE CharID=%u", pCache->GetZeni(), req->byMixLevel, req->dwMixExp, req->charId);
+			g_pCharacterRepository->UpdateMoneyAndHoipoi(pCache->GetZeni(), req->byMixLevel, req->dwMixExp, req->charId);
 
 
 
@@ -3444,7 +3384,7 @@ void CGameServerSession::RecvHoipoiItemMakeReq(CNtlPacket* pPacket, CQueryServer
 				if (pItem)
 				{
 					pItem->byStackcount = req->sCreateData.byStackcount;
-					GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pItem->byStackcount, pItem->itemId);
+					g_pItemRepository->UpdateCount(pItem->itemId, pItem->byStackcount);
 				}
 			}
 		}
@@ -3468,8 +3408,7 @@ void CGameServerSession::RecvRunTimePcDataSaveNfy(CNtlPacket * pPacket, CQuerySe
 	{
 		pCache->StoreRunTimeData(req->dwExp, req->worldTblidx, req->worldId, req->vLoc, req->vDir);
 
-		GetCharDB.Execute("UPDATE characters SET Exp=%u, CurLocX=%f,CurLocY=%f,CurLocZ=%f, CurDirX=%f,CurDirY=%f,CurDirZ=%f, WorldID=%u,WorldTable=%u, PlayTime=PlayTime+%u WHERE CharID=%u", 
-			req->dwExp, req->vLoc.x, req->vLoc.y, req->vLoc.z, req->vDir.x, req->vDir.y, req->vDir.z, req->worldId, req->worldTblidx, req->dwAddPlayTime, req->charID);
+		g_pCharacterRepository->SaveRunTimeData(req->dwExp, req->vLoc.x, req->vLoc.y, req->vLoc.z, req->vDir.x, req->vDir.y, req->vDir.z, req->worldId, req->worldTblidx, req->dwAddPlayTime, req->charID);
 	}
 }
 
@@ -3490,7 +3429,7 @@ void CGameServerSession::RecvCashItemRefreshReq(CNtlPacket * pPacket, CQueryServ
 	CAccountCache* pCache = g_pPlayerCache->GetAccount(req->accountId);
 	if (pCache)
 	{
-		smart_ptr<QueryResult> spQuery = GetAccDB.Query("SELECT mallpoints FROM accounts WHERE AccountID=%u", req->accountId);
+		smart_ptr<QueryResult> spQuery = g_pAccountRepository->GetMallpoints(req->accountId);
 		if (spQuery)
 		{
 			Field* f = spQuery->Fetch();
@@ -3554,7 +3493,7 @@ void CGameServerSession::RecvCashitemMoveReq(CNtlPacket* pPacket, CQueryServer* 
 
 			pPlayerCache->AddItem(req->sData, res->itemId);
 
-			GetAccDB.Execute("UPDATE cashshop_storage SET isMoved=1, ItemID=%I64u WHERE ProductId=%I64u", res->itemId, req->qwProductId);
+			g_pCashShopRepository->UpdateStorageItemMoved(res->itemId, req->qwProductId);
 		}
 		else res->wResultCode = QUERY_FAIL;
 	}
@@ -3598,11 +3537,10 @@ void CGameServerSession::RecvCashitemBuyReq(CNtlPacket* pPacket, CQueryServer* a
 
 			QWORD productId = g_pCashshopManager->AcquireProductId();
 
-			GetAccDB.Execute("INSERT INTO cashshop_storage (ProductId,AccountID,HLSitemTblidx,StackCount,year,month,day,hour,minute,second,millisecond,Buyer,price)VALUES(%I64u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u)",
-				productId, req->accountId, req->HLSitemTblidx, req->byCount, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond, ti.wMilliseconds, req->accountId, req->dwPrice);
+			g_pCashShopRepository->InsertStorageItem(productId, req->accountId, req->HLSitemTblidx, req->byCount, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond, ti.wMilliseconds, req->accountId, req->dwPrice);
 
 			pCache->SetCash(pCache->GetCash() - req->dwPrice);
-			GetAccDB.WaitExecute("UPDATE accounts SET mallpoints=mallpoints-%u WHERE AccountID=%u", req->dwPrice, req->accountId); //if player bought cash and did not update his cash in game.. This is why we do like this
+			g_pAccountRepository->UpdateMallpointsDeductWait(req->dwPrice, req->accountId);
 
 			res->qwProductId = productId;
 			res->dwRemainAmount = pCache->GetCash();
@@ -3642,10 +3580,7 @@ void CGameServerSession::RecvPcDataLoadReq(CNtlPacket * pPacket, CQueryServer * 
 	if(pAccountCache)
 		pAccountCache->SetSession(GetHandle());
 
-	SQLCallbackBase* pCallBack3 = new SQLClassCallbackP2<CGameServerSession, CHARACTERID, ACCOUNTID>(this, &CGameServerSession::OnAccountCheck, req->charId, req->accountId);
-	AsyncQuery * q3 = new AsyncQuery(pCallBack3);
-	q3->AddQuery("SELECT acc_status FROM accounts WHERE AccountID=%u", req->accountId);
-	GetAccDB.QueueAsyncQuery(q3);
+	g_pAccountRepository->CheckAccountStatusAsync(this, req->charId, req->accountId);
 }
 
 
@@ -3665,7 +3600,7 @@ void CGameServerSession::RecvQuickTeleportInfoLoadReq(CNtlPacket * pPacket, CQue
 	{
 		if (pCache->IsQuickTeleportLoaded() == false)
 		{
-			smart_ptr<QueryResult> result = GetCharDB.Query("SELECT * FROM quick_teleport WHERE CharID=%u LIMIT 10", req->charId); // limit NTL_QUICK_PORTAL_MAX_COUNT
+			smart_ptr<QueryResult> result = g_pQuickSlotRepository->LoadQuickTeleports(req->charId);
 
 			if (result)
 			{
@@ -3723,10 +3658,7 @@ void CGameServerSession::RecvQuickTeleportUpdateReq(CNtlPacket* pPacket, CQueryS
 		pCache->UpdateQuickTeleport(req->asData.bySlotNum, req->asData);
 	}
 
-	GetCharDB.Execute("INSERT INTO quick_teleport (CharID,SlotNum,WorldTblidx,LocX,LocY,LocZ,MapNameTblidx,day,hour,minute,month,second,year)"
-		"VALUES (%u,%u,%u,%f,%f,%f,%u,%u,%u,%u,%u,%u,%u) "
-		"ON DUPLICATE KEY UPDATE CharID=VALUES(CharID),SlotNum=VALUES(SlotNum),WorldTblidx=VALUES(WorldTblidx),LocX=VALUES(LocX),LocY=VALUES(LocY),LocZ=VALUES(LocZ),MapNameTblidx=VALUES(MapNameTblidx),day=VALUES(day),hour=VALUES(hour),minute=VALUES(minute),month=VALUES(month),second=VALUES(second),year=VALUES(year)"
-		, req->charId, req->asData.bySlotNum, req->asData.worldTblidx, req->asData.vLoc.x, req->asData.vLoc.y, req->asData.vLoc.z, req->asData.mapNameTblidx, 
+	g_pQuickSlotRepository->UpsertQuickTeleport(req->charId, req->asData.bySlotNum, req->asData.worldTblidx, req->asData.vLoc.x, req->asData.vLoc.y, req->asData.vLoc.z, req->asData.mapNameTblidx,
 		req->asData.tSaveTime.day, req->asData.tSaveTime.hour, req->asData.tSaveTime.minute, req->asData.tSaveTime.month, req->asData.tSaveTime.second, req->asData.tSaveTime.year);
 }
 
@@ -3741,7 +3673,7 @@ void CGameServerSession::RecvQuickTeleportDelReq(CNtlPacket* pPacket, CQueryServ
 	if (pCache)
 	{
 		if(pCache->DeleteQuickTeleport(req->bySlot))
-			GetCharDB.Execute("DELETE FROM quick_teleport WHERE CharID=%u AND SlotNum=%u", req->charId, req->bySlot);
+			g_pQuickSlotRepository->DeleteQuickTeleportBySlot(req->charId, req->bySlot);
 	}
 }
 
@@ -3756,7 +3688,7 @@ void CGameServerSession::RecvSaveItemCoolTimeDataReq(CNtlPacket * pPacket, CQuer
 	if (pCache)
 	{
 		// clear them
-		GetCharDB.Execute("DELETE FROM items_cd WHERE CharID = %u", req->charId);
+		g_pItemRepository->ClearItemCoolTimes(req->charId);
 
 		pCache->ClearItemCoolTime();
 
@@ -3767,8 +3699,7 @@ void CGameServerSession::RecvSaveItemCoolTimeDataReq(CNtlPacket * pPacket, CQuer
 			{
 				pCache->UpdateItemCoolTime(req->aItemCoolTimeData[i]);
 
-				GetCharDB.Execute("INSERT INTO items_cd VALUES(%u, %u, %u, %u)", req->charId,
-					req->aItemCoolTimeData[i].byItemCoolTimeGroupIndex, req->aItemCoolTimeData[i].dwInitialItemCoolTime, req->aItemCoolTimeData[i].dwItemCoolTimeRemaining);
+				g_pItemRepository->InsertItemCd(req->charId, req->aItemCoolTimeData[i].byItemCoolTimeGroupIndex, req->aItemCoolTimeData[i].dwInitialItemCoolTime, req->aItemCoolTimeData[i].dwItemCoolTimeRemaining);
 			}
 		}
 	}
@@ -3781,9 +3712,9 @@ void CGameServerSession::RecvAccountBann(CNtlPacket* pPacket, CQueryServer* app)
 
 	sGQ_ACCOUNT_BANN * req = (sGQ_ACCOUNT_BANN*)pPacket->GetPacketData();
 
-	GetAccDB.Execute("UPDATE accounts SET acc_status='block' WHERE AccountID=%u", req->targetAccountID);
+	g_pAccountRepository->BanAccount(req->targetAccountID);
 
-	GetAccDB.Execute("INSERT INTO accounts_banned(GM_AccId, Banned_AccId, Reason, Duration) VALUES (%u, %u, \"%s\", %u)", req->gmAccountID, req->targetAccountID, req->szReason, req->byDuration);
+	g_pAuditLogRepository->InsertAccountBanLog(req->gmAccountID, req->targetAccountID, req->szReason, req->byDuration);
 }
 
 void CGameServerSession::RecvCharTitleSelectReq(CNtlPacket * pPacket, CQueryServer * app)
@@ -3813,7 +3744,7 @@ void CGameServerSession::RecvCharTitleAddReq(CNtlPacket * pPacket, CQueryServer 
 		pPlayerCache->UpdateTitle(req->TitleIndexFlag);
 	}
 
-	GetCharDB.Execute("INSERT INTO titles (CharID,TitleTblidx) VALUES (%u,%u)", req->charId, req->charTitle);
+	g_pCharacterRepository->InsertTitle(req->charId, req->charTitle);
 }
 
 void CGameServerSession::RecvCharTitleDelReq(CNtlPacket * pPacket, CQueryServer * app)
@@ -3828,7 +3759,7 @@ void CGameServerSession::RecvCharTitleDelReq(CNtlPacket * pPacket, CQueryServer 
 		pPlayerCache->UpdateTitle(req->TitleIndexFlag);
 	}
 
-	GetCharDB.Execute("DELETE FROM titles WHERE CharID=%u AND TitleTblidx=%u", req->charId, req->charTitle);
+	g_pCharacterRepository->DeleteTitle(req->charId, req->charTitle);
 }
 
 
@@ -3844,7 +3775,7 @@ void CGameServerSession::RecvItemStackUpdateReq(CNtlPacket* pPacket, CQueryServe
 		if (sITEM_DATA* pItem = pPlayerCache->GetItemData(req->itemId))
 		{
 			pItem->byStackcount = req->byStackCount;
-			GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byStackCount, req->itemId);
+			g_pItemRepository->UpdateCount(req->itemId, req->byStackCount);
 		}
 	}
 }
@@ -3861,7 +3792,7 @@ void CGameServerSession::RecvSwitchChildAdult(CNtlPacket * pPacket, CQueryServer
 		pPlayerCache->SetChildAdult(req->bIsAdult);
 	}
 
-	GetCharDB.Execute("UPDATE characters SET Adult=%i WHERE CharID=%u", req->bIsAdult, req->charId);
+	g_pCharacterRepository->UpdateAdult(req->bIsAdult, req->charId);
 }
 
 
@@ -3879,8 +3810,8 @@ void CGameServerSession::RecvItemChangeAttributeReq(CNtlPacket* pPacket, CQueryS
 			pPlayerCache->SetItemBattleAttribute(req->byBattleAttribute, req->itemId);
 			pPlayerCache->SetZeni(pPlayerCache->GetZeni() - req->dwZeni);
 
-			GetCharDB.Execute("UPDATE items SET BattleAttribute=%u WHERE id=%I64u", req->byBattleAttribute, req->itemId);
-			GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%I64u", pPlayerCache->GetZeni(), req->charId);
+			g_pItemRepository->UpdateBattleAttribute(req->itemId, req->byBattleAttribute);
+			g_pCharacterRepository->UpdateMoneyCharId64(pPlayerCache->GetZeni(), req->charId);
 		}
 	}
 }
@@ -3905,7 +3836,7 @@ void CGameServerSession::RecvItemChangeDurationTimeReq(CNtlPacket * pPacket, CQu
 			res->wResultCode = GAME_SUCCESS;
 
 			pItem->nUseEndTime = req->sItem.nUseEndTime;
-			GetCharDB.Execute("UPDATE items SET UseEndTime=%u WHERE id=%I64u", pItem->nUseEndTime, req->sItem.itemId);
+			g_pItemRepository->UpdateUseEndTime32(req->sItem.itemId, pItem->nUseEndTime);
 		}
 	}
 
@@ -3938,7 +3869,7 @@ void CGameServerSession::RecvShopNetpyItemBuyReq(CNtlPacket * pPacket, CQuerySer
 		}
 
 		pCache->SetNetPy(UnsignedSafeDecrease<DWORD>(pCache->GetNetPy(), req->netpyPoint));
-		GetCharDB.Execute("UPDATE characters SET Netpy=%u WHERE CharID=%u", pCache->GetNetPy(), req->charId);
+		g_pCharacterRepository->UpdateNetpy(pCache->GetNetPy(), req->charId);
 	}
 	else res->wResultCode = QUERY_FAIL;
 
@@ -3979,7 +3910,7 @@ void CGameServerSession::RecvDurationItemBuyReq(CNtlPacket * pPacket, CQueryServ
 				if (sITEM_DATA* pItem = pCache->GetItemData(req->sItem.itemId))
 				{
 					pItem->byStackcount = req->sItem.byStackcount;
-					GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->sItem.byStackcount, req->sItem.itemId);
+					g_pItemRepository->UpdateCount(req->sItem.itemId, req->sItem.byStackcount);
 				}
 				else res->wResultCode = QUERY_FAIL;
 			}
@@ -3987,7 +3918,7 @@ void CGameServerSession::RecvDurationItemBuyReq(CNtlPacket * pPacket, CQueryServ
 			if (res->wResultCode == GAME_SUCCESS)
 			{
 				pCache->SetNetPy(UnsignedSafeDecrease<NETP>(pCache->GetNetPy(), req->dwPayAmount));
-				GetCharDB.Execute("UPDATE characters SET Netpy=%u WHERE CharID=%u", pCache->GetNetPy(), req->charId);
+				g_pCharacterRepository->UpdateNetpy(pCache->GetNetPy(), req->charId);
 			}
 		}
 		else res->wResultCode = GAME_NETP_POINT_NOT_ENOUGH;
@@ -4041,19 +3972,19 @@ void CGameServerSession::RecvDurationRenewReq(CNtlPacket* pPacket, CQueryServer*
 			{
 				pCache->RenewItemDuration(req->sData.nUseEndTime, req->sData.itemID);
 
-				GetCharDB.Execute("UPDATE items SET UseEndTime=%I64u WHERE id=%I64u", req->sData.nUseEndTime, req->sData.itemID);
+				g_pItemRepository->UpdateUseEndTime64(req->sData.itemID, req->sData.nUseEndTime);
 
 				if (req->byPayType == 1) // NetPy Token
 				{
-					GetCharDB.Execute("UPDATE characters SET Netpy=%u WHERE CharID=%u", pCache->GetNetPy(), req->charId);
+					g_pCharacterRepository->UpdateNetpy(pCache->GetNetPy(), req->charId);
 				}
 				else if (req->byPayType == 2) // Cash Token
 				{
-					GetAccDB.WaitExecute("UPDATE accounts SET mallpoints=%u WHERE AccountID=%u", pAccount->GetCash(), req->accountId);
+					g_pAccountRepository->UpdateMallpointsWait(pAccount->GetCash(), req->accountId);
 				}
 				else // Zeni
 				{
-					GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charId);
+					g_pCharacterRepository->UpdateMoney(req->charId, pCache->GetZeni());
 				}
 			}
 		}
@@ -4085,7 +4016,7 @@ void CGameServerSession::RecvCashitemSendGiftReq(CNtlPacket* pPacket, CQueryServ
 
 		if (pSenderCache->GetCash() >= req->dwPrice)
 		{
-			smart_ptr<QueryResult> acc_check = GetCharDB.Query("SELECT AccountID FROM characters WHERE CharName=\"%ls\"", req->wchDestName); //Chck if account exist
+			smart_ptr<QueryResult> acc_check = g_pCharacterRepository->GetAccountIdByCharName(req->wchDestName); //Chck if account exist
 			if (acc_check)
 			{
 				Field* f_acc_check = acc_check->Fetch();
@@ -4093,13 +4024,12 @@ void CGameServerSession::RecvCashitemSendGiftReq(CNtlPacket* pPacket, CQueryServ
 				{
 					productId = g_pCashshopManager->AcquireProductId();
 
-					if (GetAccDB.WaitExecute("UPDATE accounts SET mallpoints=mallpoints-%u WHERE AccountID=%u", req->dwPrice, req->SenderAccountId))
+					if (g_pAccountRepository->UpdateMallpointsDeductWait(req->dwPrice, req->SenderAccountId))
 					{
 						SYSTEMTIME ti;
 						GetLocalTime(&ti);
 
-						GetAccDB.Execute("INSERT INTO cashshop_storage (ProductId,AccountID,HLSitemTblidx,StackCount,giftCharId,SenderName,year,month,day,hour,minute,second,millisecond,Buyer,price)VALUES(%I64u,%u,%u,%u,%u,\"%ls\",%u,%u,%u,%u,%u,%u,%u,%u,%u)",
-							productId, f_acc_check[0].GetUInt32(), req->dwIdxHlsTable, req->byCount, req->SenderCharId, req->wchSenderName, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond, ti.wMilliseconds, req->SenderAccountId, req->dwPrice);
+						g_pCashShopRepository->InsertGiftStorageItem(productId, f_acc_check[0].GetUInt32(), req->dwIdxHlsTable, req->byCount, req->SenderCharId, req->wchSenderName, ti.wYear, ti.wMonth, ti.wDay, ti.wHour, ti.wMinute, ti.wSecond, ti.wMilliseconds, req->SenderAccountId, req->dwPrice);
 
 						pSenderCache->SetCash(pSenderCache->GetCash() - req->dwPrice);
 						res2->dwRemainAmount = pSenderCache->GetCash();
@@ -4156,7 +4086,7 @@ void CGameServerSession::RecvMascotRegisterReq(CNtlPacket * pPacket, CQueryServe
 	if (pPlayerCache)
 	{
 		pPlayerCache->RegisterMascot(req->slotId, req->tblidx, req->byRank, req->dwVP);
-		GetCharDB.Execute("INSERT INTO mascots (CharID, SlotID, MascotTblidx, CurVP, MaxVP) VALUES (%u,%u,%u,%u,%u)", req->charId, req->slotId, req->tblidx, req->dwVP, req->dwVP);
+		g_pMascotRepository->InsertMascot(req->charId, req->slotId, req->tblidx, req->dwVP, req->dwVP);
 	}
 }
 
@@ -4172,7 +4102,7 @@ void CGameServerSession::RecvMascotDeleteReq(CNtlPacket * pPacket, CQueryServer 
 		pPlayerCache->DeleteMascot(req->slotId);
 	}
 
-	GetCharDB.Execute("DELETE FROM mascots WHERE CharID=%u AND SlotID=%u", req->charId, req->slotId);
+	g_pMascotRepository->DeleteMascotBySlot(req->charId, req->slotId);
 }
 
 void CGameServerSession::RecvMascotSkillAddReq(CNtlPacket * pPacket, CQueryServer * app)
@@ -4187,7 +4117,7 @@ void CGameServerSession::RecvMascotSkillAddReq(CNtlPacket * pPacket, CQueryServe
 		pPlayerCache->MascotSkillAdd(req->byMascotIndex, req->slotId, req->skillTblidx);
 	}
 
-	GetCharDB.Execute("UPDATE mascots SET skillTblidx%u=%u WHERE CharID=%u AND SlotID=%u", req->slotId, req->skillTblidx, req->charId, req->byMascotIndex);
+	g_pMascotRepository->UpdateMascotSkill(req->slotId, req->skillTblidx, req->charId, req->byMascotIndex);
 }
 
 void CGameServerSession::RecvMascotSkillUpdateReq(CNtlPacket * pPacket, CQueryServer * app)
@@ -4204,16 +4134,16 @@ void CGameServerSession::RecvMascotSkillUpdateReq(CNtlPacket * pPacket, CQuerySe
 			if (req->byItemCount == 0)
 			{
 				pPlayerCache->RemoveItem(req->itemId);
-				GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->itemId);
+				g_pItemRepository->DeleteById(req->itemId);
 			}
 			else
 			{
 				pItem->byStackcount = req->byItemCount;
-				GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byItemCount, req->itemId);
+				g_pItemRepository->UpdateCount(req->itemId, req->byItemCount);
 			}
 
 			pPlayerCache->MascotSkillAdd(req->byMascotIndex, req->slotId, req->skillTblidx);
-			GetCharDB.Execute("UPDATE mascots SET skillTblidx%u=%u WHERE CharID=%u AND SlotID=%u", req->slotId, req->skillTblidx, req->charId, req->byMascotIndex);
+			g_pMascotRepository->UpdateMascotSkill(req->slotId, req->skillTblidx, req->charId, req->byMascotIndex);
 		}
 	}
 }
@@ -4232,16 +4162,16 @@ void CGameServerSession::RecvMascotSkillUpgradeReq(CNtlPacket * pPacket, CQueryS
 			if (pItem->byStackcount == 1)
 			{
 				pPlayerCache->RemoveItem(req->itemID);
-				GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->itemID);
+				g_pItemRepository->DeleteById(req->itemID);
 			}
 			else
 			{
 				pItem->byStackcount -= 1;
-				GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pItem->byStackcount, req->itemID);
+				g_pItemRepository->UpdateCount(req->itemID, pItem->byStackcount);
 			}
 
 			pPlayerCache->MascotSkillAdd(req->byMascotIndex, req->slotId, req->skillTblidx);
-			GetCharDB.Execute("UPDATE mascots SET skillTblidx%u=%u WHERE CharID=%u AND SlotID=%u", req->slotId, req->skillTblidx, req->charId, req->byMascotIndex);
+			g_pMascotRepository->UpdateMascotSkill(req->slotId, req->skillTblidx, req->charId, req->byMascotIndex);
 		}
 	}
 }
@@ -4268,12 +4198,12 @@ void CGameServerSession::RecvMascotFusionReq(CNtlPacket * pPacket, CQueryServer 
 						if (pItem->byStackcount == 1)
 						{
 							pPlayerCache->RemoveItem(req->itemId);
-							GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->itemId);
+							g_pItemRepository->DeleteById(req->itemId);
 						}
 						else
 						{
 							pItem->byStackcount -= 1;
-							GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pItem->byStackcount, req->itemId);
+							g_pItemRepository->UpdateCount(req->itemId, pItem->byStackcount);
 						}
 					}
 					else
@@ -4286,7 +4216,7 @@ void CGameServerSession::RecvMascotFusionReq(CNtlPacket * pPacket, CQueryServer 
 				//delete offering mascot
 				pPlayerCache->EraseMascot(req->byOfferingMascotIndex);
 				SAFE_DELETE(pOfferMascot);
-				GetCharDB.Execute("DELETE FROM mascots WHERE CharID=%u AND SlotID=%u", req->charId, req->byOfferingMascotIndex);
+				g_pMascotRepository->DeleteMascotBySlot(req->charId, req->byOfferingMascotIndex);
 
 				//update new mascot (if success)
 				if (req->bIsSuccess)
@@ -4296,7 +4226,7 @@ void CGameServerSession::RecvMascotFusionReq(CNtlPacket * pPacket, CQueryServer 
 					pMainMascot->dwCurExp = 0;
 					pMainMascot->dwMaxVP = req->dwMaxVP;
 					pMainMascot->itemTblidx = req->nextMascotTblidx;
-					GetCharDB.Execute("UPDATE mascots SET MascotTblidx=%u, MaxVP=%u, CurExp=0 WHERE CharID=%u AND SlotID=%u", req->nextMascotTblidx, req->dwMaxVP, req->charId, req->byMascotIndex);
+					g_pMascotRepository->UpdateMascotFusion(req->nextMascotTblidx, req->dwMaxVP, req->charId, req->byMascotIndex);
 				}
 			}
 		}
@@ -4318,7 +4248,7 @@ void CGameServerSession::RecvMascotSaveDataReq(CNtlPacket * pPacket, CQueryServe
 			{
 				pData->dwCurExp = req->dwExp[i];
 				pData->dwCurVP = req->dwVp[i];
-				GetCharDB.Execute("UPDATE mascots SET CurVP=%u, CurExp=%u WHERE CharID=%u AND SlotID=%u", pData->dwCurVP, pData->dwCurExp, req->charId, req->slotId[i]);
+				g_pMascotRepository->UpdateMascotVpExp(pData->dwCurVP, pData->dwCurExp, req->charId, req->slotId[i]);
 			}
 		}
 	}
@@ -4344,7 +4274,7 @@ void CGameServerSession::RecvMaterialDisassembleReq(CNtlPacket* pPacket, CQueryS
 
 		if (pCache->RemoveItem(req->sDeleteItem.itemId)) //remove item and check if success
 		{
-			GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->sDeleteItem.itemId); //query to remove item
+			g_pItemRepository->DeleteById(req->sDeleteItem.itemId); //query to remove item
 
 			for (int i = 0; i < req->byCount; i++)
 			{
@@ -4359,7 +4289,7 @@ void CGameServerSession::RecvMaterialDisassembleReq(CNtlPacket* pPacket, CQueryS
 					if (sITEM_DATA* pItem = pCache->GetItemData(req->asCreateItem[i].itemId)) //get item
 					{
 						pItem->byStackcount = req->asCreateItem[i].byStackcount;
-						GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pItem->byStackcount, req->asCreateItem[i].itemId); //update db stack count
+						g_pItemRepository->UpdateCount(req->asCreateItem[i].itemId, pItem->byStackcount); //update db stack count
 					}
 				}
 			}
@@ -4384,7 +4314,7 @@ void CGameServerSession::RecvInvisibleCostumeUpdateReq(CNtlPacket* pPacket, CQue
 	if (pCache)
 	{
 		pCache->SetInvisibleCostume(req->bInvisibleCostume);
-		GetCharDB.Execute("UPDATE characters SET InvisibleCostume=%i WHERE CharID=%u", req->bInvisibleCostume, req->charId);
+		g_pCharacterRepository->UpdateInvisibleCostume(req->bInvisibleCostume, req->charId);
 	}
 }
 
@@ -4428,12 +4358,12 @@ void CGameServerSession::RecvItemSocketInsertBeadReq(CNtlPacket* pPacket, CQuery
 					if (req->byBeadRemainStack == 0)
 					{
 						if (pCache->RemoveItem(req->BeadItemId))
-							GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->BeadItemId);
+							g_pItemRepository->DeleteById(req->BeadItemId);
 						else res->wResultCode = QUERY_FAIL;
 					}
 					else
 					{
-						GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->byBeadRemainStack, req->BeadItemId);
+						g_pItemRepository->UpdateCount(req->BeadItemId, req->byBeadRemainStack);
 						pBeadItem->byStackcount = req->byBeadRemainStack;
 					}
 				}
@@ -4452,8 +4382,7 @@ void CGameServerSession::RecvItemSocketInsertBeadReq(CNtlPacket* pPacket, CQuery
 				pItem->nUseStartTime = req->nUseStartTime;
 				pItem->nUseEndTime = req->nUseEndTime;
 
-				GetCharDB.Execute("UPDATE items SET OptionRandomId7=%u, OptionRandomVal7=%i, OptionRandomId8=%u, OptionRandomVal8=%i, UseStartTime=%I64u, UseEndTime=%I64u, RestrictState=%u, DurationType=%u WHERE id=%I64u",
-					req->sItemRandomOption[0].wOptionIndex, req->sItemRandomOption[0].optionValue, req->sItemRandomOption[1].wOptionIndex, req->sItemRandomOption[1].optionValue,
+				g_pItemRepository->UpdateBeadOptions(req->sItemRandomOption[0].wOptionIndex, req->sItemRandomOption[0].optionValue, req->sItemRandomOption[1].wOptionIndex, req->sItemRandomOption[1].optionValue,
 					req->nUseStartTime, req->nUseEndTime, req->byRestrictState, req->byDurationType, req->ItemId);
 			}
 		}
@@ -4499,8 +4428,7 @@ void CGameServerSession::RecvItemSocketDestroyBeadReq(CNtlPacket* pPacket, CQuer
 			pItem->nUseStartTime = 0;
 			pItem->nUseEndTime = 0;
 
-			GetCharDB.Execute("UPDATE items SET OptionRandomId7=%u, OptionRandomVal7=0, OptionRandomId8=%u, OptionRandomVal8=0, UseStartTime=0, UseEndTime=0, RestrictState=%u, DurationType=%u WHERE id=%I64u",
-				INVALID_WORD, INVALID_WORD, req->byRestrictState, req->byDurationType, req->ItemId);
+			g_pItemRepository->ClearBeadOptions(INVALID_WORD, INVALID_WORD, req->byRestrictState, req->byDurationType, req->ItemId);
 		}
 		else res->wResultCode = QUERY_FAIL;
 	}
@@ -4548,7 +4476,7 @@ void CGameServerSession::RecvCashItemPublicBankAddReq(CNtlPacket * pPacket, CQue
 
 					res->itemID = pItem->itemId;
 
-					GetCharDB.Execute("UPDATE items SET UseStartTime=%I64u,UseEndTime=%I64u WHERE id=%I64u", req->nUseStartTime, req->nUseEndTime, pItem->itemId);
+					g_pItemRepository->UpdateUseTimeRange(pItem->itemId, req->nUseStartTime, req->nUseEndTime);
 			}
 			else
 			{
@@ -4557,9 +4485,7 @@ void CGameServerSession::RecvCashItemPublicBankAddReq(CNtlPacket * pPacket, CQue
 
 				res->itemID = g_pItemManager->IncLastItemID();
 
-				GetCharDB.Execute("INSERT INTO items (id,tblidx,place,pos,`rank`,UseStartTime,UseEndTime,DurationType,AccountID)"
-					"VALUES(%I64u, %u, %u, %u, %u, %I64u, %I64u, %u, %u)",
-					res->itemID, req->itemNo, req->byPlace, req->byPosition, req->byRank, req->nUseStartTime, req->nUseEndTime, req->byDurationType, req->accountID);
+				g_pItemRepository->InsertSharedBankItemMinimal(res->itemID, req->itemNo, req->byPlace, req->byPosition, req->byRank, req->nUseStartTime, req->nUseEndTime, req->byDurationType, req->accountID);
 
 				pItem->charId = req->charId;
 				pItem->byStackcount = 1;
@@ -4575,7 +4501,7 @@ void CGameServerSession::RecvCashItemPublicBankAddReq(CNtlPacket * pPacket, CQue
 				pAccountCache->InsertBankItem(pItem);
 			}
 
-			GetAccDB.Execute("UPDATE cashshop_storage SET isMoved=1, ItemID=%I64u WHERE ProductId=%I64u", res->itemID, req->dwProductId);
+			g_pCashShopRepository->UpdateStorageItemMoved(res->itemID, req->dwProductId);
 		}
 		else res->wResultCode = QUERY_FAIL;
 	}
@@ -4617,7 +4543,7 @@ void CGameServerSession::RecvItemExchangeReq(CNtlPacket * pPacket, CQueryServer 
 				for (int i = 0; i < req->byDeleteCount; i++)
 				{
 					if (pCache->RemoveItem(req->aDeleteItem[i].itemId))
-						GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->aDeleteItem[i].itemId);
+						g_pItemRepository->DeleteById(req->aDeleteItem[i].itemId);
 					else
 					{
 						res->wResultCode = GAME_FAIL;
@@ -4647,7 +4573,7 @@ void CGameServerSession::RecvItemExchangeReq(CNtlPacket * pPacket, CQueryServer 
 						if (sITEM_DATA* pData = pCache->GetItemData(req->aUpdateItem[i].nItemID))
 						{
 							pData->byStackcount = req->aUpdateItem[i].byStack;
-							GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", req->aUpdateItem[i].byStack, req->aUpdateItem[i].nItemID);
+							g_pItemRepository->UpdateCount(req->aUpdateItem[i].nItemID, req->aUpdateItem[i].byStack);
 						}
 					}
 				}
@@ -4660,7 +4586,7 @@ void CGameServerSession::RecvItemExchangeReq(CNtlPacket * pPacket, CQueryServer 
 				if (req->dwZenny > 0 && req->dwZenny != INVALID_DWORD)
 				{
 					pCache->SetZeni(UnsignedSafeDecrease<DWORD>(pCache->GetZeni(), req->dwZenny));
-					GetCharDB.Execute("UPDATE characters SET Money=%u WHERE CharID=%u", pCache->GetZeni(), req->charId);
+					g_pCharacterRepository->UpdateMoney(req->charId, pCache->GetZeni());
 				}
 			}
 		}
@@ -4668,7 +4594,7 @@ void CGameServerSession::RecvItemExchangeReq(CNtlPacket * pPacket, CQueryServer 
 	}
 	else res->wResultCode = QUERY_FAIL;
 
-	
+
 	packet.SetPacketLen(sizeof(sQG_ITEM_EXCHANGE_RES));
 	app->Send(GetHandle(), &packet);
 }
@@ -4686,7 +4612,7 @@ void CGameServerSession::RecvEventCoinAddReq(CNtlPacket * pPacket, CQueryServer 
 		if (req->byCoinType == 0)
 		{
 			pCache->SetEventCoin(UnsignedSafeIncrease<DWORD>(pCache->GetEventCoin(), req->byIncreaseCoin));
-			GetAccDB.Execute("UPDATE accounts SET EventCoins=%u WHERE AccountID=%u", pCache->GetEventCoin(), req->accountId);
+			g_pAccountRepository->UpdateEventCoins(req->accountId, pCache->GetEventCoin());
 		}
 	}
 }
@@ -4713,7 +4639,7 @@ void CGameServerSession::RecvWaguWaguMachineCoinIncreaseReq(CNtlPacket * pPacket
 		{
 			if (pCache->RemoveCashItem(req->qwProductId))
 			{
-				GetAccDB.Execute("UPDATE cashshop_storage SET isMoved=1 WHERE ProductId=%I64u", req->qwProductId);
+				g_pCashShopRepository->UpdateStorageItemMovedOnly(req->qwProductId);
 			}
 			else res->wResultCode = QUERY_FAIL;
 		}
@@ -4721,7 +4647,7 @@ void CGameServerSession::RecvWaguWaguMachineCoinIncreaseReq(CNtlPacket * pPacket
 		if (res->wResultCode == GAME_SUCCESS)
 		{
 			pCache->SetWaguCoin(UnsignedSafeIncrease<DWORD>(pCache->GetWaguCoin(), req->wWaguCoin));
-			GetAccDB.Execute("UPDATE accounts SET WaguCoins=%u WHERE AccountID=%u", pCache->GetWaguCoin(), req->accountId);
+			g_pAccountRepository->UpdateWaguCoins(req->accountId, pCache->GetWaguCoin());
 
 			res->wTotalWaguCoin = (WORD)pCache->GetWaguCoin();
 		}
@@ -4752,20 +4678,20 @@ void CGameServerSession::RecvCharacterRenameReq(CNtlPacket * pPacket, CQueryServ
 	CPlayerCache* pCache = g_pPlayerCache->GetCharacter(req->charId);
 	if (pCache)
 	{
-		if (smart_ptr<QueryResult> namecheck = GetCharDB.Query("SELECT CharID FROM characters WHERE CharName=\"%ls\" ", req->wszCharName))
+		if (smart_ptr<QueryResult> namecheck = g_pCharacterRepository->GetByNameTrailingSpace(req->wszCharName))
 			res->wResultCode = GAME_SAMENAME_EXIST;
 		else
 		{
 			if (pCache->RemoveItem(req->itemId))
 			{
-				GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->itemId);
-				GetCharDB.WaitExecute("UPDATE characters SET CharName=\"%ls\" WHERE CharID=%u", req->wszCharName, req->charId); //required waitexecute so none can get the same name
-				GetCharDB.Execute("UPDATE friendlist SET friend_name=\"%ls\" WHERE friend_id=%u", req->wszCharName, req->charId);
-				GetCharDB.Execute("UPDATE auctionhouse SET Seller=\"%ls\" WHERE CharID=%u", req->wszCharName, req->charId);
-				GetCharDB.Execute("UPDATE mail SET FromName=\"%ls\" WHERE FromName=\"%ls\"", req->wszCharName, pCache->GetCharName());
-				GetCharDB.Execute("UPDATE mail SET TargetName=\"%ls\" WHERE TargetName=\"%ls\"", req->wszCharName, pCache->GetCharName());
+				g_pItemRepository->DeleteById(req->itemId);
+				g_pCharacterRepository->UpdateCharNameWait(req->wszCharName, req->charId); //required waitexecute so none can get the same name
+				g_pFriendRepository->UpdateFriendName(req->wszCharName, req->charId);
+				g_pAuctionHouseRepository->UpdateSellerName(req->wszCharName, req->charId);
+				g_pMailRepository->UpdateFromNameByOldName(req->wszCharName, pCache->GetCharName());
+				g_pMailRepository->UpdateTargetNameByOldName(req->wszCharName, pCache->GetCharName());
 
-				GetLogDB.Execute("INSERT INTO change_char_name (CharID, Name, newName) VALUES(%u, \"%ls\", \"%ls\")", req->charId, pCache->GetCharName(), req->wszCharName);
+				g_pAuditLogRepository->InsertCharNameChangeLog(req->charId, pCache->GetCharName(), req->wszCharName);
 
 				//if inside guild then update guild member data
 				if (pCache->GetGuildID() > 0)
@@ -4821,17 +4747,16 @@ void CGameServerSession::RecvItemChangeOptionReq(CNtlPacket * pPacket, CQuerySer
 				if (pKitItem->byStackcount == 0)
 				{
 					pCache->RemoveItem(req->KitItemId);
-					GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->KitItemId);
+					g_pItemRepository->DeleteById(req->KitItemId);
 				}
 				else
 				{
-					GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pKitItem->byStackcount, req->KitItemId);
+					g_pItemRepository->UpdateCount(req->KitItemId, pKitItem->byStackcount);
 				}
 
 				memcpy(&pItem->sOptionSet, &req->sItemOptionSet, sizeof(sITEM_OPTION_SET));
 
-				GetCharDB.Execute("UPDATE items SET OptionTblidx=%u,OptionTblidx2=%u,OptionRandomId=%u,OptionRandomVal=%u,OptionRandomId2=%u,OptionRandomVal2=%u,OptionRandomId3=%u,OptionRandomVal3=%u,OptionRandomId4=%u,OptionRandomVal4=%u WHERE id=%I64u",
-					req->sItemOptionSet.aOptionTblidx[0], req->sItemOptionSet.aOptionTblidx[1],
+				g_pItemRepository->UpdateOptionSet(req->sItemOptionSet.aOptionTblidx[0], req->sItemOptionSet.aOptionTblidx[1],
 					req->sItemOptionSet.aRandomOption[0].wOptionIndex, req->sItemOptionSet.aRandomOption[0].optionValue,
 					req->sItemOptionSet.aRandomOption[1].wOptionIndex, req->sItemOptionSet.aRandomOption[1].optionValue,
 					req->sItemOptionSet.aRandomOption[2].wOptionIndex, req->sItemOptionSet.aRandomOption[2].optionValue,
@@ -4866,11 +4791,11 @@ void CGameServerSession::RecvItemUpgradeWorkReq(CNtlPacket * pPacket, CQueryServ
 				if (pStoneItem->byStackcount == 0)
 				{
 					pCache->RemoveItem(req->stoneId);
-					GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->stoneId);
+					g_pItemRepository->DeleteById(req->stoneId);
 				}
 				else
 				{
-					GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pStoneItem->byStackcount, req->stoneId);
+					g_pItemRepository->UpdateCount(req->stoneId, pStoneItem->byStackcount);
 				}
 
 				TBLIDX coreItemIdx = INVALID_TBLIDX;
@@ -4887,15 +4812,15 @@ void CGameServerSession::RecvItemUpgradeWorkReq(CNtlPacket * pPacket, CQueryServ
 						if (pCoreItem->byStackcount == 0)
 						{
 							pCache->RemoveItem(req->coreId);
-							GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->coreId);
+							g_pItemRepository->DeleteById(req->coreId);
 						}
 						else
 						{
-							GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pCoreItem->byStackcount, req->coreId);
+							g_pItemRepository->UpdateCount(req->coreId, pCoreItem->byStackcount);
 						}
 
 						pItem->byGrade = req->byItemGrade;
-						GetCharDB.Execute("UPDATE items SET grade=%u WHERE id=%I64u", req->byItemGrade, req->itemId);
+						g_pItemRepository->UpdateGrade(req->itemId, req->byItemGrade);
 					}
 					else
 					{
@@ -4903,15 +4828,14 @@ void CGameServerSession::RecvItemUpgradeWorkReq(CNtlPacket * pPacket, CQueryServ
 					}
 				}
 				else
-				{ 
+				{
 					pItem->byGrade = req->byItemGrade;
-					GetCharDB.Execute("UPDATE items SET grade=%u WHERE id=%I64u", req->byItemGrade, req->itemId);
+					g_pItemRepository->UpdateGrade(req->itemId, req->byItemGrade);
 				}
 
 				if (byCurGrade >= 12 || req->byItemGrade >= 12)
 				{
-					GetLogDB.Execute("INSERT INTO item_upgrade_log (charId, IsSuccess, itemId, itemTblidx, grade, newGrade, StoneItemId, StoneItemTblidx, CoreItemUse, coreItemId, coreItemTblidx) VALUES (%u, %i, %I64u, %u, %u, %u, %I64u, %u, %i, %I64u, %u)",
-						req->charId, req->bIsSuccessful, req->itemId, pItem->itemNo, byCurGrade, req->byItemGrade, req->stoneId, pStoneItem->itemNo, req->bCoreItemUse, req->coreId, coreItemIdx);
+					g_pAuditLogRepository->InsertItemUpgradeLog(req->charId, req->bIsSuccessful, req->itemId, pItem->itemNo, byCurGrade, req->byItemGrade, req->stoneId, pStoneItem->itemNo, req->bCoreItemUse, req->coreId, coreItemIdx);
 				}
 			}
 		}
@@ -4944,7 +4868,7 @@ void CGameServerSession::RecvDynamicFieldSystemCountingReq(CNtlPacket * pPacket,
 		if (res->dwTotalCount >= req->dwSettingCount) //send to all channels to start dynamic event
 		{
 			//set counter to 0 because event going to start now
-			GetLogDB.Execute("UPDATE dynamic_field_count SET count=0 WHERE serverIndex=%u", req->ServerFarmId);
+			g_pDynamicFieldRepository->ResetCount(req->ServerFarmId);
 			g_pDynamicFieldSystem->SetCurCount(0);
 
 			packet.SetPacketLen(sizeof(sQG_DYNAMIC_FIELD_SYSTEM_COUNTING_RES));
@@ -4952,7 +4876,7 @@ void CGameServerSession::RecvDynamicFieldSystemCountingReq(CNtlPacket * pPacket,
 		}
 		else
 		{
-			GetLogDB.Execute("UPDATE dynamic_field_count SET count=%u WHERE serverIndex=%u", res->dwTotalCount, req->ServerFarmId);
+			g_pDynamicFieldRepository->UpdateCount(res->dwTotalCount, req->ServerFarmId);
 		}
 	}
 
@@ -4999,15 +4923,15 @@ void CGameServerSession::RecvItemSealReq(CNtlPacket * pPacket, CQueryServer * ap
 					if (pSealItem->byStackcount == 0)
 					{
 						pCache->RemoveItem(req->SealitemId);
-						GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->SealitemId);
+						g_pItemRepository->DeleteById(req->SealitemId);
 					}
 					else
 					{
-						GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pSealItem->byStackcount, req->SealitemId);
+						g_pItemRepository->UpdateCount(req->SealitemId, pSealItem->byStackcount);
 					}
 
 					pItem->byRestrictState = req->byRestrictState;
-					GetCharDB.Execute("UPDATE items SET RestrictState=%u WHERE id=%I64u", req->byRestrictState, req->itemId);
+					g_pItemRepository->UpdateRestrictState(req->itemId, req->byRestrictState);
 				}
 			}
 		}
@@ -5040,7 +4964,7 @@ void CGameServerSession::RecvItemSealExtractReq(CNtlPacket * pPacket, CQueryServ
 			res->wResultCode = GAME_SUCCESS;
 
 			pItem->byRestrictState = req->byRestrictState;
-			GetCharDB.Execute("UPDATE items SET RestrictState=%u WHERE id=%I64u", req->byRestrictState, req->itemId);
+			g_pItemRepository->UpdateRestrictState(req->itemId, req->byRestrictState);
 		}
 	}
 
@@ -5100,19 +5024,19 @@ void CGameServerSession::RecvItemUpgradeByCouponReq(CNtlPacket * pPacket, CQuery
 				pEquipmentItem->nUseStartTime = req->nUseStartTime;
 				pEquipmentItem->byDurationType = req->byDurationType;
 
-				GetCharDB.Execute("UPDATE items SET grade=%u, UseStartTime=%u, UseEndTime=%u, RestrictState=%u, DurationType=%u WHERE id=%I64u", req->byGrade, req->nUseStartTime, req->nUseEndTime, req->byRestrictState, req->byDurationType, req->itemId);
+				g_pItemRepository->UpdateGradeAndDuration(req->byGrade, req->nUseStartTime, req->nUseEndTime, req->byRestrictState, req->byDurationType, req->itemId);
 
 				if (pCouponItem->byStackcount == 1)
 				{
 					pCache->RemoveItem(req->couponId);
 					res->byStack = 0;
-					GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->couponId);
+					g_pItemRepository->DeleteById(req->couponId);
 				}
 				else
 				{
 					pCouponItem->byStackcount -= 1;
 					res->byStack = pCouponItem->byStackcount;
-					GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", res->byStack, req->couponId);
+					g_pItemRepository->UpdateCount(req->couponId, res->byStack);
 				}
 			}
 		}
@@ -5150,7 +5074,7 @@ void CGameServerSession::RecvItemGradeInitByCouponReq(CNtlPacket * pPacket, CQue
 			pEquipmentItem->nUseStartTime = 0;
 			pEquipmentItem->byDurationType = eDURATIONTYPE_NORMAL;
 
-			GetCharDB.Execute("UPDATE items SET grade=0, UseStartTime=0, UseEndTime=0, RestrictState=%u, DurationType=0 WHERE id=%I64u", req->byRestrictState, req->itemId);
+			g_pItemRepository->ResetGradeAndDuration(req->byRestrictState, req->itemId);
 		}
 	}
 
@@ -5170,10 +5094,7 @@ void CGameServerSession::RecvEventRewardLoadReq(CNtlPacket * pPacket, CQueryServ
 		pAccount->SetSession(GetHandle()); //set session
 		pAccount->ClearEventReward(); //clear all reward
 
-		SQLCallbackBase* pCallBack = new SQLClassCallbackP2<CAccountCache, HOBJECT, CHARACTERID>(pAccount, &CAccountCache::OnLoadEventReward, req->handle, req->charId);
-		AsyncQuery * q = new AsyncQuery(pCallBack);
-		q->AddQuery("SELECT rewardTblidx, CharID, CharName FROM event_reward WHERE AccountID=%u LIMIT %u", req->accountId, NTL_MAX_EVENT_REWARD_COUNT_IN_PACKET);
-		GetAccDB.QueueAsyncQuery(q);
+		g_pAccountRepository->LoadEventRewardAsync(pAccount, req->accountId, req->handle, req->charId);
 	}
 }
 
@@ -5202,7 +5123,7 @@ void CGameServerSession::RecvEventRewardSelectReq(CNtlPacket * pPacket, CQuerySe
 			{
 				pAccount->EraseEventReward(req->eventTblidx); // erase reward
 
-				GetAccDB.Execute("DELETE FROM event_reward WHERE AccountID=%u AND rewardTblidx=%u", req->accountId, req->eventTblidx);
+				g_pAccountRepository->DeleteEventReward(req->accountId, req->eventTblidx);
 
 				res->sItem.itemId = g_pItemManager->CreateItem(req->sItem);
 
@@ -5248,15 +5169,15 @@ void CGameServerSession::RecvMascotSealSetReq(CNtlPacket * pPacket, CQueryServer
 				if (pItem->byStackcount == 0)
 				{
 					pCache->RemoveItem(req->SealitemId);
-					GetCharDB.Execute("DELETE FROM items WHERE id=%I64u", req->SealitemId);
+					g_pItemRepository->DeleteById(req->SealitemId);
 				}
 				else
 				{
-					GetCharDB.Execute("UPDATE items SET count=%u WHERE id=%I64u", pItem->byStackcount, req->SealitemId);
+					g_pItemRepository->UpdateCount(req->SealitemId, pItem->byStackcount);
 				}
 
 				pCache->DeleteMascot(req->byMascotPos);
-				GetCharDB.Execute("DELETE FROM mascots WHERE CharID=%u AND SlotID=%u", req->charId, req->byMascotPos);
+				g_pMascotRepository->DeleteMascotBySlot(req->charId, req->byMascotPos);
 
 				res->sNewItemData.itemId = g_pItemManager->CreateItem(req->sNewItemData);
 
@@ -5282,5 +5203,5 @@ void CGameServerSession::RecvGmLog(CNtlPacket * pPacket, CQueryServer * app)
 {
 	sGQ_GM_LOG * req = (sGQ_GM_LOG*)pPacket->GetPacketData();
 
-	GetLogDB.Execute("INSERT INTO gm_log (CharID, LogType, String) VALUES (%u,%u,'%s')", req->charId, req->byLogType, ws2s(req->wchBuffer).c_str());
+	g_pAuditLogRepository->InsertGmLog(req->charId, req->byLogType, ws2s(req->wchBuffer).c_str());
 }

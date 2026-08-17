@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DynamicFieldSystem.h"
 #include "QueryServer.h"
+#include "Repository/DynamicFieldRepository.h"
 
 
 CDynamicFieldSystem::CDynamicFieldSystem()
@@ -17,7 +18,7 @@ CDynamicFieldSystem::~CDynamicFieldSystem()
 
 void CDynamicFieldSystem::Init()
 {
-	smart_ptr<QueryResult> item = GetLogDB.Query("SELECT count FROM dynamic_field_count WHERE serverIndex=0");
+	smart_ptr<QueryResult> item = g_pDynamicFieldRepository->GetCount();
 	if (item)
 	{
 		Field* i = item->Fetch();

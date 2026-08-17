@@ -5,6 +5,7 @@
 #include "NtlPacketQG.h"
 #include "NtlPacketQC.h"
 #include "Utils.h"
+#include "Repository/ItemRepository.h"
 
 
 bool sortByPlace(const sITEM_DATA *lhs, const sITEM_DATA *rhs) { return lhs->byPlace < rhs->byPlace; }
@@ -2536,7 +2537,7 @@ void CPlayerCache::StartMailResult(QueryResultVector & results, HOBJECT hHandle,
 
 				if (itemid > 0)
 				{
-					smart_ptr<QueryResult> item = GetCharDB.Query("SELECT * FROM items WHERE id=%I64u LIMIT 1", itemid);
+					smart_ptr<QueryResult> item = g_pItemRepository->GetByIdSingle(itemid);
 					if (item)
 					{
 						Field* i = item->Fetch();
@@ -2656,7 +2657,7 @@ void CPlayerCache::LoadMailResult(QueryResultVector & results, HOBJECT hHandle, 
 
 				if (itemid > 0)
 				{
-					smart_ptr<QueryResult> item = GetCharDB.Query("SELECT * FROM items WHERE id=%I64u LIMIT 1", itemid);
+					smart_ptr<QueryResult> item = g_pItemRepository->GetByIdSingle(itemid);
 					if (item)
 					{
 						Field* i = item->Fetch();

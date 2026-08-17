@@ -6,6 +6,19 @@
 #include "ItemManager.h"
 #include "CharacterManager.h"
 #include "PlayerCache.h"
+#include "Repository/CharacterRepository.h"
+#include "Repository/SkillRepository.h"
+#include "Repository/BuffRepository.h"
+#include "Repository/FriendRepository.h"
+#include "Repository/RecipeRepository.h"
+#include "Repository/MailRepository.h"
+#include "Repository/MascotRepository.h"
+#include "Repository/QuestRepository.h"
+#include "Repository/QuickSlotRepository.h"
+#include "Repository/ItemRepository.h"
+#include "Repository/AuctionHouseRepository.h"
+#include "Repository/AuditLogRepository.h"
+#include "Repository/AccountRepository.h"
 
 
 
@@ -26,7 +39,7 @@ void CCharServerSession::RecvCreateCharReq(CNtlPacket * pPacket, CQueryServer* a
 	sCQ_CHARACTER_ADD_REQ * req = (sCQ_CHARACTER_ADD_REQ*)pPacket->GetPacketData();
 
 	//check if char name already exist
-	smart_ptr<QueryResult> namecheck = GetCharDB.Query("SELECT CharID FROM characters WHERE CharName='%ls'", req->awchCharName);
+	smart_ptr<QueryResult> namecheck = g_pCharacterRepository->GetByName(req->awchCharName);
 	if (namecheck)
 	{
 		CNtlPacket packet(sizeof(sQC_CHARACTER_ADD_RES));
@@ -83,16 +96,15 @@ void CCharServerSession::RecvCreateCharReq(CNtlPacket * pPacket, CQueryServer* a
 
 		for (int i = 0; i < req->bySkillCount; i++)
 		{
-			GetCharDB.Execute("INSERT INTO skills (skill_id,owner_id,SlotID) VALUES (%u,%u,%u)", req->aSkill[i], newCharId, i);
+			g_pSkillRepository->InsertSkill(req->aSkill[i], newCharId, i);
 		}
 
 		for (int i = 0; i < 3; i++)
 		{
-			GetCharDB.Execute("INSERT INTO portals (CharID,Point) VALUES (%u,%u)", newCharId, req->defaultPortalId[i]);
+			g_pCharacterRepository->InsertPortal(newCharId, req->defaultPortalId[i]);
 		}
 
-		GetCharDB.Execute("INSERT INTO bind (CharID,WorldID,LocX,LocY,LocZ,DirX,DirY,DirZ) VALUES (%u,%u,%f,%f,%f,%f,%f,%f)", 
-			newCharId, req->bindWorldId, req->vBind_Loc.x, req->vBind_Loc.y, req->vBind_Loc.z, req->vBind_Dir.x, req->vBind_Dir.y, req->vBind_Dir.z);
+		g_pCharacterRepository->InsertBind(newCharId, req->bindWorldId, req->vBind_Loc.x, req->vBind_Loc.y, req->vBind_Loc.z, req->vBind_Dir.x, req->vBind_Dir.y, req->vBind_Dir.z);
 
 		res->sPcDataSummary.dwMapInfoIndex = (DWORD)req->mapNameTblidx;
 		res->sPcDataSummary.bTutorialFlag = false; //must change to false when tutorial works
@@ -131,28 +143,28 @@ void CCharServerSession::RecvCharacterDelReq(CNtlPacket * pPacket, CQueryServer 
 		delete pCache;
 	}
 
-	GetLogDB.Execute("INSERT INTO character_delete_log (AccountID, CharID) VALUES (%u, %u)", req->accountID, req->charID);
+	g_pAuditLogRepository->InsertCharacterDeleteLog(req->accountID, req->charID);
 
-	GetCharDB.Execute("DELETE FROM characters WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM auctionhouse WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM bind WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM buffs WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM friendlist WHERE user_id=%u OR friend_id=%u", req->charID, req->charID);
-	GetCharDB.Execute("DELETE FROM hoipoi_recipe WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM htb_skills WHERE owner_id=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM items WHERE owner_id=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM mail WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM mascots WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM portals WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM questitems WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM quests WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM quickslot WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM skills WHERE owner_id=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM titles WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM warfog WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM items_cd WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM quick_teleport WHERE CharID=%u", req->charID);
-	GetCharDB.Execute("DELETE FROM rank_battle WHERE CharID=%u", req->charID);
+	g_pCharacterRepository->DeleteCharacter(req->charID);
+	g_pAuctionHouseRepository->DeleteListingsByChar(req->charID);
+	g_pCharacterRepository->DeleteBind(req->charID);
+	g_pBuffRepository->DeleteBuffs(req->charID);
+	g_pFriendRepository->DeleteFriendList(req->charID);
+	g_pRecipeRepository->DeleteRecipes(req->charID);
+	g_pSkillRepository->DeleteHtbSkills(req->charID);
+	g_pItemRepository->DeleteItemsByOwner(req->charID);
+	g_pMailRepository->DeleteMailByChar(req->charID);
+	g_pMascotRepository->DeleteMascots(req->charID);
+	g_pCharacterRepository->DeletePortals(req->charID);
+	g_pQuestRepository->DeleteQuestItems(req->charID);
+	g_pQuestRepository->DeleteQuests(req->charID);
+	g_pQuickSlotRepository->DeleteQuickSlots(req->charID);
+	g_pSkillRepository->DeleteSkills(req->charID);
+	g_pCharacterRepository->DeleteTitles(req->charID);
+	g_pCharacterRepository->DeleteWarfog(req->charID);
+	g_pItemRepository->DeleteItemsCdByChar(req->charID);
+	g_pQuickSlotRepository->DeleteQuickTeleports(req->charID);
+	g_pCharacterRepository->DeleteRankBattle(req->charID);
 }
 
 void CCharServerSession::RecvCharacterLoadReq(CNtlPacket * pPacket, CQueryServer * app)
@@ -178,12 +190,7 @@ void CCharServerSession::RecvCharacterLoadReq(CNtlPacket * pPacket, CQueryServer
 
 		pAccount->SetSession(GetHandle());
 
-		SQLCallbackBase* pCallBack = new SQLClassCallbackP0<CAccountCache>(pAccount, &CAccountCache::OnLoadAccountInfo);
-		AsyncQuery * q = new AsyncQuery(pCallBack);
-		q->AddQuery("SELECT mallpoints, isGm, PremiumSlots, EventCoins, WaguCoins FROM accounts WHERE AccountID=%u", req->accountId);
-		q->AddQuery("SELECT * FROM cashshop_storage WHERE AccountID=%u AND isMoved=0", req->accountId);
-		q->AddQuery("SELECT ActionID, wKey FROM shortcuts WHERE AccountID=%u", req->accountId);
-		GetAccDB.QueueAsyncQuery(q);
+		g_pAccountRepository->LoadAccountDataAsync(pAccount, req->accountId);
 
 		g_pPlayerCache->InsertAccount(req->accountId, pAccount);
 	}

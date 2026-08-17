@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "AuctionHouse.h"
 #include "QueryServer.h"
+#include "Repository/AuctionHouseRepository.h"
+#include "Repository/ItemRepository.h"
 
 
 CAutionhouse::CAutionhouse()
@@ -18,14 +20,14 @@ void CAutionhouse::Init()
 {
 	ullHighestAuctionID = 0;
 
-	smart_ptr<QueryResult> result = GetCharDB.Query("SELECT * FROM auctionhouse");
+	smart_ptr<QueryResult> result = g_pAuctionHouseRepository->LoadAuctionHouse();
 	if (result)
 	{
 		do
 		{
 			Field* f = result->Fetch();
 
-			smart_ptr<QueryResult> item = GetCharDB.Query("SELECT * FROM items WHERE id=%I64u", f[6].GetUInt64());
+			smart_ptr<QueryResult> item = g_pItemRepository->GetById(f[6].GetUInt64());
 			if (item)
 			{
 				Field* fi = item->Fetch();
@@ -79,7 +81,7 @@ void CAutionhouse::Init()
 			}
 			else
 			{
-				GetCharDB.Execute("DELETE FROM auctionhouse WHERE id=%I64u", f[0].GetUInt64());
+				g_pAuctionHouseRepository->DeleteListing(f[0].GetUInt64());
 			}
 
 		} while (result->NextRow());
