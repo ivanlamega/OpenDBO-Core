@@ -1551,7 +1551,7 @@ void CClientSession::RecvHlsSlotMachineExtractReq(CNtlPacket * pPacket)
 									if (pSlotItem->byRank == 1) // congratulation.. Won top 10 item
 									{
 										bHasTop1 = true;
-										top1ItemTblidx = pSlotItem->pHlsItem->tblidx;
+										top1ItemTblidx = pSlotItem->pHlsItem->itemTblidx;
 
 										g_pHlsSlotMachine->AddWinner(req->wMachineIndex, pSlotItem->pHlsItem->tblidx, cPlayer);
 									}
