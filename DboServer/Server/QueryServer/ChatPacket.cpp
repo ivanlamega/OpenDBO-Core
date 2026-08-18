@@ -192,9 +192,9 @@ void CChatServerSession::RecvGuildLeaveReq(CNtlPacket * pPacket, CQueryServer * 
 						{
 							pGuildData->guildSecondMaster[i] = INVALID_CHARACTERID;
 
-							CNtlString rowName("GuildSecondMaster");
+							CNtlString rowName("second_master_char_id");
 							if (i > 0)
-								rowName.Format("GuildSecondMaster%i", i + 1);
+								rowName.Format("second_master_%i_char_id", i + 1);
 
 							g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), INVALID_CHARACTERID, pCache->GetGuildID());
 
@@ -244,9 +244,9 @@ void CChatServerSession::RecvGuildKickOutReq(CNtlPacket * pPacket, CQueryServer 
 						{
 							pGuildData->guildSecondMaster[i] = INVALID_CHARACTERID;
 
-							CNtlString rowName("GuildSecondMaster");
+							CNtlString rowName("second_master_char_id");
 							if (i > 0)
-								rowName.Format("GuildSecondMaster%i", i + 1);
+								rowName.Format("second_master_%i_char_id", i + 1);
 
 							g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), INVALID_CHARACTERID, pCache->GetGuildID());
 
@@ -283,9 +283,9 @@ void CChatServerSession::RecvGuildKickOutReq(CNtlPacket * pPacket, CQueryServer 
 							{
 								pGuildData->guildSecondMaster[i] = INVALID_CHARACTERID;
 
-								CNtlString rowName("GuildSecondMaster");
+								CNtlString rowName("second_master_char_id");
 								if (i > 0)
-									rowName.Format("GuildSecondMaster%i", i + 1);
+									rowName.Format("second_master_%i_char_id", i + 1);
 
 								g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), INVALID_CHARACTERID, req->guildId);
 
@@ -326,9 +326,9 @@ void CChatServerSession::RecvGuildAppointSecondMasterReq(CNtlPacket * pPacket, C
 			{
 				pGuildData->guildSecondMaster[secondMasterSpot] = req->targetMemberCharId;
 
-				CNtlString rowName("GuildSecondMaster");
+				CNtlString rowName("second_master_char_id");
 				if (secondMasterSpot > 0)
-					rowName.Format("GuildSecondMaster%i", secondMasterSpot + 1);
+					rowName.Format("second_master_%i_char_id", secondMasterSpot + 1);
 
 				g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), req->targetMemberCharId, req->guildId);
 
@@ -363,9 +363,9 @@ void CChatServerSession::RecvGuildDismissSecondMasterReq(CNtlPacket * pPacket, C
 			{
 				pGuildData->guildSecondMaster[secondMasterSpot] = INVALID_CHARACTERID;
 
-				CNtlString rowName("GuildSecondMaster");
+				CNtlString rowName("second_master_char_id");
 				if (secondMasterSpot > 0)
-					rowName.Format("GuildSecondMaster%i", secondMasterSpot + 1);
+					rowName.Format("second_master_%i_char_id", secondMasterSpot + 1);
 
 				g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), INVALID_CHARACTERID, req->guildId);
 

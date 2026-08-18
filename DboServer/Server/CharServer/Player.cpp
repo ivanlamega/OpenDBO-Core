@@ -44,7 +44,7 @@ void CPlayer::LoadCharactersFromDB()
 {
 	//load characters async
 	AsyncQuery * q = new AsyncQuery(new SQLClassCallbackP1<CPlayer, ACCOUNTID>(this, &CPlayer::LoadFromDBProc, GetAccountID()));
-	q->AddQuery("SELECT CharID,CharName,Level,Race,Class,Gender,Face,Adult,Hair,HairColor,SkinColor,CurLocX,CurLocY,CurLocZ,WorldID,WorldTable,MapInfoIndex,Money,MoneyBank,TutorialFlag,NameChange,GuildID,DelCharTime,Title,InvisibleCostume,SuperiorEffectType FROM characters WHERE AccountID=%u AND SrvFarmID=%u LIMIT 8", GetAccountID(), GetServerFarmID());
+	q->AddQuery("SELECT id,char_name,level,race,class,gender,face,adult,hair,hair_color,skin_color,cur_loc_x,cur_loc_y,cur_loc_z,world_id,world_table,map_info_index,money,money_bank,tutorial_flag,name_change,guild_id,del_char_time,title,invisible_costume,superior_effect_type FROM characters WHERE account_id=%u AND srv_farm_id=%u LIMIT 8", GetAccountID(), GetServerFarmID());
 	GetCharDB.QueueAsyncQuery(q);
 }
 
@@ -145,13 +145,13 @@ void CPlayer::LoadFromDBProc(QueryResultVector & results, ACCOUNTID accountID)
 
 		for (BYTE i = 0; i < m_byCharCount; i++)
 		{
-			q->AddQuery("SELECT tblidx,pos,`rank`,grade,BattleAttribute FROM items WHERE owner_id=%u AND place=6", m_sPcData[i].charId);
+			q->AddQuery("SELECT tblidx,pos,`rank`,grade,battle_attribute FROM items WHERE char_id=%u AND place=6", m_sPcData[i].charId);
 		}
 
 		for (BYTE i = 0; i < m_byCharCount; i++)
 		{
 			if (m_sPcData[i].sDogi.guildId > 0)
-				q->AddQuery("SELECT MarkInColor,MarkInLine,MarkMain,MarkMainColor,MarkOutColor,MarkOutLine,DojoColor,GuildColor,DogiType FROM guilds WHERE GuildID=%u LIMIT 1", m_sPcData[i].sDogi.guildId);
+				q->AddQuery("SELECT mark_in_color,mark_in_line,mark_main,mark_main_color,mark_out_color,mark_out_line,dojo_color,guild_color,dogi_type FROM guilds WHERE id=%u LIMIT 1", m_sPcData[i].sDogi.guildId);
 		}
 
 		GetCharDB.QueueAsyncQuery(q);
@@ -255,7 +255,7 @@ void CPlayer::LoadFromDBProcSecond(QueryResultVector & results, ACCOUNTID accoun
 
 	//load acc data & finish
 	AsyncQuery * q2 = new AsyncQuery(new SQLClassCallbackP1<CPlayer, ACCOUNTID>(this, &CPlayer::LoadFromDBProcEnd, GetAccountID()));
-	q2->AddQuery("SELECT PremiumSlots,isGm FROM accounts WHERE AccountID = %u LIMIT 1", GetAccountID());
+	q2->AddQuery("SELECT premium_slots,is_gm FROM accounts WHERE id = %u LIMIT 1", GetAccountID());
 	GetAccDB.QueueAsyncQuery(q2);
 }
 

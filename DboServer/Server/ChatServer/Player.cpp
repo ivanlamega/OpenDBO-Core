@@ -88,12 +88,12 @@ void CPlayer::LoadFromDB()
 
 		SQLCallbackBase* pCallBack = new SQLClassCallbackP0<CPlayer>(this, &CPlayer::LoadFromDBProc);
 		AsyncQuery * q = new AsyncQuery(pCallBack);
-		q->AddQuery("SELECT * FROM friendlist WHERE user_id=%u LIMIT 200", GetCharID()); // LIMIT NTL_MAX_COUNT_FRIEND + NTL_MAX_COUNT_FRIEND
+		q->AddQuery("SELECT * FROM friendlist WHERE char_id=%u LIMIT 200", GetCharID()); // LIMIT NTL_MAX_COUNT_FRIEND + NTL_MAX_COUNT_FRIEND
 		GetCharDB.QueueAsyncQuery(q);
 
 		SQLCallbackBase* pCallBack2 = new SQLClassCallbackP0<CPlayer>(this, &CPlayer::LoadFromLogDBProc);
 		AsyncQuery * q2 = new AsyncQuery(pCallBack2);
-		q2->AddQuery("SELECT muteUntil FROM mute_log WHERE CharID=%u", GetCharID());
+		q2->AddQuery("SELECT mute_until FROM mute_log WHERE char_id=%u", GetCharID());
 		GetLogDB.QueueAsyncQuery(q2);
 	}
 }
@@ -262,7 +262,7 @@ void CPlayer::Logout(bool bForce/* = false*/)
 
 	if (m_dwMuteDurationInMilliseconds > 0)
 	{
-		GetLogDB.Execute("UPDATE mute_log SET muteUntil=%u WHERE CharID=%u", m_dwMuteDurationInMilliseconds, GetCharID());
+		GetLogDB.Execute("UPDATE mute_log SET mute_until=%u WHERE char_id=%u", m_dwMuteDurationInMilliseconds, GetCharID());
 	}
 
 	//notify guild that player logged out

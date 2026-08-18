@@ -21,12 +21,12 @@ smart_ptr<QueryResult> CItemRepository::GetByIdSingle(ITEMID itemId)
 
 smart_ptr<QueryResult> CItemRepository::GetItemsByGuildId(GUILDID guildId)
 {
-	return GetCharDB.Query("SELECT * FROM items WHERE GuildID=%u ORDER BY place ASC LIMIT 96", guildId); //NTL_MAX_COUNT_GUILD_HAVE_TOTAL_ITEM
+	return GetCharDB.Query("SELECT * FROM items WHERE guild_id=%u ORDER BY place ASC LIMIT 96", guildId); //NTL_MAX_COUNT_GUILD_HAVE_TOTAL_ITEM
 }
 
 void CItemRepository::Insert(ITEMID id, sITEM_DATA& rItemData, CHARACTERID charId)
 {
-	GetCharDB.Execute("INSERT INTO items (id,tblidx,owner_id,place,pos,count,`rank`,durability,grade,NeedToIdentify,BattleAttribute,Maker,OptionTblidx,OptionTblidx2,OptionRandomId,OptionRandomVal,OptionRandomId2,OptionRandomVal2,OptionRandomId3,OptionRandomVal3,OptionRandomId4,OptionRandomVal4,OptionRandomId5,OptionRandomVal5,OptionRandomId6,OptionRandomVal6,OptionRandomId7,OptionRandomVal7,OptionRandomId8,OptionRandomVal8,UseStartTime,UseEndTime,RestrictState,DurationType)"
+	GetCharDB.Execute("INSERT INTO items (id,tblidx,char_id,place,pos,count,`rank`,durability,grade,need_to_identify,battle_attribute,maker,option_tblidx,option_tblidx_2,option_random_id,option_random_val,option_random_id_2,option_random_val_2,option_random_id_3,option_random_val_3,option_random_id_4,option_random_val_4,option_random_id_5,option_random_val_5,option_random_id_6,option_random_val_6,option_random_id_7,option_random_val_7,option_random_id_8,option_random_val_8,use_start_time,use_end_time,restrict_state,duration_type)"
 		"VALUES(%I64u, %u,%u,%u,%u,%u,%u,%u,%u,%u,%u,'%ls',%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u)",
 		id, rItemData.itemNo, charId, rItemData.byPlace, rItemData.byPosition, rItemData.byStackcount, rItemData.byRank, rItemData.byCurrentDurability, rItemData.byGrade, rItemData.bNeedToIdentify, rItemData.byBattleAttribute, rItemData.awchMaker,
 		rItemData.sOptionSet.aOptionTblidx[0], rItemData.sOptionSet.aOptionTblidx[1],
@@ -43,7 +43,7 @@ void CItemRepository::Insert(ITEMID id, sITEM_DATA& rItemData, CHARACTERID charI
 
 void CItemRepository::Insert(ITEMID id, sSHOP_BUY_INVEN& rData, CHARACTERID charID)
 {
-	GetCharDB.Execute("INSERT INTO items (id,tblidx,owner_id,place,pos,count,`rank`,durability,grade,Maker,OptionTblidx,OptionTblidx2,OptionRandomId,OptionRandomVal,OptionRandomId2,OptionRandomVal2,OptionRandomId3,OptionRandomVal3,OptionRandomId4,OptionRandomVal4,OptionRandomId5,OptionRandomVal5,OptionRandomId6,OptionRandomVal6,OptionRandomId7,OptionRandomVal7,OptionRandomId8,OptionRandomVal8,UseStartTime,UseEndTime,RestrictState,DurationType)"
+	GetCharDB.Execute("INSERT INTO items (id,tblidx,char_id,place,pos,count,`rank`,durability,grade,maker,option_tblidx,option_tblidx_2,option_random_id,option_random_val,option_random_id_2,option_random_val_2,option_random_id_3,option_random_val_3,option_random_id_4,option_random_val_4,option_random_id_5,option_random_val_5,option_random_id_6,option_random_val_6,option_random_id_7,option_random_val_7,option_random_id_8,option_random_val_8,use_start_time,use_end_time,restrict_state,duration_type)"
 		"VALUES(%I64u, %u,%u,%u,%u,%u,%u,%u,%u,'%ls',%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u)",
 		id, rData.tblItem, charID, rData.byPlace, rData.byPos, rData.byStack, rData.byRank, rData.byCurrentDurability, rData.byGrade, rData.awchMaker,
 		rData.sOptionSet.aOptionTblidx[0], rData.sOptionSet.aOptionTblidx[1],
@@ -60,12 +60,12 @@ void CItemRepository::Insert(ITEMID id, sSHOP_BUY_INVEN& rData, CHARACTERID char
 
 void CItemRepository::InsertBank(ITEMID id, CHARACTERID charID, TBLIDX itemTblidx, BYTE byPlace, BYTE byPos, BYTE byRank, BYTE byDurType, DBOTIME nUseStartTime, DBOTIME nUseEndTime)
 {
-	GetCharDB.Execute("INSERT INTO items (id,tblidx,owner_id,place,pos,`rank`,UseStartTime,UseEndTime,DurationType) VALUES (%I64u, %u,%u,%u,%u,%u,%u,%u,%u)", id, itemTblidx, charID, byPlace, byPos, byRank, nUseStartTime, nUseEndTime, byDurType);
+	GetCharDB.Execute("INSERT INTO items (id,tblidx,char_id,place,pos,`rank`,use_start_time,use_end_time,duration_type) VALUES (%I64u, %u,%u,%u,%u,%u,%u,%u,%u)", id, itemTblidx, charID, byPlace, byPos, byRank, nUseStartTime, nUseEndTime, byDurType);
 }
 
 void CItemRepository::InsertGuildItem(ITEMID id, sITEM_DATA& rItemData, GUILDID guildId)
 {
-	GetCharDB.Execute("INSERT INTO items (id,tblidx,place,pos,count,`rank`,durability,grade,NeedToIdentify,BattleAttribute,Maker,OptionTblidx,OptionTblidx2,OptionRandomId,OptionRandomVal,OptionRandomId2,OptionRandomVal2,OptionRandomId3,OptionRandomVal3,OptionRandomId4,OptionRandomVal4,OptionRandomId5,OptionRandomVal5,OptionRandomId6,OptionRandomVal6,OptionRandomId7,OptionRandomVal7,OptionRandomId8,OptionRandomVal8,UseStartTime,UseEndTime,RestrictState,DurationType,GuildID)"
+	GetCharDB.Execute("INSERT INTO items (id,tblidx,place,pos,count,`rank`,durability,grade,need_to_identify,battle_attribute,maker,option_tblidx,option_tblidx_2,option_random_id,option_random_val,option_random_id_2,option_random_val_2,option_random_id_3,option_random_val_3,option_random_id_4,option_random_val_4,option_random_id_5,option_random_val_5,option_random_id_6,option_random_val_6,option_random_id_7,option_random_val_7,option_random_id_8,option_random_val_8,use_start_time,use_end_time,restrict_state,duration_type,guild_id)"
 		"VALUES(%I64u, %u,%u,%u,%u,%u,%u,%u,%u,%u,'%ls',%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u)",
 		id, rItemData.itemNo, rItemData.byPlace, rItemData.byPosition, rItemData.byStackcount, rItemData.byRank, rItemData.byCurrentDurability, rItemData.byGrade, rItemData.bNeedToIdentify, rItemData.byBattleAttribute, rItemData.awchMaker,
 		rItemData.sOptionSet.aOptionTblidx[0], rItemData.sOptionSet.aOptionTblidx[1],
@@ -82,7 +82,7 @@ void CItemRepository::InsertGuildItem(ITEMID id, sITEM_DATA& rItemData, GUILDID 
 
 void CItemRepository::InsertSharedBankItem(ITEMID id, sITEM_DATA& rItemData, ACCOUNTID accountId)
 {
-	GetCharDB.Execute("INSERT INTO items (id,tblidx,place,pos,count,`rank`,durability,grade,NeedToIdentify,BattleAttribute,Maker,OptionTblidx,OptionTblidx2,OptionRandomId,OptionRandomVal,OptionRandomId2,OptionRandomVal2,OptionRandomId3,OptionRandomVal3,OptionRandomId4,OptionRandomVal4,OptionRandomId5,OptionRandomVal5,OptionRandomId6,OptionRandomVal6,OptionRandomId7,OptionRandomVal7,OptionRandomId8,OptionRandomVal8,UseStartTime,UseEndTime,RestrictState,DurationType,AccountID)"
+	GetCharDB.Execute("INSERT INTO items (id,tblidx,place,pos,count,`rank`,durability,grade,need_to_identify,battle_attribute,maker,option_tblidx,option_tblidx_2,option_random_id,option_random_val,option_random_id_2,option_random_val_2,option_random_id_3,option_random_val_3,option_random_id_4,option_random_val_4,option_random_id_5,option_random_val_5,option_random_id_6,option_random_val_6,option_random_id_7,option_random_val_7,option_random_id_8,option_random_val_8,use_start_time,use_end_time,restrict_state,duration_type,account_id)"
 		"VALUES(%I64u, %u,%u,%u,%u,%u,%u,%u,%u,%u,'%ls',%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u)",
 		id, rItemData.itemNo, rItemData.byPlace, rItemData.byPosition, rItemData.byStackcount, rItemData.byRank, rItemData.byCurrentDurability, rItemData.byGrade, rItemData.bNeedToIdentify, rItemData.byBattleAttribute, rItemData.awchMaker,
 		rItemData.sOptionSet.aOptionTblidx[0], rItemData.sOptionSet.aOptionTblidx[1],
@@ -99,17 +99,17 @@ void CItemRepository::InsertSharedBankItem(ITEMID id, sITEM_DATA& rItemData, ACC
 
 void CItemRepository::DeleteItemsByOwner(CHARACTERID charId)
 {
-	GetCharDB.Execute("DELETE FROM items WHERE owner_id=%u", charId);
+	GetCharDB.Execute("DELETE FROM items WHERE char_id=%u", charId);
 }
 
 void CItemRepository::DeleteItemsCdByChar(CHARACTERID charId)
 {
-	GetCharDB.Execute("DELETE FROM items_cd WHERE CharID=%u", charId);
+	GetCharDB.Execute("DELETE FROM items_cd WHERE char_id=%u", charId);
 }
 
 void CItemRepository::ClearItemCoolTimes(CHARACTERID charId)
 {
-	GetCharDB.Execute("DELETE FROM items_cd WHERE CharID = %u", charId);
+	GetCharDB.Execute("DELETE FROM items_cd WHERE char_id = %u", charId);
 }
 
 void CItemRepository::InsertItemCd(CHARACTERID charId, BYTE byGroupIndex, DWORD dwInitial, DWORD dwRemaining)
@@ -119,47 +119,47 @@ void CItemRepository::InsertItemCd(CHARACTERID charId, BYTE byGroupIndex, DWORD 
 
 void CItemRepository::UpdateBattleAttribute(ITEMID itemId, BYTE byBattleAttribute)
 {
-	GetCharDB.Execute("UPDATE items SET BattleAttribute=%u WHERE id=%I64u", byBattleAttribute, itemId);
+	GetCharDB.Execute("UPDATE items SET battle_attribute=%u WHERE id=%I64u", byBattleAttribute, itemId);
 }
 
 void CItemRepository::UpdateUseEndTime32(ITEMID itemId, DWORD useEndTime)
 {
-	GetCharDB.Execute("UPDATE items SET UseEndTime=%u WHERE id=%I64u", useEndTime, itemId);
+	GetCharDB.Execute("UPDATE items SET use_end_time=%u WHERE id=%I64u", useEndTime, itemId);
 }
 
 void CItemRepository::UpdateUseEndTime64(ITEMID itemId, DBOTIME useEndTime)
 {
-	GetCharDB.Execute("UPDATE items SET UseEndTime=%I64u WHERE id=%I64u", useEndTime, itemId);
+	GetCharDB.Execute("UPDATE items SET use_end_time=%I64u WHERE id=%I64u", useEndTime, itemId);
 }
 
 void CItemRepository::UpdateBeadOptions(WORD option7Idx, INT option7Val, WORD option8Idx, INT option8Val, DBOTIME useStartTime, DBOTIME useEndTime, BYTE byRestrictState, BYTE byDurationType, ITEMID itemId)
 {
-	GetCharDB.Execute("UPDATE items SET OptionRandomId7=%u, OptionRandomVal7=%i, OptionRandomId8=%u, OptionRandomVal8=%i, UseStartTime=%I64u, UseEndTime=%I64u, RestrictState=%u, DurationType=%u WHERE id=%I64u",
+	GetCharDB.Execute("UPDATE items SET option_random_id_7=%u, option_random_val_7=%i, option_random_id_8=%u, option_random_val_8=%i, use_start_time=%I64u, use_end_time=%I64u, restrict_state=%u, duration_type=%u WHERE id=%I64u",
 		option7Idx, option7Val, option8Idx, option8Val,
 		useStartTime, useEndTime, byRestrictState, byDurationType, itemId);
 }
 
 void CItemRepository::ClearBeadOptions(WORD invalidIdx1, WORD invalidIdx2, BYTE byRestrictState, BYTE byDurationType, ITEMID itemId)
 {
-	GetCharDB.Execute("UPDATE items SET OptionRandomId7=%u, OptionRandomVal7=0, OptionRandomId8=%u, OptionRandomVal8=0, UseStartTime=0, UseEndTime=0, RestrictState=%u, DurationType=%u WHERE id=%I64u",
+	GetCharDB.Execute("UPDATE items SET option_random_id_7=%u, option_random_val_7=0, option_random_id_8=%u, option_random_val_8=0, use_start_time=0, use_end_time=0, restrict_state=%u, duration_type=%u WHERE id=%I64u",
 		invalidIdx1, invalidIdx2, byRestrictState, byDurationType, itemId);
 }
 
 void CItemRepository::UpdateUseTimeRange(ITEMID itemId, DBOTIME startTime, DBOTIME endTime)
 {
-	GetCharDB.Execute("UPDATE items SET UseStartTime=%I64u,UseEndTime=%I64u WHERE id=%I64u", startTime, endTime, itemId);
+	GetCharDB.Execute("UPDATE items SET use_start_time=%I64u,use_end_time=%I64u WHERE id=%I64u", startTime, endTime, itemId);
 }
 
 void CItemRepository::InsertSharedBankItemMinimal(ITEMID id, TBLIDX itemNo, BYTE byPlace, BYTE byPos, BYTE byRank, DBOTIME useStartTime, DBOTIME useEndTime, BYTE byDurationType, ACCOUNTID accountId)
 {
-	GetCharDB.Execute("INSERT INTO items (id,tblidx,place,pos,`rank`,UseStartTime,UseEndTime,DurationType,AccountID)"
+	GetCharDB.Execute("INSERT INTO items (id,tblidx,place,pos,`rank`,use_start_time,use_end_time,duration_type,account_id)"
 		"VALUES(%I64u, %u, %u, %u, %u, %I64u, %I64u, %u, %u)",
 		id, itemNo, byPlace, byPos, byRank, useStartTime, useEndTime, byDurationType, accountId);
 }
 
 void CItemRepository::UpdateOptionSet(TBLIDX opt1, TBLIDX opt2, WORD randId1, INT randVal1, WORD randId2, INT randVal2, WORD randId3, INT randVal3, WORD randId4, INT randVal4, ITEMID itemId)
 {
-	GetCharDB.Execute("UPDATE items SET OptionTblidx=%u,OptionTblidx2=%u,OptionRandomId=%u,OptionRandomVal=%u,OptionRandomId2=%u,OptionRandomVal2=%u,OptionRandomId3=%u,OptionRandomVal3=%u,OptionRandomId4=%u,OptionRandomVal4=%u WHERE id=%I64u",
+	GetCharDB.Execute("UPDATE items SET option_tblidx=%u,option_tblidx_2=%u,option_random_id=%u,option_random_val=%u,option_random_id_2=%u,option_random_val_2=%u,option_random_id_3=%u,option_random_val_3=%u,option_random_id_4=%u,option_random_val_4=%u WHERE id=%I64u",
 		opt1, opt2, randId1, randVal1, randId2, randVal2, randId3, randVal3, randId4, randVal4, itemId);
 }
 
@@ -170,17 +170,17 @@ void CItemRepository::UpdateGrade(ITEMID itemId, BYTE byGrade)
 
 void CItemRepository::UpdateRestrictState(ITEMID itemId, BYTE byRestrictState)
 {
-	GetCharDB.Execute("UPDATE items SET RestrictState=%u WHERE id=%I64u", byRestrictState, itemId);
+	GetCharDB.Execute("UPDATE items SET restrict_state=%u WHERE id=%I64u", byRestrictState, itemId);
 }
 
 void CItemRepository::UpdateGradeAndDuration(BYTE byGrade, DWORD nUseStartTime, DWORD nUseEndTime, BYTE byRestrictState, BYTE byDurationType, ITEMID itemId)
 {
-	GetCharDB.Execute("UPDATE items SET grade=%u, UseStartTime=%u, UseEndTime=%u, RestrictState=%u, DurationType=%u WHERE id=%I64u", byGrade, nUseStartTime, nUseEndTime, byRestrictState, byDurationType, itemId);
+	GetCharDB.Execute("UPDATE items SET grade=%u, use_start_time=%u, use_end_time=%u, restrict_state=%u, duration_type=%u WHERE id=%I64u", byGrade, nUseStartTime, nUseEndTime, byRestrictState, byDurationType, itemId);
 }
 
 void CItemRepository::ResetGradeAndDuration(BYTE byRestrictState, ITEMID itemId)
 {
-	GetCharDB.Execute("UPDATE items SET grade=0, UseStartTime=0, UseEndTime=0, RestrictState=%u, DurationType=0 WHERE id=%I64u", byRestrictState, itemId);
+	GetCharDB.Execute("UPDATE items SET grade=0, use_start_time=0, use_end_time=0, restrict_state=%u, duration_type=0 WHERE id=%I64u", byRestrictState, itemId);
 }
 
 void CItemRepository::DeleteById(ITEMID itemId)
@@ -195,7 +195,7 @@ void CItemRepository::UpdateCount(ITEMID itemId, BYTE byCount)
 
 void CItemRepository::ClearOwner(ITEMID itemId)
 {
-	GetCharDB.Execute("UPDATE items SET owner_id=0 WHERE id=%I64u", itemId);
+	GetCharDB.Execute("UPDATE items SET char_id=0 WHERE id=%I64u", itemId);
 }
 
 void CItemRepository::UpdatePlace(ITEMID itemId, BYTE byPlace, BYTE byPos)
@@ -205,37 +205,37 @@ void CItemRepository::UpdatePlace(ITEMID itemId, BYTE byPlace, BYTE byPos)
 
 void CItemRepository::UpdatePlaceWithRestrict(ITEMID itemId, BYTE byPlace, BYTE byPos, BYTE byRestrictState)
 {
-	GetCharDB.Execute("UPDATE items SET place=%u, pos=%u, RestrictState=%u WHERE id=%I64u", byPlace, byPos, byRestrictState, itemId);
+	GetCharDB.Execute("UPDATE items SET place=%u, pos=%u, restrict_state=%u WHERE id=%I64u", byPlace, byPos, byRestrictState, itemId);
 }
 
 void CItemRepository::MoveToPersonalBank(ITEMID itemId, CHARACTERID ownerId, BYTE byPlace, BYTE byPos)
 {
-	GetCharDB.Execute("UPDATE items SET owner_id=%u, place=%u, pos=%u, AccountID=0 WHERE id=%I64u", ownerId, byPlace, byPos, itemId);
+	GetCharDB.Execute("UPDATE items SET char_id=%u, place=%u, pos=%u, account_id=0 WHERE id=%I64u", ownerId, byPlace, byPos, itemId);
 }
 
 void CItemRepository::MoveToSharedBank(ITEMID itemId, BYTE byPlace, BYTE byPos, ACCOUNTID accountId)
 {
-	GetCharDB.Execute("UPDATE items SET owner_id=0, place=%u, pos=%u, AccountID=%u WHERE id=%I64u", byPlace, byPos, accountId, itemId);
+	GetCharDB.Execute("UPDATE items SET char_id=0, place=%u, pos=%u, account_id=%u WHERE id=%I64u", byPlace, byPos, accountId, itemId);
 }
 
 void CItemRepository::UpdateOwnerPlace(ITEMID itemId, CHARACTERID ownerId, BYTE byPlace, BYTE byPos)
 {
-	GetCharDB.Execute("UPDATE items SET owner_id=%u, place=%u, pos=%u WHERE id=%I64u", ownerId, byPlace, byPos, itemId);
+	GetCharDB.Execute("UPDATE items SET char_id=%u, place=%u, pos=%u WHERE id=%I64u", ownerId, byPlace, byPos, itemId);
 }
 
 void CItemRepository::UpdateOwnerPlacePos(ITEMID itemId, CHARACTERID ownerId, BYTE byPlace, BYTE byPos)
 {
-	GetCharDB.Execute("UPDATE items SET owner_id=%u,place=%u,pos=%u WHERE id=%I64u", ownerId, byPlace, byPos, itemId);
+	GetCharDB.Execute("UPDATE items SET char_id=%u,place=%u,pos=%u WHERE id=%I64u", ownerId, byPlace, byPos, itemId);
 }
 
 void CItemRepository::MoveToGuildBank(ITEMID itemId, BYTE byPlace, BYTE byPos, GUILDID guildId)
 {
-	GetCharDB.Execute("UPDATE items SET owner_id=0, place=%u, pos=%u, GuildID=%u WHERE id=%I64u", byPlace, byPos, guildId, itemId);
+	GetCharDB.Execute("UPDATE items SET char_id=0, place=%u, pos=%u, guild_id=%u WHERE id=%I64u", byPlace, byPos, guildId, itemId);
 }
 
 void CItemRepository::MoveFromGuildBankToOwner(ITEMID itemId, CHARACTERID ownerId, BYTE byPlace, BYTE byPos)
 {
-	GetCharDB.Execute("UPDATE items SET owner_id=%u, place=%u, pos=%u, GuildID=0 WHERE id=%I64u", ownerId, byPlace, byPos, itemId);
+	GetCharDB.Execute("UPDATE items SET char_id=%u, place=%u, pos=%u, guild_id=0 WHERE id=%I64u", ownerId, byPlace, byPos, itemId);
 }
 
 void CItemRepository::UpdateRankGrade(ITEMID itemId, BYTE byRank, BYTE byGrade)
@@ -250,17 +250,17 @@ void CItemRepository::UpdateDurability(ITEMID itemId, BYTE byDurability)
 
 void CItemRepository::UpdateDurabilityByOwnerPlacePos(BYTE byDurability, CHARACTERID charId, BYTE byPlace, BYTE byPos)
 {
-	GetCharDB.Execute("UPDATE items SET durability=%u WHERE owner_id=%u AND place=%u AND pos=%u", byDurability, charId, byPlace, byPos);
+	GetCharDB.Execute("UPDATE items SET durability=%u WHERE char_id=%u AND place=%u AND pos=%u", byDurability, charId, byPlace, byPos);
 }
 
 void CItemRepository::ClearNeedToIdentify(ITEMID itemId)
 {
-	GetCharDB.Execute("UPDATE items SET NeedToIdentify=false WHERE id=%I64u", itemId);
+	GetCharDB.Execute("UPDATE items SET need_to_identify=false WHERE id=%I64u", itemId);
 }
 
 void CItemRepository::InsertSplitFromSource(ITEMID newItemId, BYTE byPlace, BYTE byPos, BYTE byCount, ITEMID sourceItemId)
 {
-	GetCharDB.Execute("INSERT INTO items (id,tblidx,owner_id,place,pos,count,`rank`,Maker,RestrictState) SELECT %I64u,tblidx,owner_id,%u,%u,%u,`rank`,Maker,RestrictState FROM items WHERE id=%I64u",
+	GetCharDB.Execute("INSERT INTO items (id,tblidx,char_id,place,pos,count,`rank`,maker,restrict_state) SELECT %I64u,tblidx,char_id,%u,%u,%u,`rank`,maker,restrict_state FROM items WHERE id=%I64u",
 		newItemId, byPlace, byPos, byCount, sourceItemId);
 }
 
@@ -268,8 +268,8 @@ void CItemRepository::LoadBankDataAsync(CPlayerCache* pCache, CAccountCache* pAc
 {
 	SQLCallbackBase* pCallBack = new SQLClassCallbackP4<CPlayerCache, CAccountCache*, bool, HOBJECT, HOBJECT>(pCache, &CPlayerCache::OnLoadBank, pAccount, bAccountBankAlreadyLoaded, handle, npcHandle);
 	AsyncQuery * q = new AsyncQuery(pCallBack);
-	q->AddQuery("SELECT * FROM items WHERE owner_id=%u AND (place >= 7 AND place <=10) ORDER BY place ASC LIMIT 68", charId); // 7 = CONTAINER_TYPE_BANKSLOT
+	q->AddQuery("SELECT * FROM items WHERE char_id=%u AND (place >= 7 AND place <=10) ORDER BY place ASC LIMIT 68", charId); // 7 = CONTAINER_TYPE_BANKSLOT
 	if (!bAccountBankAlreadyLoaded)
-		q->AddQuery("SELECT * FROM items WHERE AccountID=%u ORDER BY place ASC LIMIT 68", accountId);
+		q->AddQuery("SELECT * FROM items WHERE account_id=%u ORDER BY place ASC LIMIT 68", accountId);
 	GetCharDB.QueueAsyncQuery(q);
 }

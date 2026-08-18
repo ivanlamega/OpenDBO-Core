@@ -980,13 +980,13 @@ void CClientSession::RecvAddFriendReq(CNtlPacket * pPacket)
 	{
 		char* target = Ntl_WC2MB(req->wchName);
 		std::string escapeTarget = GetCharDB.EscapeString(target);
-		smart_ptr<QueryResult> result = GetCharDB.Query("SELECT CharID FROM characters WHERE CharName=\"%s\"", escapeTarget.c_str());
+		smart_ptr<QueryResult> result = GetCharDB.Query("SELECT id FROM characters WHERE char_name=\"%s\"", escapeTarget.c_str());
 		if (result)
 		{
 			Field* f = result->Fetch();
 			charid = f[0].GetUInt32();
 
-			GetCharDB.Execute("INSERT INTO friendlist (user_id,friend_id,friend_name)VALUES(%u,%u,\"%s\")", cPlayer->GetCharID(), charid, escapeTarget.c_str());
+			GetCharDB.Execute("INSERT INTO friendlist (char_id,friend_char_id,friend_name)VALUES(%u,%u,\"%s\")", cPlayer->GetCharID(), charid, escapeTarget.c_str());
 
 			sFRIEND_FULL_INFO friendinfo;
 			friendinfo.bIsBlack = false;
@@ -1062,7 +1062,7 @@ void CClientSession::RecvDelFriendReq(CNtlPacket * pPacket)
 
 	if (resultcode == CHAT_SUCCESS)
 	{
-		GetCharDB.Execute("DELETE FROM friendlist WHERE user_id=%u AND friend_id=%u", cPlayer->GetCharID(), req->targetID);
+		GetCharDB.Execute("DELETE FROM friendlist WHERE char_id=%u AND friend_char_id=%u", cPlayer->GetCharID(), req->targetID);
 		cPlayer->DelFriend(req->targetID);
 	}
 
@@ -1107,7 +1107,7 @@ void CClientSession::RecvMoveFriendReq(CNtlPacket * pPacket)
 
 	if (resultcode == CHAT_SUCCESS)
 	{
-		GetCharDB.Execute("UPDATE friendlist SET blacklist=1 WHERE user_id=%u AND friend_id=%u", cPlayer->GetCharID(), req->targetID);
+		GetCharDB.Execute("UPDATE friendlist SET blacklist=1 WHERE char_id=%u AND friend_char_id=%u", cPlayer->GetCharID(), req->targetID);
 		finfo->bIsBlack = true;
 	}
 
@@ -1154,13 +1154,13 @@ void CClientSession::RecvBlackListAddReq(CNtlPacket * pPacket)
 		char* target = Ntl_WC2MB(req->awchName);
 		std::string escapeTarget = GetCharDB.EscapeString(target);
 
-		smart_ptr<QueryResult> result = GetCharDB.Query("SELECT CharID FROM characters WHERE CharName=\"%s\"", escapeTarget.c_str());
+		smart_ptr<QueryResult> result = GetCharDB.Query("SELECT id FROM characters WHERE char_name=\"%s\"", escapeTarget.c_str());
 		if (result)
 		{
 			Field* f = result->Fetch();
 			charid = f[0].GetUInt32();
 
-			GetCharDB.Execute("INSERT INTO friendlist (user_id,friend_id,blacklist,friend_name)VALUES(%u,%u,%i,\"%s\")", cPlayer->GetCharID(), charid, TRUE, escapeTarget.c_str());
+			GetCharDB.Execute("INSERT INTO friendlist (char_id,friend_char_id,blacklist,friend_name)VALUES(%u,%u,%i,\"%s\")", cPlayer->GetCharID(), charid, TRUE, escapeTarget.c_str());
 
 			sFRIEND_FULL_INFO friendinfo;
 			friendinfo.bIsBlack = true;
@@ -1207,7 +1207,7 @@ void CClientSession::RecvBlackListDelReq(CNtlPacket * pPacket)
 
 	else
 	{
-		GetCharDB.Execute("DELETE FROM friendlist WHERE user_id=%u AND friend_id=%u", cPlayer->GetCharID(), req->targetID);
+		GetCharDB.Execute("DELETE FROM friendlist WHERE char_id=%u AND friend_char_id=%u", cPlayer->GetCharID(), req->targetID);
 		cPlayer->DelFriend(req->targetID);
 	}
 
