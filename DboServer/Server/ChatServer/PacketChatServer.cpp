@@ -980,13 +980,13 @@ void CClientSession::RecvAddFriendReq(CNtlPacket * pPacket)
 	{
 		char* target = Ntl_WC2MB(req->wchName);
 		std::string escapeTarget = GetCharDB.EscapeString(target);
-		smart_ptr<QueryResult> result = GetCharDB.Query("SELECT CharID FROM characters WHERE CharName=\"%s\"", escapeTarget.c_str());
+		smart_ptr<QueryResult> result = GetCharDB.Query("SELECT id FROM characters WHERE char_name=\"%s\"", escapeTarget.c_str());
 		if (result)
 		{
 			Field* f = result->Fetch();
 			charid = f[0].GetUInt32();
 
-			GetCharDB.Execute("INSERT INTO friendlist (user_id,friend_id,friend_name)VALUES(%u,%u,\"%s\")", cPlayer->GetCharID(), charid, escapeTarget.c_str());
+			GetCharDB.Execute("INSERT INTO friendlist (char_id,friend_char_id,friend_name)VALUES(%u,%u,\"%s\")", cPlayer->GetCharID(), charid, escapeTarget.c_str());
 
 			sFRIEND_FULL_INFO friendinfo;
 			friendinfo.bIsBlack = false;
@@ -1062,7 +1062,7 @@ void CClientSession::RecvDelFriendReq(CNtlPacket * pPacket)
 
 	if (resultcode == CHAT_SUCCESS)
 	{
-		GetCharDB.Execute("DELETE FROM friendlist WHERE user_id=%u AND friend_id=%u", cPlayer->GetCharID(), req->targetID);
+		GetCharDB.Execute("DELETE FROM friendlist WHERE char_id=%u AND friend_char_id=%u", cPlayer->GetCharID(), req->targetID);
 		cPlayer->DelFriend(req->targetID);
 	}
 
@@ -1107,7 +1107,7 @@ void CClientSession::RecvMoveFriendReq(CNtlPacket * pPacket)
 
 	if (resultcode == CHAT_SUCCESS)
 	{
-		GetCharDB.Execute("UPDATE friendlist SET blacklist=1 WHERE user_id=%u AND friend_id=%u", cPlayer->GetCharID(), req->targetID);
+		GetCharDB.Execute("UPDATE friendlist SET blacklist=1 WHERE char_id=%u AND friend_char_id=%u", cPlayer->GetCharID(), req->targetID);
 		finfo->bIsBlack = true;
 	}
 
@@ -1154,13 +1154,13 @@ void CClientSession::RecvBlackListAddReq(CNtlPacket * pPacket)
 		char* target = Ntl_WC2MB(req->awchName);
 		std::string escapeTarget = GetCharDB.EscapeString(target);
 
-		smart_ptr<QueryResult> result = GetCharDB.Query("SELECT CharID FROM characters WHERE CharName=\"%s\"", escapeTarget.c_str());
+		smart_ptr<QueryResult> result = GetCharDB.Query("SELECT id FROM characters WHERE char_name=\"%s\"", escapeTarget.c_str());
 		if (result)
 		{
 			Field* f = result->Fetch();
 			charid = f[0].GetUInt32();
 
-			GetCharDB.Execute("INSERT INTO friendlist (user_id,friend_id,blacklist,friend_name)VALUES(%u,%u,%i,\"%s\")", cPlayer->GetCharID(), charid, TRUE, escapeTarget.c_str());
+			GetCharDB.Execute("INSERT INTO friendlist (char_id,friend_char_id,blacklist,friend_name)VALUES(%u,%u,%i,\"%s\")", cPlayer->GetCharID(), charid, TRUE, escapeTarget.c_str());
 
 			sFRIEND_FULL_INFO friendinfo;
 			friendinfo.bIsBlack = true;
@@ -1207,7 +1207,7 @@ void CClientSession::RecvBlackListDelReq(CNtlPacket * pPacket)
 
 	else
 	{
-		GetCharDB.Execute("DELETE FROM friendlist WHERE user_id=%u AND friend_id=%u", cPlayer->GetCharID(), req->targetID);
+		GetCharDB.Execute("DELETE FROM friendlist WHERE char_id=%u AND friend_char_id=%u", cPlayer->GetCharID(), req->targetID);
 		cPlayer->DelFriend(req->targetID);
 	}
 
@@ -1483,6 +1483,13 @@ void CClientSession::RecvHlsSlotMachineExtractReq(CNtlPacket * pPacket)
 	res->wResultCode = CHAT_SUCCESS;
 	res->wMachineIndex = req->wMachineIndex;
 
+	// holds sSLOT_MACHINE*/sHLS_SLOT_ITEM* pointers into g_pHlsSlotMachine's internal maps
+	// for the whole extract sequence below; Init() (called on this same machine emptying
+	// out or on a top prize win) deletes and rebuilds those maps, so a concurrent extract
+	// on another IOCP worker thread must not be allowed to run while this one is still
+	// dereferencing pointers obtained before its own Init() call
+	CNtlLock lock(g_pHlsSlotMachine->GetMutex());
+
 	sSLOT_MACHINE* pSlotMachine = (sSLOT_MACHINE*)g_pHlsSlotMachine->GetSlotMachine(req->wMachineIndex);
 	if (pSlotMachine)
 	{
@@ -1544,7 +1551,7 @@ void CClientSession::RecvHlsSlotMachineExtractReq(CNtlPacket * pPacket)
 									if (pSlotItem->byRank == 1) // congratulation.. Won top 10 item
 									{
 										bHasTop1 = true;
-										top1ItemTblidx = pSlotItem->pHlsItem->tblidx;
+										top1ItemTblidx = pSlotItem->pHlsItem->itemTblidx;
 
 										g_pHlsSlotMachine->AddWinner(req->wMachineIndex, pSlotItem->pHlsItem->tblidx, cPlayer);
 									}
@@ -1587,19 +1594,46 @@ void CClientSession::RecvHlsSlotMachineExtractReq(CNtlPacket * pPacket)
 
 							return;
 						}
-						else res->wResultCode = WAGUWAGUMACHINE_FAIL;
+						else
+						{
+							res->wResultCode = WAGUWAGUMACHINE_FAIL;
+							printf("[HlsSlotMachine] extract FAIL: machine %u type %u had capsules but GetSlotItems returned empty (all remaining items may have wCountLeft <= 0)\n",
+								req->wMachineIndex, byMachineType);
+						}
 					}
-					else res->wResultCode = WAGUWAGUMACHINE_NOT_ENOUGH_COIN;
+					else
+					{
+						res->wResultCode = WAGUWAGUMACHINE_NOT_ENOUGH_COIN;
+						printf("[HlsSlotMachine] extract NOT_ENOUGH_COIN: machine %u type %u player has %u coin(s), needs %u (byCoin=%u * count=%u)\n",
+							req->wMachineIndex, byMachineType, dwPlayerCoin, DWORD(pSlotMachine->pTbldat->byCoin * req->byExtractCount),
+							pSlotMachine->pTbldat->byCoin, req->byExtractCount);
+					}
 				}
-				else res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_QNTT;
+				else
+				{
+					res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_QNTT;
+					printf("[HlsSlotMachine] extract NOT_EXIST_QNTT: machine %u type %u wCurrentCapsule=%u < byExtractCount=%u\n",
+						req->wMachineIndex, byMachineType, pSlotMachine->wCurrentCapsule, req->byExtractCount);
+				}
 			}
-			else res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_QNTT;
+			else
+			{
+				res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_QNTT;
+				printf("[HlsSlotMachine] extract NOT_EXIST_QNTT: machine %u type %u byExtractCount=%u exceeds max %u\n",
+					req->wMachineIndex, byMachineType, req->byExtractCount, DBO_MAX_HLS_SLOT_MACHINES_MAX_ITEMS);
+			}
 		}
-		else res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_MACHINE;
+		else
+		{
+			res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_MACHINE;
+			printf("[HlsSlotMachine] extract NOT_EXIST_MACHINE: machine %u has byType=%u (expected WAGUWAGU=%u or EVENT=%u)\n",
+				req->wMachineIndex, pSlotMachine->pTbldat->byType, HLS_MACHINE_TYPE_WAGUWAGU, HLS_MACHINE_TYPE_EVENT);
+		}
 	}
 	else
 	{
 		res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_MACHINE;
+		printf("[HlsSlotMachine] extract NOT_EXIST_MACHINE: machine index %u not found in g_pHlsSlotMachine\n", req->wMachineIndex);
 		g_pHlsSlotMachine->DebugDumpSlotMachines(req->wMachineIndex);
 	}
 

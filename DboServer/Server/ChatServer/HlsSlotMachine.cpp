@@ -21,6 +21,8 @@ CHlsSlotMachine::~CHlsSlotMachine()
 
 void CHlsSlotMachine::Init()
 {
+	CNtlLock lock(&m_mutex);
+
 	//delete items
 	for (SLOTMACHINEGROUP::iterator it = m_slotMachineGroup.begin(); it != m_slotMachineGroup.end();)
 	{
@@ -113,6 +115,8 @@ void CHlsSlotMachine::Init()
 
 void CHlsSlotMachine::GetSlotItems(TBLIDX slotIdx, std::vector<sHLS_SLOT_ITEM*>* pVec)
 {
+	CNtlLock lock(&m_mutex);
+
 	sSLOT_MACHINE* pSlot = GetSlotMachine(slotIdx);
 	if (pSlot == NULL)
 		return;
@@ -136,6 +140,8 @@ void CHlsSlotMachine::GetSlotItems(TBLIDX slotIdx, std::vector<sHLS_SLOT_ITEM*>*
 
 void CHlsSlotMachine::SetWaguItemCount(TBLIDX slotIdx, BYTE Count, TBLIDX tblidx)
 {
+	CNtlLock lock(&m_mutex);
+
 	std::multimap<TBLIDX, sHLS_SLOT_ITEM*>::iterator itLow = m_slotMachineGroup.lower_bound(slotIdx);
 	std::multimap<TBLIDX, sHLS_SLOT_ITEM*>::iterator itUp = m_slotMachineGroup.upper_bound(slotIdx);
 
@@ -153,6 +159,8 @@ void CHlsSlotMachine::SetWaguItemCount(TBLIDX slotIdx, BYTE Count, TBLIDX tblidx
 
 void CHlsSlotMachine::AddWinner(TBLIDX slotId, TBLIDX itemTblidx, CPlayer * pPlayer)
 {
+	CNtlLock lock(&m_mutex);
+
 	QWORD& winnerIndex = m_mapWinnerIndex[slotId];
 	winnerIndex += 1;
 
@@ -175,6 +183,8 @@ void CHlsSlotMachine::AddWinner(TBLIDX slotId, TBLIDX itemTblidx, CPlayer * pPla
 
 void CHlsSlotMachine::GetWinnerInfo(TBLIDX wSlot, CPlayer * pPlayer)
 {
+	CNtlLock lock(&m_mutex);
+
 	CNtlPacket packet(sizeof(sTU_HLS_SLOT_MACHINE_WINNER_INFO_RES));
 	sTU_HLS_SLOT_MACHINE_WINNER_INFO_RES* res = (sTU_HLS_SLOT_MACHINE_WINNER_INFO_RES*)packet.GetPacketData();
 	res->wOpCode = TU_HLS_SLOT_MACHINE_WINNER_INFO_RES;
@@ -205,6 +215,8 @@ void CHlsSlotMachine::GetWinnerInfo(TBLIDX wSlot, CPlayer * pPlayer)
 
 void CHlsSlotMachine::LoadSlotMachines(CPlayer* pPlayer, BYTE byType)
 {
+	CNtlLock lock(&m_mutex);
+
 	BYTE i = 0;
 
 	CNtlPacket packet(sizeof(sTU_HLS_SLOT_MACHINE_INFO_RES));
@@ -238,6 +250,8 @@ void CHlsSlotMachine::LoadSlotMachines(CPlayer* pPlayer, BYTE byType)
 
 sSLOT_MACHINE * CHlsSlotMachine::GetSlotMachine(TBLIDX tblidx)
 {
+	CNtlLock lock(&m_mutex);
+
 	std::map<TBLIDX, sSLOT_MACHINE*>::iterator it = m_mapSlotMachine.find(tblidx);
 	if (it != m_mapSlotMachine.end())
 		return it->second;
@@ -247,6 +261,8 @@ sSLOT_MACHINE * CHlsSlotMachine::GetSlotMachine(TBLIDX tblidx)
 
 void CHlsSlotMachine::DebugDumpSlotMachines(TBLIDX requestedIdx)
 {
+	CNtlLock lock(&m_mutex);
+
 	printf("[HlsSlotMachine] machine index %u not found. Loaded machines (tblidx/type/bOnOff):", requestedIdx);
 	for (std::map<TBLIDX, sSLOT_MACHINE*>::iterator it = m_mapSlotMachine.begin(); it != m_mapSlotMachine.end(); it++)
 	{

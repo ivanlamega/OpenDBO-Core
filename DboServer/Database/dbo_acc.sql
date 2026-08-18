@@ -20,9 +20,9 @@ SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE `accounts` (
-  `AccountID` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `Username` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
-  `Password_hash` varchar(64) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'password in sha3-256',
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+  `password_hash` varchar(64) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'password in sha3-256',
   `acc_status` enum('pending','block','active') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'active',
   `email` varchar(80) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'test@mail.com',
   `mallpoints` int(10) unsigned NOT NULL DEFAULT '10000000',
@@ -30,19 +30,19 @@ CREATE TABLE `accounts` (
   `last_login` timestamp NULL DEFAULT NULL,
   `reg_ip` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
   `admin` tinyint(2) NOT NULL DEFAULT '0' COMMENT 'value from 0 to 10',
-  `isGm` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0 = normal user / 1 = game master or people with who can login in testing phase',
-  `lastServerFarmId` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT 'default: INVALID_SERVERFARMID ( 255 )',
+  `is_gm` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0 = normal user / 1 = game master or people with who can login in testing phase',
+  `last_server_farm_id` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT 'default: INVALID_SERVERFARMID ( 255 )',
   `founder` smallint(1) NOT NULL DEFAULT '0' COMMENT '0 = no founder / 1 = first founder / 2 = second / 3 = third',
   `founder_recv` smallint(1) NOT NULL DEFAULT '0' COMMENT '0 = founder not received / 1 = founder received',
   `last_ip` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '0.0.0.0',
   `del_char_pw` varchar(64) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '87cd084d190e436f147322b90e7384f6a8e0676c99d21ef519ea718e51d45f9c',
-  `PremiumSlots` tinyint(1) unsigned NOT NULL DEFAULT '4',
-  `EventCoins` int(10) unsigned DEFAULT '0' COMMENT 'coins used to play on HLS event machine',
-  `WaguCoins` int(10) unsigned DEFAULT '0' COMMENT 'coins used to play on HLS slot machine',
+  `premium_slots` tinyint(1) unsigned NOT NULL DEFAULT '4',
+  `event_coins` int(10) unsigned DEFAULT '0' COMMENT 'coins used to play on HLS event machine',
+  `wagu_coins` int(10) unsigned DEFAULT '0' COMMENT 'coins used to play on HLS slot machine',
   `web_ip` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
-  PRIMARY KEY (`AccountID`,`Username`),
-  UNIQUE KEY `AccountID` (`AccountID`) USING BTREE,
-  UNIQUE KEY `Username` (`Username`) USING BTREE
+  PRIMARY KEY (`id`,`username`),
+  UNIQUE KEY `id` (`id`) USING BTREE,
+  UNIQUE KEY `username` (`username`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -51,12 +51,12 @@ CREATE TABLE `accounts` (
 DROP TABLE IF EXISTS `accounts_banned`;
 CREATE TABLE `accounts_banned` (
   `id` int(20) unsigned NOT NULL AUTO_INCREMENT,
-  `GM_AccId` int(16) unsigned NOT NULL DEFAULT '0',
-  `Banned_AccId` int(16) unsigned NOT NULL DEFAULT '0',
-  `DateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `Reason` varchar(1024) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
-  `Duration` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT 'Value in days. 255 = permanent',
-  `Active` tinyint(1) NOT NULL DEFAULT '1' COMMENT '1 = true, 0 = false',
+  `gm_account_id` int(16) unsigned NOT NULL DEFAULT '0',
+  `banned_account_id` int(16) unsigned NOT NULL DEFAULT '0',
+  `date_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `reason` varchar(1024) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+  `duration` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT 'Value in days. 255 = permanent',
+  `active` tinyint(1) NOT NULL DEFAULT '1' COMMENT '1 = true, 0 = false',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -65,13 +65,13 @@ CREATE TABLE `accounts_banned` (
 -- ----------------------------
 DROP TABLE IF EXISTS `cashshop_storage`;
 CREATE TABLE `cashshop_storage` (
-  `ProductId` int(20) unsigned NOT NULL AUTO_INCREMENT,
-  `AccountID` int(10) unsigned NOT NULL,
-  `HLSitemTblidx` int(10) unsigned NOT NULL,
-  `StackCount` tinyint(3) unsigned NOT NULL,
-  `giftCharId` int(10) unsigned DEFAULT NULL,
-  `IsRead` tinyint(1) NOT NULL DEFAULT '0',
-  `SenderName` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `id` int(20) unsigned NOT NULL AUTO_INCREMENT,
+  `account_id` int(10) unsigned NOT NULL,
+  `hls_item_tblidx` int(10) unsigned NOT NULL,
+  `stack_count` tinyint(3) unsigned NOT NULL,
+  `gift_char_id` int(10) unsigned DEFAULT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT '0',
+  `sender_name` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
   `year` int(4) unsigned NOT NULL,
   `month` tinyint(2) unsigned NOT NULL,
   `day` tinyint(2) unsigned NOT NULL,
@@ -79,13 +79,13 @@ CREATE TABLE `cashshop_storage` (
   `minute` tinyint(2) unsigned NOT NULL,
   `second` tinyint(2) unsigned NOT NULL,
   `millisecond` int(4) unsigned NOT NULL,
-  `isMoved` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'BOOL. Did the player move the item to his inventory',
-  `Buyer` int(10) unsigned DEFAULT '0' COMMENT 'account id from the buyer',
+  `is_moved` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'BOOL. Did the player move the item to his inventory',
+  `buyer_account_id` int(10) unsigned DEFAULT '0' COMMENT 'account id from the buyer',
   `price` int(10) unsigned DEFAULT '0',
-  `ItemID` bigint(20) unsigned DEFAULT '0',
-  PRIMARY KEY (`ProductId`),
-  UNIQUE KEY `ProductId` (`ProductId`,`AccountID`) USING BTREE,
-  KEY `AccountID` (`AccountID`,`isMoved`) USING BTREE
+  `item_id` bigint(20) unsigned DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`,`account_id`) USING BTREE,
+  KEY `account_id` (`account_id`,`is_moved`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -93,11 +93,11 @@ CREATE TABLE `cashshop_storage` (
 -- ----------------------------
 DROP TABLE IF EXISTS `event_reward`;
 CREATE TABLE `event_reward` (
-  `AccountID` int(15) unsigned DEFAULT NULL,
-  `rewardTblidx` int(15) unsigned DEFAULT NULL,
-  `CharID` int(15) unsigned DEFAULT '0',
-  `CharName` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
-  UNIQUE KEY `AccountID` (`AccountID`,`rewardTblidx`) USING BTREE
+  `account_id` int(15) unsigned DEFAULT NULL,
+  `reward_tblidx` int(15) unsigned DEFAULT NULL,
+  `char_id` int(15) unsigned DEFAULT '0',
+  `char_name` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  UNIQUE KEY `account_id` (`account_id`,`reward_tblidx`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -105,10 +105,10 @@ CREATE TABLE `event_reward` (
 -- ----------------------------
 DROP TABLE IF EXISTS `shortcuts`;
 CREATE TABLE `shortcuts` (
-  `AccountID` int(10) unsigned NOT NULL,
-  `ActionID` int(10) unsigned NOT NULL DEFAULT '0',
-  `wKey` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`AccountID`,`ActionID`),
-  UNIQUE KEY `AccountID` (`AccountID`,`ActionID`) USING BTREE,
-  KEY `AccountID_2` (`AccountID`) USING BTREE
+  `account_id` int(10) unsigned NOT NULL,
+  `action_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `key_code` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`account_id`,`action_id`),
+  UNIQUE KEY `account_id` (`account_id`,`action_id`) USING BTREE,
+  KEY `account_id_2` (`account_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

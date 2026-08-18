@@ -5,6 +5,7 @@
 #include "NtlSingleton.h"
 #include "HlsSlotMachineItemTable.h"
 #include "NtlSharedDef.h"
+#include "NtlMutex.h"
 #include <list>
 
 class CPlayer;
@@ -62,7 +63,16 @@ public:
 
 	void							DebugDumpSlotMachines(TBLIDX requestedIdx);
 
+	// this singleton's machine/item state is shared across every IOCP worker
+	// thread; callers that need to make several calls appear atomic (e.g. a
+	// GetSlotMachine + GetSlotItems + ... + Init sequence spanning a single
+	// extract request) must hold this for the whole sequence, since Init()
+	// deletes and rebuilds the very objects other threads may be mid-read on
+	CNtlMutex*						GetMutex() { return &m_mutex; }
+
 private:
+
+	CNtlMutex						m_mutex;
 
 	typedef std::multimap<TBLIDX, sHLS_SLOT_ITEM*> SLOTMACHINEGROUP;
 	typedef SLOTMACHINEGROUP::iterator SLOTMACHINEGROUP_IT;

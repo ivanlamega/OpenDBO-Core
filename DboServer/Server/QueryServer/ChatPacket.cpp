@@ -192,9 +192,9 @@ void CChatServerSession::RecvGuildLeaveReq(CNtlPacket * pPacket, CQueryServer * 
 						{
 							pGuildData->guildSecondMaster[i] = INVALID_CHARACTERID;
 
-							CNtlString rowName("GuildSecondMaster");
+							CNtlString rowName("second_master_char_id");
 							if (i > 0)
-								rowName.Format("GuildSecondMaster%i", i + 1);
+								rowName.Format("second_master_%i_char_id", i + 1);
 
 							g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), INVALID_CHARACTERID, pCache->GetGuildID());
 
@@ -244,9 +244,9 @@ void CChatServerSession::RecvGuildKickOutReq(CNtlPacket * pPacket, CQueryServer 
 						{
 							pGuildData->guildSecondMaster[i] = INVALID_CHARACTERID;
 
-							CNtlString rowName("GuildSecondMaster");
+							CNtlString rowName("second_master_char_id");
 							if (i > 0)
-								rowName.Format("GuildSecondMaster%i", i + 1);
+								rowName.Format("second_master_%i_char_id", i + 1);
 
 							g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), INVALID_CHARACTERID, pCache->GetGuildID());
 
@@ -283,9 +283,9 @@ void CChatServerSession::RecvGuildKickOutReq(CNtlPacket * pPacket, CQueryServer 
 							{
 								pGuildData->guildSecondMaster[i] = INVALID_CHARACTERID;
 
-								CNtlString rowName("GuildSecondMaster");
+								CNtlString rowName("second_master_char_id");
 								if (i > 0)
-									rowName.Format("GuildSecondMaster%i", i + 1);
+									rowName.Format("second_master_%i_char_id", i + 1);
 
 								g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), INVALID_CHARACTERID, req->guildId);
 
@@ -326,9 +326,9 @@ void CChatServerSession::RecvGuildAppointSecondMasterReq(CNtlPacket * pPacket, C
 			{
 				pGuildData->guildSecondMaster[secondMasterSpot] = req->targetMemberCharId;
 
-				CNtlString rowName("GuildSecondMaster");
+				CNtlString rowName("second_master_char_id");
 				if (secondMasterSpot > 0)
-					rowName.Format("GuildSecondMaster%i", secondMasterSpot + 1);
+					rowName.Format("second_master_%i_char_id", secondMasterSpot + 1);
 
 				g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), req->targetMemberCharId, req->guildId);
 
@@ -363,9 +363,9 @@ void CChatServerSession::RecvGuildDismissSecondMasterReq(CNtlPacket * pPacket, C
 			{
 				pGuildData->guildSecondMaster[secondMasterSpot] = INVALID_CHARACTERID;
 
-				CNtlString rowName("GuildSecondMaster");
+				CNtlString rowName("second_master_char_id");
 				if (secondMasterSpot > 0)
-					rowName.Format("GuildSecondMaster%i", secondMasterSpot + 1);
+					rowName.Format("second_master_%i_char_id", secondMasterSpot + 1);
 
 				g_pGuildRepository->UpdateSecondMaster(rowName.c_str(), INVALID_CHARACTERID, req->guildId);
 
@@ -1242,8 +1242,19 @@ void CChatServerSession::RecvMutePlayerNfy(CNtlPacket * pPacket, CQueryServer * 
 	}
 }
 
+// serializes HLS slot-machine extract requests against each other; a
+// multi-item draw makes several AcquireProductId()/CAccountCache/CPlayerCache
+// mutations in a row on this same account+character, and QueryServer's IOCP
+// worker pool can otherwise run two extract requests concurrently and
+// interleave those mutations (product-id collisions, racing cache writes) -
+// the wider window on multi-item draws is exactly why those crash while
+// single-item draws mostly don't
+static CNtlMutex s_hlsExtractMutex;
+
 void CChatServerSession::RecvHlsSlotMachineExtractReq(CNtlPacket * pPacket, CQueryServer * app)
 {
+	CNtlLock lock(&s_hlsExtractMutex);
+
 	sTQ_HLS_SLOT_MACHINE_EXTRACT_REQ * req = (sTQ_HLS_SLOT_MACHINE_EXTRACT_REQ*)pPacket->GetPacketData();
 
 	CNtlPacket packet(sizeof(sQT_HLS_SLOT_MACHINE_EXTRACT_RES));

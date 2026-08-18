@@ -45,7 +45,7 @@ void CClientSession::SendCharLogInReq(CNtlPacket * pPacket, CAuthServer * app)
 
 			ERR_LOG(LOG_USER, "User %s request connection! req->wLVersion %i, req->wRVersion %i, mac %s\n", username, (int)req->wLVersion, (int)req->wRVersion, mac);
 
-			smart_ptr<QueryResult> result = GetAccDB.Query("SELECT AccountID,Password_hash,acc_status,isGm,lastServerFarmId,founder FROM accounts WHERE Username = \"%s\" LIMIT 1", GetAccDB.EscapeString(username).c_str());
+			smart_ptr<QueryResult> result = GetAccDB.Query("SELECT id,password_hash,acc_status,is_gm,last_server_farm_id,founder FROM accounts WHERE username = \"%s\" LIMIT 1", GetAccDB.EscapeString(username).c_str());
 			if (result)
 			{
 				Field* fields = result->Fetch();

@@ -32,5 +32,7 @@ void CCashshopManager::Init()
 
 QWORD CCashshopManager::AcquireProductId()
 {
+	CNtlLock lock(&m_mutex);
+
 	return ++m_qwLastProductId;
 }

@@ -304,7 +304,7 @@ void CClientSession::SendCharExitReq(CNtlPacket * pPacket)
 
 	if(req->byMoveType == 2 && GetPlayer()->IsServerChanged() && GetPlayer()->GetServerFarmID() != INVALID_SERVERFARMID) //if move type 2 (move to gameserver) and if serverid changed
 	{
-		GetAccDB.Execute("UPDATE accounts SET lastServerFarmId=%u WHERE AccountID=%u LIMIT 1", GetPlayer()->GetServerFarmID(), GetPlayer()->GetAccountID());
+		GetAccDB.Execute("UPDATE accounts SET last_server_farm_id=%u WHERE id=%u LIMIT 1", GetPlayer()->GetServerFarmID(), GetPlayer()->GetAccountID());
 	}
 }
 
@@ -338,7 +338,7 @@ void CClientSession::SendCharDeleteReq(CNtlPacket * pPacket)
 	else
 	{
 		//check if del password is correct
-		smart_ptr<QueryResult> delpwcheck = GetAccDB.Query("SELECT del_char_pw FROM accounts WHERE AccountID=%u LIMIT 1", GetPlayer()->GetAccountID());
+		smart_ptr<QueryResult> delpwcheck = GetAccDB.Query("SELECT del_char_pw FROM accounts WHERE id=%u LIMIT 1", GetPlayer()->GetAccountID());
 		if (delpwcheck)
 		{
 			Field* delpw = delpwcheck->Fetch();
@@ -347,7 +347,7 @@ void CClientSession::SendCharDeleteReq(CNtlPacket * pPacket)
 				resultcode = CHARACTER_DELETE_CHAR_FAIL_NOT_MATCH_CODE;
 			else
 			{
-				smart_ptr<QueryResult> check = GetCharDB.Query("SELECT GameMaster, GuildID FROM characters WHERE CharID=%u AND AccountID=%u LIMIT 1", req->charId, GetPlayer()->GetAccountID());
+				smart_ptr<QueryResult> check = GetCharDB.Query("SELECT game_master, guild_id FROM characters WHERE id=%u AND account_id=%u LIMIT 1", req->charId, GetPlayer()->GetAccountID());
 				if (check)
 				{
 					Field* f = check->Fetch();
@@ -358,7 +358,7 @@ void CClientSession::SendCharDeleteReq(CNtlPacket * pPacket)
 						if(f[0].GetBool() == true)
 							DelTime = time(0) + 60;
 
-						if (GetCharDB.Execute("UPDATE characters SET DelCharTime=%I64u WHERE CharID=%u AND AccountID=%u LIMIT 1", DelTime, req->charId, GetPlayer()->GetAccountID()) == false)
+						if (GetCharDB.Execute("UPDATE characters SET del_char_time=%I64u WHERE id=%u AND account_id=%u LIMIT 1", DelTime, req->charId, GetPlayer()->GetAccountID()) == false)
 							resultcode = CHARACTER_DELETE_CHAR_FAIL;
 						else
 						{
@@ -413,7 +413,7 @@ void CClientSession::SendCancelCharDeleteReq(CNtlPacket * pPacket)
 	else
 	{
 		//check if del password is correct
-		smart_ptr<QueryResult> delpwcheck = GetAccDB.Query("SELECT del_char_pw FROM accounts WHERE AccountID=%u LIMIT 1", GetPlayer()->GetAccountID());
+		smart_ptr<QueryResult> delpwcheck = GetAccDB.Query("SELECT del_char_pw FROM accounts WHERE id=%u LIMIT 1", GetPlayer()->GetAccountID());
 		if (delpwcheck)
 		{
 			Field* delpw = delpwcheck->Fetch();
@@ -422,7 +422,7 @@ void CClientSession::SendCancelCharDeleteReq(CNtlPacket * pPacket)
 				resultcode = CHARACTER_DELETE_CHAR_FAIL_NOT_MATCH_CODE;
 			else
 			{
-				if (GetCharDB.Execute("UPDATE characters SET DelCharTime=0 WHERE CharID=%u AND AccountID=%u LIMIT 1", req->charId, GetPlayer()->GetAccountID()) == false)
+				if (GetCharDB.Execute("UPDATE characters SET del_char_time=0 WHERE id=%u AND account_id=%u LIMIT 1", req->charId, GetPlayer()->GetAccountID()) == false)
 					resultcode = CHARACTER_DB_QUERY_FAIL;
 				else
 				{
@@ -478,17 +478,17 @@ void CClientSession::SendCharRenameReq(CNtlPacket * pPacket)
 		res->wResultCode = CHARACTER_BLOCK_STRING_INCLUDED;
 	else
 	{
-		smart_ptr<QueryResult> check = GetCharDB.Query("SELECT NameChange FROM characters WHERE CharID=%u AND AccountID=%u LIMIT 1", req->charId, GetPlayer()->GetAccountID());
+		smart_ptr<QueryResult> check = GetCharDB.Query("SELECT name_change FROM characters WHERE id=%u AND account_id=%u LIMIT 1", req->charId, GetPlayer()->GetAccountID());
 		if (check)
 		{
 			Field *f = check->Fetch();
 			if (f[0].GetBool())
 			{
 				//check name if available
-				smart_ptr<QueryResult> namecheck = GetCharDB.Query("SELECT CharID FROM characters WHERE CharName='%s' AND NameChange=1 LIMIT 1", charname.c_str());
+				smart_ptr<QueryResult> namecheck = GetCharDB.Query("SELECT id FROM characters WHERE char_name='%s' AND name_change=1 LIMIT 1", charname.c_str());
 				if (!namecheck)
 				{
-					GetCharDB.Execute("UPDATE characters SET CharName='%s', NameChange=0 WHERE CharID=%u LIMIT 1", charname.c_str(), req->charId);
+					GetCharDB.Execute("UPDATE characters SET char_name='%s', name_change=0 WHERE id=%u LIMIT 1", charname.c_str(), req->charId);
 
 					GetPlayer()->SetNewCharName(req->charId, req->awchCharName);
 				}

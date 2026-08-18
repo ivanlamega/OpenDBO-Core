@@ -81,8 +81,8 @@ void CMasterServerSession::RecvPlayerOnlineCheck(CNtlPacket * pPacket, CAuthServ
 				packet.SetPacketLen(sizeof(sAU_LOGIN_RES));
 				app->SendTo(session, &packet);
 
-				GetAccDB.Execute("UPDATE accounts SET last_login=CURRENT_TIMESTAMP, last_ip='%s' WHERE AccountID = %u LIMIT 1", session->GetRemoteIP(), req->accountId);
-				GetLogDB.Execute("INSERT INTO auth_login_log(AccountID, IP) VALUES (%u, '%s')", req->accountId, session->GetRemoteIP());
+				GetAccDB.Execute("UPDATE accounts SET last_login=CURRENT_TIMESTAMP, last_ip='%s' WHERE id = %u LIMIT 1", session->GetRemoteIP(), req->accountId);
+				GetLogDB.Execute("INSERT INTO auth_login_log(account_id, ip) VALUES (%u, '%s')", req->accountId, session->GetRemoteIP());
 
 				return;
 			}

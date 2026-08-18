@@ -29,7 +29,7 @@ void CRankBattle::LoadRankBattleList(HSESSION hSession, DWORD dwPage, BYTE byCom
 {
 	SQLCallbackBase* pCallBack = new SQLClassCallbackP3<CRankBattle, HSESSION, DWORD, BYTE>(this, &CRankBattle::OnLoadRankBattleList, hSession, dwPage, byCompareDay);
 	AsyncQuery * q = new AsyncQuery(pCallBack);
-	q->AddQuery("SELECT CharID, Points, StraightWin FROM rank_battle ORDER BY Points DESC LIMIT 10 OFFSET %u", dwPage * 10); //page * 10 = 1 * 10 = result 11-20 or if page is 2 then 2 * 10 = result 21-30
+	q->AddQuery("SELECT char_id, points, straight_win FROM rank_battle ORDER BY points DESC LIMIT 10 OFFSET %u", dwPage * 10); //page * 10 = 1 * 10 = result 11-20 or if page is 2 then 2 * 10 = result 21-30
 	GetCharDB.QueueAsyncQuery(q);
 }
 
@@ -50,7 +50,7 @@ void CRankBattle::OnLoadRankBattleList(QueryResultVector & results, HSESSION hSe
 		{
 			Field* f = results[0].result->Fetch();
 
-			smart_ptr<QueryResult> pPlayer = GetCharDB.Query("SELECT CharName, Level, Class, GuildName FROM characters WHERE CharID=%u LIMIT 1", f[0].GetUInt32());
+			smart_ptr<QueryResult> pPlayer = GetCharDB.Query("SELECT char_name, level, class, guild_name FROM characters WHERE id=%u LIMIT 1", f[0].GetUInt32());
 			if (pPlayer)
 			{
 				Field* i = pPlayer->Fetch();
@@ -98,12 +98,12 @@ void CRankBattle::LoadRankBattleListFindName(HSESSION hSession, WCHAR * wchCharN
 	//std::string escapeTarget = GetCharDB.EscapeString(target);
 	//Ntl_CleanUpHeapString(target);
 
-	//smart_ptr<QueryResult> pPlayer = GetCharDB.Query("SELECT CharID FROM characters WHERE CharName=\"%s\" LIMIT 1", escapeTarget.c_str());
+	//smart_ptr<QueryResult> pPlayer = GetCharDB.Query("SELECT id FROM characters WHERE char_name=\"%s\" LIMIT 1", escapeTarget.c_str());
 	//if (pPlayer)
 	//{
 	//	Field* a = pPlayer->Fetch();
 
-	////	smart_ptr<QueryResult> pPlayerRank = GetCharDB.Query("SELECT Points FROM rank_battle WHERE CharID=%u LIMIT 1", a[0].GetUInt32());
+	////	smart_ptr<QueryResult> pPlayerRank = GetCharDB.Query("SELECT points FROM rank_battle WHERE char_id=%u LIMIT 1", a[0].GetUInt32());
 	////	if (pPlayerRank)
 	////	{
 	////		Field* b = pPlayerRank->Fetch();
@@ -111,7 +111,7 @@ void CRankBattle::LoadRankBattleListFindName(HSESSION hSession, WCHAR * wchCharN
 
 	////		SQLCallbackBase* pCallBack = new SQLClassCallbackP4<CRankBattle, HSESSION, DWORD, BYTE, WCHAR *>(this, &CRankBattle::OnLoadRankBattleListFindName, hSession, dwPage, byCompareDay, wchCharName);
 	////		AsyncQuery * q = new AsyncQuery(pCallBack);
-	////		q->AddQuery("SELECT CharID, Points, StraightWin FROM rank_battle WHERE Points <= %u ORDER BY Points DESC LIMIT 10 OFFSET %u", b[0].GetUInt32(), dwPage * 10); //page * 10 = 1 * 10 = result 11-20 or if page is 2 then 2 * 10 = result 21-30
+	////		q->AddQuery("SELECT char_id, points, straight_win FROM rank_battle WHERE points <= %u ORDER BY points DESC LIMIT 10 OFFSET %u", b[0].GetUInt32(), dwPage * 10); //page * 10 = 1 * 10 = result 11-20 or if page is 2 then 2 * 10 = result 21-30
 	////		GetCharDB.QueueAsyncQuery(q);
 
 	//		return;
@@ -143,7 +143,7 @@ void CRankBattle::OnLoadRankBattleListFindName(QueryResultVector & results, HSES
 		{
 			Field* f = results[0].result->Fetch();
 
-			smart_ptr<QueryResult> pPlayer = GetCharDB.Query("SELECT CharName, Level, Class, GuildName FROM characters WHERE CharID=%u LIMIT 1", f[0].GetUInt32());
+			smart_ptr<QueryResult> pPlayer = GetCharDB.Query("SELECT char_name, level, class, guild_name FROM characters WHERE id=%u LIMIT 1", f[0].GetUInt32());
 			if (pPlayer)
 			{
 				Field* i = pPlayer->Fetch();

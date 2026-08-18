@@ -3,6 +3,7 @@
 
 #include "NtlSingleton.h"
 #include "HLSItemTable.h"
+#include "NtlMutex.h"
 
 class CCashshopManager : public CNtlSingleton<CCashshopManager>
 {
@@ -19,9 +20,15 @@ private:
 
 public:
 
+	// called from multiple QueryServer IOCP worker threads (cash shop
+	// purchases, mail, slot-machine draws); ++m_qwLastProductId is not
+	// atomic on its own, so concurrent callers can hand out the same id,
+	// which then collides on the cashshop_storage primary key
 	QWORD						AcquireProductId();
 
 private:
+
+	CNtlMutex					m_mutex;
 
 	QWORD						m_qwLastProductId;
 

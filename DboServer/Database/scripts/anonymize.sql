@@ -31,7 +31,7 @@ USE dbo_acc;
 -- ---------------------------------------------------------------------
 -- Scrub account credentials and status; grant local admin/GM access.
 --
---  Password_hash / del_char_pw:
+--  password_hash / del_char_pw:
 --      Replaced with the SHA3-256 hash of the known placeholder
 --      password "password". This overwrites the real user's password
 --      hash so it can no longer be used/cracked from the exported
@@ -59,24 +59,24 @@ USE dbo_acc;
 --  admin:
 --      1 -> flags the local account as a server administrator.
 --
---  isGm:
+--  is_gm:
 --      10 -> Game Master permission level (scale depends on server
 --      config; 10 typically = highest/owner-level GM access).
 --
---  WaguCoins / EventCoins:
+--  wagu_coins / event_coins:
 --      Additional in-game currencies, set high for local testing.
 -- ---------------------------------------------------------------------
 UPDATE accounts
-SET Password_hash = 'c0067d4af4e87f00dbac63b6156828237059172d1bbeac67427345d6a9fda484', -- SHA3-256 hash of "password"
+SET password_hash = 'c0067d4af4e87f00dbac63b6156828237059172d1bbeac67427345d6a9fda484', -- SHA3-256 hash of "password"
 	email = "test@mail.com",
     del_char_pw = 'c0067d4af4e87f00dbac63b6156828237059172d1bbeac67427345d6a9fda484',    -- SHA3-256 hash of "password"
     acc_status = 'active',
     last_ip = '127.0.0.1',
 	mallpoints = 10000000,
     admin = 1,
-    isGm = 10,
-    WaguCoins = 9999,
-    EventCoins = 9999;
+    is_gm = 10,
+    wagu_coins = 9999,
+    event_coins = 9999;
 
 
 USE dbo_char;
@@ -84,12 +84,12 @@ USE dbo_char;
 -- ---------------------------------------------------------------------
 -- Grant GM level 10 to every character in the anonymized local copy.
 --
---  GameMaster:
+--  game_master:
 --      10 -> in-game GM command/permission level for the character
---      (separate from the account-level isGm flag above; this is
+--      (separate from the account-level is_gm flag above; this is
 --      what the game client/server checks for in-world GM commands).
 --      Set on all characters so any character can be used to debug
 --      GM-only commands/content locally.
 -- ---------------------------------------------------------------------
 UPDATE characters
-SET GameMaster = 10;
+SET game_master = 10;

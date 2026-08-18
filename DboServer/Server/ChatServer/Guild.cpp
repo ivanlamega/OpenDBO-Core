@@ -525,7 +525,7 @@ WORD	CGuild::AddFunction(CPlayer* pMaster, DWORD dwZeniCost, BYTE byFunction, bo
 		g_pApp->Send(pMaster->GetClientSessionID(), &packet2);
 
 		//do query
-		GetCharDB.Execute("UPDATE guilds SET FunctionFlag=%I64u WHERE GuildID=%u", guildInfo.qwGuildFunctionFlag, guildInfo.guildId);
+		GetCharDB.Execute("UPDATE guilds SET function_flag=%I64u WHERE id=%u", guildInfo.qwGuildFunctionFlag, guildInfo.guildId);
 
 		if (!bIsGuildFunction && GetDojo())
 		{
@@ -533,7 +533,7 @@ WORD	CGuild::AddFunction(CPlayer* pMaster, DWORD dwZeniCost, BYTE byFunction, bo
 			if (byDojoLv > 0)
 			{
 				dojodata->byLevel = byDojoLv;
-				GetCharDB.Execute("UPDATE dojos SET Level=%u WHERE GuildID=%u", dojodata->byLevel, guildInfo.guildId);
+				GetCharDB.Execute("UPDATE dojos SET level=%u WHERE guild_id=%u", dojodata->byLevel, guildInfo.guildId);
 			}
 		}
 
