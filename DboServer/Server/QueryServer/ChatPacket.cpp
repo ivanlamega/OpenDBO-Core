@@ -1242,8 +1242,19 @@ void CChatServerSession::RecvMutePlayerNfy(CNtlPacket * pPacket, CQueryServer * 
 	}
 }
 
+// serializes HLS slot-machine extract requests against each other; a
+// multi-item draw makes several AcquireProductId()/CAccountCache/CPlayerCache
+// mutations in a row on this same account+character, and QueryServer's IOCP
+// worker pool can otherwise run two extract requests concurrently and
+// interleave those mutations (product-id collisions, racing cache writes) -
+// the wider window on multi-item draws is exactly why those crash while
+// single-item draws mostly don't
+static CNtlMutex s_hlsExtractMutex;
+
 void CChatServerSession::RecvHlsSlotMachineExtractReq(CNtlPacket * pPacket, CQueryServer * app)
 {
+	CNtlLock lock(&s_hlsExtractMutex);
+
 	sTQ_HLS_SLOT_MACHINE_EXTRACT_REQ * req = (sTQ_HLS_SLOT_MACHINE_EXTRACT_REQ*)pPacket->GetPacketData();
 
 	CNtlPacket packet(sizeof(sQT_HLS_SLOT_MACHINE_EXTRACT_RES));
