@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "CashshopManager.h"
 #include "QueryServer.h"
+#include "Repository/CashShopRepository.h"
 
 
 CCashshopManager::CCashshopManager()
@@ -17,7 +18,7 @@ void CCashshopManager::Init()
 {
 	m_qwLastProductId = 0;
 
-	smart_ptr<QueryResult> result = GetAccDB.Query("SELECT MAX(ProductId) FROM cashshop_storage");
+	smart_ptr<QueryResult> result = g_pCashShopRepository->GetMaxProductId();
 	if (result)
 	{
 		Field* f = result->Fetch();

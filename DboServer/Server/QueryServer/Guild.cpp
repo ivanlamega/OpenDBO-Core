@@ -3,6 +3,7 @@
 #include "QueryServer.h"
 #include "NtlPacketQT.h"
 #include "PlayerCache.h"
+#include "Repository/GuildRepository.h"
 
 
 CGuild::CGuild()
@@ -22,7 +23,7 @@ void CGuild::Init()
 
 	ERR_LOG(LOG_SYSTEM, "Start loading guild");
 
-	smart_ptr<QueryResult> result = GetCharDB.Query("SELECT * FROM guilds");
+	smart_ptr<QueryResult> result = g_pGuildRepository->LoadGuilds();
 	if (result)
 	{
 		ERR_LOG(LOG_SYSTEM, "Total Guilds %u", result->GetRowCount());
@@ -88,7 +89,7 @@ void CGuild::Destroy()
 
 void CGuild::LoadGuildMemberData(GUILDID guilId, DWORD dwLimit)
 {
-	smart_ptr<QueryResult> result = GetCharDB.Query("SELECT CharID,CharName,AccountID,Level,Race,Class,Reputation FROM characters WHERE GuildID=%u LIMIT %u", guilId, dwLimit);
+	smart_ptr<QueryResult> result = g_pGuildRepository->LoadGuildMembers(guilId, dwLimit);
 	if (result)
 	{
 		do
@@ -178,7 +179,7 @@ sDBO_GUILD_DATA * CGuild::CreateGuild(CHARACTERID guildMaster, WCHAR * wszName, 
 
 	m_mapGuild.insert(std::make_pair(pData->guildId, pData));
 
-	GetCharDB.WaitExecute("INSERT INTO guilds(GuildID,GuildName,GuildMaster,FunctionFlag)VALUES(%u, \"%ls\", %u, %I64u)", pData->guildId, pData->wszName, guildMaster, qwGuildFunctionFlag);
+	g_pGuildRepository->InsertGuild(pData->guildId, pData->wszName, guildMaster, qwGuildFunctionFlag);
 
 	return pData;
 }
@@ -187,8 +188,8 @@ void CGuild::AddGuildMember(GUILDID guildId, sDBO_GUILD_MEMBER_DATA * pData, WCH
 {
 	m_mapGuildMember.insert(std::make_pair(guildId, pData));
 
-	GetCharDB.Execute("UPDATE characters SET GuildID=%u, GuildName=\"%ls\" WHERE CharID=%u", guildId, wszGuildName, pData->charId);
-	GetCharDB.Execute("INSERT INTO guild_members(GuildID,CharID)VALUES(%u,%u)", guildId, pData->charId);
+	g_pGuildRepository->SetCharacterGuild(pData->charId, guildId, wszGuildName);
+	g_pGuildRepository->InsertGuildMember(guildId, pData->charId);
 }
 
 bool CGuild::RemoveGuildMember(GUILDID guildId, CHARACTERID charId)
@@ -203,8 +204,8 @@ bool CGuild::RemoveGuildMember(GUILDID guildId, CHARACTERID charId)
 		{
 			if (pData->charId == charId)
 			{
-				GetCharDB.Execute("UPDATE characters SET GuildID=0, GuildName=(null) WHERE CharID=%u", charId); //update database
-				GetCharDB.Execute("DELETE FROM guild_members WHERE GuildID=%u AND CharID=%u", guildId, charId);
+				g_pGuildRepository->RemoveMemberGuildFlag(charId); //update database
+				g_pGuildRepository->DeleteGuildMember(guildId, charId);
 
 				m_mapGuildMember.erase(low);
 				delete pData;
@@ -255,9 +256,9 @@ void CGuild::RemoveGuild(GUILDID guildId)
 		SAFE_DELETE(pData);
 	}
 
-	GetCharDB.Execute("UPDATE characters SET GuildID=0, GuildName=(null) WHERE GuildID=%u", guildId); //update database
-	GetCharDB.Execute("DELETE FROM guild_members WHERE GuildID=%u", guildId);
-	GetCharDB.Execute("DELETE FROM guilds WHERE GuildID=%u", guildId);
+	g_pGuildRepository->RemoveAllMembersGuildFlag(guildId); //update database
+	g_pGuildRepository->DeleteGuildMembers(guildId);
+	g_pGuildRepository->DeleteGuild(guildId);
 
 	m_mapGuild.erase(guildId);
 }

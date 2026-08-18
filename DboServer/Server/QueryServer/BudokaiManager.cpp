@@ -6,6 +6,7 @@
 #include "PlayerCache.h"
 #include "Servermanager.h"
 #include "Dojo.h"
+#include "Repository/BudokaiRepository.h"
 
 
 CBudokaiManager::CBudokaiManager()
@@ -22,7 +23,7 @@ void CBudokaiManager::Init()
 {
 	memset(&m_sBudokai, -1, sizeof(m_sBudokai));
 
-	smart_ptr<QueryResult> result = GetLogDB.Query("SELECT * FROM budokai");
+	smart_ptr<QueryResult> result = g_pBudokaiRepository->LoadBudokaiState();
 	if (result)
 	{
 		Field* f = result->Fetch();
@@ -437,7 +438,7 @@ void CBudokaiManager::HistoryWrite(BYTE byBudokaiType, BYTE byMatchType)
 			{
 				std::multimap<JOINID, CHARACTERID>::iterator it2 = m_mapJoinID.find(it->first);
 				if(it2 != m_mapJoinID.end())
-					GetLogDB.Execute("INSERT INTO budokai_winners (BudokaiNumber,Type,MatchType,WinnerCharID1) VALUES (%u, %u, %u, %u)", m_sBudokai.wSeasonCount, byBudokaiType, byMatchType, it2->second);
+					g_pBudokaiRepository->InsertWinnerIndividual(m_sBudokai.wSeasonCount, byBudokaiType, byMatchType, it2->second);
 
 				break;
 
@@ -467,8 +468,7 @@ void CBudokaiManager::HistoryWrite(BYTE byBudokaiType, BYTE byMatchType)
 						break;
 				}
 
-				GetLogDB.Execute("INSERT INTO budokai_winners (BudokaiNumber,Type,MatchType,WinnerCharID1,WinnerCharID2,WinnerCharID3,WinnerCharID4,WinnerCharID5) VALUES (%u, %u, %u, %u, %u, %u, %u, %u)", 
-					m_sBudokai.wSeasonCount, byBudokaiType, byMatchType, aMembers[0], aMembers[1], aMembers[2], aMembers[3], aMembers[4]);
+				g_pBudokaiRepository->InsertWinnerTeam(m_sBudokai.wSeasonCount, byBudokaiType, byMatchType, aMembers[0], aMembers[1], aMembers[2], aMembers[3], aMembers[4]);
 
 				break;
 			}
@@ -479,7 +479,7 @@ void CBudokaiManager::HistoryWrite(BYTE byBudokaiType, BYTE byMatchType)
 	if (byMatchType == BUDOKAI_MATCH_TYPE_TEAM && byBudokaiType == BUDOKAI_TYPE_ADULT) //solo adult is the last one. So we update when solo adult ends
 	{
 		m_sBudokai.wSeasonCount += 1;
-		GetLogDB.Execute("UPDATE budokai SET SeasonCount=%u", m_sBudokai.wSeasonCount);
+		g_pBudokaiRepository->UpdateSeasonCount(m_sBudokai.wSeasonCount);
 	}
 
 	//clear everything except m_sBudokai. So we are ready for next budokai

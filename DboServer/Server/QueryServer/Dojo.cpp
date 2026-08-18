@@ -2,6 +2,7 @@
 #include "Dojo.h"
 #include "QueryServer.h"
 #include "NtlPacketQT.h"
+#include "Repository/DojoRepository.h"
 
 
 
@@ -19,7 +20,7 @@ CDojo::~CDojo()
 
 void CDojo::Init()
 {
-	smart_ptr<QueryResult> result = GetCharDB.Query("SELECT * FROM dojos LIMIT 7");
+	smart_ptr<QueryResult> result = g_pDojoRepository->LoadDojos();
 	if (result)
 	{
 		do
