@@ -21,20 +21,20 @@ SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS `auctionhouse`;
 CREATE TABLE `auctionhouse` (
   `id` bigint(20) unsigned NOT NULL,
-  `CharID` int(10) unsigned NOT NULL DEFAULT '0',
-  `TabType` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `ItemName` varchar(33) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `Seller` varchar(17) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
-  `Price` int(10) unsigned NOT NULL,
-  `ItemID` bigint(20) unsigned NOT NULL,
-  `TimeStart` int(10) unsigned NOT NULL,
-  `TimeEnd` int(10) unsigned DEFAULT NULL COMMENT 'time in seconds',
-  `ItemLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `NeedClass` int(10) unsigned NOT NULL,
-  `ItemType` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`,`CharID`),
+  `char_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `tab_type` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `item_name` varchar(33) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `seller_name` varchar(17) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `price` int(10) unsigned NOT NULL,
+  `item_id` bigint(20) unsigned NOT NULL,
+  `time_start` int(10) unsigned NOT NULL,
+  `time_end` int(10) unsigned DEFAULT NULL COMMENT 'time in seconds',
+  `item_level` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `need_class` int(10) unsigned NOT NULL,
+  `item_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`,`char_id`),
   UNIQUE KEY `id` (`id`) USING BTREE,
-  KEY `CharID` (`CharID`) USING BTREE
+  KEY `char_id` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- ----------------------------
@@ -43,7 +43,7 @@ CREATE TABLE `auctionhouse` (
 DROP TABLE IF EXISTS `bannword`;
 CREATE TABLE `bannword` (
   `id` int(5) NOT NULL AUTO_INCREMENT,
-  `bannword` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `word` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -52,18 +52,18 @@ CREATE TABLE `bannword` (
 -- ----------------------------
 DROP TABLE IF EXISTS `bind`;
 CREATE TABLE `bind` (
-  `CharID` int(10) unsigned NOT NULL,
-  `WorldID` int(10) unsigned NOT NULL DEFAULT '1',
-  `BindObjectTblIdx` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `LocX` float(11,6) NOT NULL,
-  `LocY` float(11,6) NOT NULL,
-  `LocZ` float(11,6) NOT NULL,
-  `DirX` float(11,6) NOT NULL,
-  `DirY` float(11,6) NOT NULL,
-  `DirZ` float(11,6) NOT NULL,
-  `Type` tinyint(1) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`CharID`),
-  UNIQUE KEY `CharID` (`CharID`) USING BTREE
+  `char_id` int(10) unsigned NOT NULL,
+  `world_id` int(10) unsigned NOT NULL DEFAULT '1',
+  `bind_object_tblidx` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `loc_x` float(11,6) NOT NULL,
+  `loc_y` float(11,6) NOT NULL,
+  `loc_z` float(11,6) NOT NULL,
+  `dir_x` float(11,6) NOT NULL,
+  `dir_y` float(11,6) NOT NULL,
+  `dir_z` float(11,6) NOT NULL,
+  `type` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`char_id`),
+  UNIQUE KEY `char_id` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -71,24 +71,24 @@ CREATE TABLE `bind` (
 -- ----------------------------
 DROP TABLE IF EXISTS `buffs`;
 CREATE TABLE `buffs` (
-  `CharID` int(10) unsigned NOT NULL,
-  `SourceTblidx` int(10) unsigned NOT NULL,
-  `SourceType` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT '0 skill and 1 item',
-  `BuffIndex` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `BuffGroup` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `InitialDuration` int(10) unsigned NOT NULL DEFAULT '0',
-  `TimeRemaining` int(10) unsigned NOT NULL DEFAULT '0',
-  `effectValue1` double(10,2) DEFAULT NULL,
-  `effectValue2` double(10,2) DEFAULT NULL,
-  `Argument1_0` int(10) unsigned DEFAULT NULL COMMENT 'commonConfigTblidx',
-  `Argument1_1` int(10) unsigned DEFAULT NULL COMMENT 'dwRemainTime',
-  `Argument1_2` int(10) unsigned DEFAULT NULL COMMENT 'dwRemainValue',
-  `Argument2_0` int(10) unsigned DEFAULT NULL COMMENT 'commonConfigTblidx',
-  `Argument2_1` int(10) unsigned DEFAULT NULL COMMENT 'dwRemainTime',
-  `Argument2_2` int(10) unsigned DEFAULT NULL COMMENT 'dwRemainValue',
-  PRIMARY KEY (`CharID`,`BuffIndex`),
-  UNIQUE KEY `CharID` (`CharID`,`BuffIndex`) USING BTREE,
-  KEY `CharID_2` (`CharID`) USING BTREE
+  `char_id` int(10) unsigned NOT NULL,
+  `source_tblidx` int(10) unsigned NOT NULL,
+  `source_type` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT '0 skill and 1 item',
+  `buff_index` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `buff_group` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `initial_duration` int(10) unsigned NOT NULL DEFAULT '0',
+  `time_remaining` int(10) unsigned NOT NULL DEFAULT '0',
+  `effect_value_1` double(10,2) DEFAULT NULL,
+  `effect_value_2` double(10,2) DEFAULT NULL,
+  `argument_1_0` int(10) unsigned DEFAULT NULL COMMENT 'commonConfigTblidx',
+  `argument_1_1` int(10) unsigned DEFAULT NULL COMMENT 'dwRemainTime',
+  `argument_1_2` int(10) unsigned DEFAULT NULL COMMENT 'dwRemainValue',
+  `argument_2_0` int(10) unsigned DEFAULT NULL COMMENT 'commonConfigTblidx',
+  `argument_2_1` int(10) unsigned DEFAULT NULL COMMENT 'dwRemainTime',
+  `argument_2_2` int(10) unsigned DEFAULT NULL COMMENT 'dwRemainValue',
+  PRIMARY KEY (`char_id`,`buff_index`),
+  UNIQUE KEY `char_id` (`char_id`,`buff_index`) USING BTREE,
+  KEY `char_id_2` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -96,69 +96,69 @@ CREATE TABLE `buffs` (
 -- ----------------------------
 DROP TABLE IF EXISTS `characters`;
 CREATE TABLE `characters` (
-  `CharID` int(10) unsigned NOT NULL,
-  `CharName` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
-  `AccountID` int(10) unsigned NOT NULL,
-  `Level` tinyint(3) unsigned NOT NULL DEFAULT '1',
-  `Exp` int(10) unsigned NOT NULL DEFAULT '0',
-  `Race` tinyint(1) unsigned DEFAULT NULL,
-  `Class` tinyint(2) unsigned DEFAULT NULL,
-  `Gender` tinyint(1) unsigned DEFAULT NULL,
-  `Face` tinyint(2) unsigned DEFAULT NULL,
-  `Adult` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `Hair` tinyint(2) unsigned NOT NULL,
-  `HairColor` tinyint(2) unsigned NOT NULL DEFAULT '0',
-  `SkinColor` tinyint(2) unsigned NOT NULL DEFAULT '0',
-  `Blood` tinyint(2) unsigned NOT NULL DEFAULT '0',
-  `CurLocX` float(11,6) NOT NULL DEFAULT '78.900002',
-  `CurLocY` float(11,6) NOT NULL DEFAULT '46.950001',
-  `CurLocZ` float(11,6) NOT NULL DEFAULT '168.350006',
-  `CurDirX` float(11,6) NOT NULL DEFAULT '0.950000',
-  `CurDirY` float(11,6) NOT NULL DEFAULT '0.000000',
-  `CurDirZ` float(11,6) NOT NULL DEFAULT '0.300000',
-  `WorldID` int(10) unsigned NOT NULL DEFAULT '1',
-  `WorldTable` int(10) unsigned NOT NULL DEFAULT '1',
-  `MapInfoIndex` int(10) unsigned NOT NULL DEFAULT '0',
-  `Money` int(10) unsigned NOT NULL DEFAULT '0',
-  `MoneyBank` int(10) unsigned NOT NULL DEFAULT '0',
-  `TutorialFlag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0 = start tutorial / 1 = dont start tutorial',
-  `TutorialHint` int(10) unsigned NOT NULL DEFAULT '0',
-  `NameChange` tinyint(1) NOT NULL DEFAULT '0',
-  `Reputation` int(10) unsigned NOT NULL DEFAULT '0',
-  `MudosaPoint` int(10) unsigned NOT NULL DEFAULT '0',
-  `SpPoint` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'skill points',
-  `GameMaster` tinyint(1) NOT NULL DEFAULT '0',
-  `GuildID` int(10) unsigned NOT NULL DEFAULT '0',
-  `GuildName` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
-  `CurLP` int(10) NOT NULL DEFAULT '15000',
-  `CurEP` smallint(5) unsigned NOT NULL DEFAULT '15000',
-  `CurRP` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `CurAP` int(10) NOT NULL DEFAULT '450000',
-  `MailIsAway` tinyint(1) NOT NULL DEFAULT '0',
-  `SrvFarmID` int(3) unsigned NOT NULL DEFAULT '0',
-  `DelCharTime` bigint(20) unsigned DEFAULT NULL COMMENT 'time(0) + 43200 = 12 hours',
-  `Hoipoi_NormalStart` tinyint(1) NOT NULL DEFAULT '0',
-  `Hoipoi_SpecialStart` tinyint(1) NOT NULL DEFAULT '0',
-  `Hoipoi_Type` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `Hoipoi_MixLevel` tinyint(3) unsigned NOT NULL DEFAULT '1',
-  `Hoipoi_MixExp` int(10) unsigned NOT NULL DEFAULT '0',
-  `Title` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `Mascot` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `RpBall` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `Netpy` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Netpy are points the user receives while staying online',
-  `WaguPoint` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '',
-  `IP` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '0.0.0.0' COMMENT 'the last IP in the char',
-  `AirState` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0 = off and 1 = on',
-  `InvisibleCostume` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0 = false 1 = true',
-  `PlayTime` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'play time in seconds',
-  `SuperiorEffectType` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `CreateTime` bigint(15) unsigned NOT NULL COMMENT 'time(0)',
-  `IsOnline` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`CharID`,`CharName`,`SrvFarmID`),
-  UNIQUE KEY `CharID` (`CharID`) USING BTREE,
-  UNIQUE KEY `CharName` (`CharName`) USING BTREE,
-  UNIQUE KEY `CharID_2` (`CharID`,`SrvFarmID`) USING BTREE,
-  UNIQUE KEY `CharID_3` (`CharID`,`AccountID`) USING BTREE
+  `id` int(10) unsigned NOT NULL,
+  `char_name` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+  `account_id` int(10) unsigned NOT NULL,
+  `level` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `exp` int(10) unsigned NOT NULL DEFAULT '0',
+  `race` tinyint(1) unsigned DEFAULT NULL,
+  `class` tinyint(2) unsigned DEFAULT NULL,
+  `gender` tinyint(1) unsigned DEFAULT NULL,
+  `face` tinyint(2) unsigned DEFAULT NULL,
+  `adult` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `hair` tinyint(2) unsigned NOT NULL,
+  `hair_color` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `skin_color` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `blood` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `cur_loc_x` float(11,6) NOT NULL DEFAULT '78.900002',
+  `cur_loc_y` float(11,6) NOT NULL DEFAULT '46.950001',
+  `cur_loc_z` float(11,6) NOT NULL DEFAULT '168.350006',
+  `cur_dir_x` float(11,6) NOT NULL DEFAULT '0.950000',
+  `cur_dir_y` float(11,6) NOT NULL DEFAULT '0.000000',
+  `cur_dir_z` float(11,6) NOT NULL DEFAULT '0.300000',
+  `world_id` int(10) unsigned NOT NULL DEFAULT '1',
+  `world_table` int(10) unsigned NOT NULL DEFAULT '1',
+  `map_info_index` int(10) unsigned NOT NULL DEFAULT '0',
+  `money` int(10) unsigned NOT NULL DEFAULT '0',
+  `money_bank` int(10) unsigned NOT NULL DEFAULT '0',
+  `tutorial_flag` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0 = start tutorial / 1 = dont start tutorial',
+  `tutorial_hint` int(10) unsigned NOT NULL DEFAULT '0',
+  `name_change` tinyint(1) NOT NULL DEFAULT '0',
+  `reputation` int(10) unsigned NOT NULL DEFAULT '0',
+  `mudosa_point` int(10) unsigned NOT NULL DEFAULT '0',
+  `sp_point` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'skill points',
+  `game_master` tinyint(1) NOT NULL DEFAULT '0',
+  `guild_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `guild_name` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `cur_lp` int(10) NOT NULL DEFAULT '15000',
+  `cur_ep` smallint(5) unsigned NOT NULL DEFAULT '15000',
+  `cur_rp` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `cur_ap` int(10) NOT NULL DEFAULT '450000',
+  `mail_is_away` tinyint(1) NOT NULL DEFAULT '0',
+  `srv_farm_id` int(3) unsigned NOT NULL DEFAULT '0',
+  `del_char_time` bigint(20) unsigned DEFAULT NULL COMMENT 'time(0) + 43200 = 12 hours',
+  `hoipoi_normal_start` tinyint(1) NOT NULL DEFAULT '0',
+  `hoipoi_special_start` tinyint(1) NOT NULL DEFAULT '0',
+  `hoipoi_type` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `hoipoi_mix_level` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `hoipoi_mix_exp` int(10) unsigned NOT NULL DEFAULT '0',
+  `title` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `mascot` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `rp_ball` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `netpy` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Netpy are points the user receives while staying online',
+  `wagu_point` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '',
+  `ip` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '0.0.0.0' COMMENT 'the last IP in the char',
+  `air_state` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0 = off and 1 = on',
+  `invisible_costume` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0 = false 1 = true',
+  `play_time` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'play time in seconds',
+  `superior_effect_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `create_time` bigint(15) unsigned NOT NULL COMMENT 'time(0)',
+  `is_online` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`,`char_name`,`srv_farm_id`),
+  UNIQUE KEY `id` (`id`) USING BTREE,
+  UNIQUE KEY `char_name` (`char_name`) USING BTREE,
+  UNIQUE KEY `id_2` (`id`,`srv_farm_id`) USING BTREE,
+  UNIQUE KEY `id_3` (`id`,`account_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -166,19 +166,19 @@ CREATE TABLE `characters` (
 -- ----------------------------
 DROP TABLE IF EXISTS `dojos`;
 CREATE TABLE `dojos` (
-  `GuildId` int(10) unsigned NOT NULL,
-  `DojoTblidx` int(10) unsigned NOT NULL,
-  `Level` tinyint(1) unsigned NOT NULL DEFAULT '1',
-  `PeaceStatus` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `PeacePoints` int(15) unsigned NOT NULL DEFAULT '0',
-  `GuildName` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
-  `LeaderName` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
-  `Notice` varchar(64) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
-  `ChallengeGuildId` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `SeedCharName` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
-  PRIMARY KEY (`DojoTblidx`),
-  UNIQUE KEY `DojoTblidx` (`DojoTblidx`) USING BTREE,
-  UNIQUE KEY `GuildId` (`GuildId`) USING BTREE
+  `guild_id` int(10) unsigned NOT NULL,
+  `dojo_tblidx` int(10) unsigned NOT NULL,
+  `level` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `peace_status` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `peace_points` int(15) unsigned NOT NULL DEFAULT '0',
+  `guild_name` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+  `leader_name` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `notice` varchar(64) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `challenge_guild_id` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `seed_char_name` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  PRIMARY KEY (`dojo_tblidx`),
+  UNIQUE KEY `dojo_tblidx` (`dojo_tblidx`) USING BTREE,
+  UNIQUE KEY `guild_id` (`guild_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -186,13 +186,13 @@ CREATE TABLE `dojos` (
 -- ----------------------------
 DROP TABLE IF EXISTS `friendlist`;
 CREATE TABLE `friendlist` (
-  `user_id` int(10) unsigned NOT NULL,
-  `friend_id` int(10) unsigned NOT NULL,
+  `char_id` int(10) unsigned NOT NULL,
+  `friend_char_id` int(10) unsigned NOT NULL,
   `friend_name` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `blacklist` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`user_id`,`friend_id`),
-  UNIQUE KEY `user_id` (`user_id`,`friend_id`) USING BTREE,
-  KEY `user_id_2` (`user_id`) USING BTREE
+  PRIMARY KEY (`char_id`,`friend_char_id`),
+  UNIQUE KEY `char_id` (`char_id`,`friend_char_id`) USING BTREE,
+  KEY `char_id_2` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -200,32 +200,32 @@ CREATE TABLE `friendlist` (
 -- ----------------------------
 DROP TABLE IF EXISTS `guilds`;
 CREATE TABLE `guilds` (
-  `GuildID` int(10) unsigned NOT NULL,
-  `GuildName` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
-  `GuildMaster` int(10) unsigned NOT NULL,
-  `GuildSecondMaster` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `GuildSecondMaster2` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `GuildSecondMaster3` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `GuildSecondMaster4` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `GuildReputation` int(10) unsigned NOT NULL DEFAULT '0',
-  `GuildPointEver` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'max guild points ever received',
-  `FunctionFlag` bigint(15) unsigned NOT NULL DEFAULT '7',
-  `GuildDisbandTime` int(15) unsigned DEFAULT NULL,
-  `MarkInColor` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `MarkInLine` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `MarkMain` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `MarkMainColor` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `MarkOutColor` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `MarkOutLine` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `NoticeBy` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
-  `GuildNotice` varchar(257) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
-  `DojoColor` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `GuildColor` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `DogiType` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `Zeni` int(10) unsigned DEFAULT '0' COMMENT 'Zeni inside guild bank',
-  PRIMARY KEY (`GuildID`,`GuildName`),
-  UNIQUE KEY `GuildID` (`GuildID`) USING BTREE,
-  UNIQUE KEY `GuildName` (`GuildName`) USING BTREE
+  `id` int(10) unsigned NOT NULL,
+  `guild_name` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+  `master_char_id` int(10) unsigned NOT NULL,
+  `second_master_char_id` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `second_master_2_char_id` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `second_master_3_char_id` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `second_master_4_char_id` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `guild_reputation` int(10) unsigned NOT NULL DEFAULT '0',
+  `guild_point_ever` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'max guild points ever received',
+  `function_flag` bigint(15) unsigned NOT NULL DEFAULT '7',
+  `guild_disband_time` int(15) unsigned DEFAULT NULL,
+  `mark_in_color` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `mark_in_line` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `mark_main` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `mark_main_color` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `mark_out_color` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `mark_out_line` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `notice_by` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `guild_notice` varchar(257) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `dojo_color` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `guild_color` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `dogi_type` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `zeni` int(10) unsigned DEFAULT '0' COMMENT 'Zeni inside guild bank',
+  PRIMARY KEY (`id`,`guild_name`),
+  UNIQUE KEY `id` (`id`) USING BTREE,
+  UNIQUE KEY `guild_name` (`guild_name`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -233,11 +233,11 @@ CREATE TABLE `guilds` (
 -- ----------------------------
 DROP TABLE IF EXISTS `guild_members`;
 CREATE TABLE `guild_members` (
-  `GuildID` int(14) unsigned NOT NULL,
-  `CharID` int(14) unsigned NOT NULL,
-  PRIMARY KEY (`GuildID`,`CharID`),
-  UNIQUE KEY `GuildID` (`GuildID`,`CharID`) USING BTREE,
-  UNIQUE KEY `CharID` (`CharID`) USING BTREE
+  `guild_id` int(14) unsigned NOT NULL,
+  `char_id` int(14) unsigned NOT NULL,
+  PRIMARY KEY (`guild_id`,`char_id`),
+  UNIQUE KEY `guild_id` (`guild_id`,`char_id`) USING BTREE,
+  UNIQUE KEY `char_id` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -245,12 +245,12 @@ CREATE TABLE `guild_members` (
 -- ----------------------------
 DROP TABLE IF EXISTS `hoipoi_recipe`;
 CREATE TABLE `hoipoi_recipe` (
-  `CharID` int(10) unsigned NOT NULL,
-  `RecipeTblidx` int(10) unsigned NOT NULL,
-  `RecipeType` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  PRIMARY KEY (`CharID`,`RecipeTblidx`),
-  UNIQUE KEY `CharID_2` (`CharID`,`RecipeTblidx`) USING BTREE,
-  KEY `CharID` (`CharID`) USING BTREE
+  `char_id` int(10) unsigned NOT NULL,
+  `recipe_tblidx` int(10) unsigned NOT NULL,
+  `recipe_type` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  PRIMARY KEY (`char_id`,`recipe_tblidx`),
+  UNIQUE KEY `char_id_2` (`char_id`,`recipe_tblidx`) USING BTREE,
+  KEY `char_id` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -259,12 +259,12 @@ CREATE TABLE `hoipoi_recipe` (
 DROP TABLE IF EXISTS `htb_skills`;
 CREATE TABLE `htb_skills` (
   `skill_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `owner_id` int(10) unsigned NOT NULL,
-  `SlotID` smallint(3) unsigned NOT NULL DEFAULT '0',
-  `TimeRemaining` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`skill_id`,`owner_id`),
-  UNIQUE KEY `skill_id` (`skill_id`,`owner_id`) USING BTREE,
-  UNIQUE KEY `owner_id` (`owner_id`,`SlotID`) USING BTREE
+  `char_id` int(10) unsigned NOT NULL,
+  `slot_id` smallint(3) unsigned NOT NULL DEFAULT '0',
+  `time_remaining` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`skill_id`,`char_id`),
+  UNIQUE KEY `skill_id` (`skill_id`,`char_id`) USING BTREE,
+  UNIQUE KEY `char_id` (`char_id`,`slot_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -274,48 +274,48 @@ DROP TABLE IF EXISTS `items`;
 CREATE TABLE `items` (
   `id` bigint(20) unsigned NOT NULL,
   `tblidx` int(10) unsigned NOT NULL DEFAULT '0',
-  `owner_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'character id',
+  `char_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'character id',
   `place` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `pos` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `count` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `rank` tinyint(2) NOT NULL DEFAULT '1',
   `durability` tinyint(3) unsigned NOT NULL DEFAULT '255',
   `grade` tinyint(2) NOT NULL DEFAULT '0',
-  `NeedToIdentify` tinyint(1) NOT NULL DEFAULT '0',
-  `BattleAttribute` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `Maker` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
-  `OptionTblidx` int(10) unsigned NOT NULL DEFAULT '4294967295' COMMENT 'item_option_data tblidx',
-  `OptionTblidx2` int(10) unsigned NOT NULL DEFAULT '4294967295' COMMENT 'item_option_data tblidx',
-  `OptionRandomId` smallint(5) unsigned NOT NULL DEFAULT '65535' COMMENT 'item_enchant tblidx',
-  `OptionRandomVal` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `OptionRandomId2` smallint(5) unsigned NOT NULL DEFAULT '65535',
-  `OptionRandomVal2` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `OptionRandomId3` smallint(5) unsigned NOT NULL DEFAULT '65535',
-  `OptionRandomVal3` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `OptionRandomId4` smallint(5) unsigned NOT NULL DEFAULT '65535',
-  `OptionRandomVal4` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `OptionRandomId5` smallint(5) unsigned NOT NULL DEFAULT '65535',
-  `OptionRandomVal5` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `OptionRandomId6` smallint(5) unsigned NOT NULL DEFAULT '65535',
-  `OptionRandomVal6` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `OptionRandomId7` smallint(5) unsigned NOT NULL DEFAULT '65535',
-  `OptionRandomVal7` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `OptionRandomId8` smallint(5) unsigned NOT NULL DEFAULT '65535',
-  `OptionRandomVal8` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `UseStartTime` bigint(15) unsigned NOT NULL DEFAULT '0' COMMENT 'max duration time (3600 = 60 minutes)',
-  `UseEndTime` bigint(15) unsigned NOT NULL DEFAULT '0' COMMENT 'current duration time (3600 = 60 minutes)',
-  `RestrictState` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `DurationType` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `AccountID` int(10) unsigned DEFAULT '0',
-  `GuildID` int(10) unsigned DEFAULT '0',
-  PRIMARY KEY (`id`,`owner_id`,`place`,`pos`),
+  `need_to_identify` tinyint(1) NOT NULL DEFAULT '0',
+  `battle_attribute` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `maker` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
+  `option_tblidx` int(10) unsigned NOT NULL DEFAULT '4294967295' COMMENT 'item_option_data tblidx',
+  `option_tblidx_2` int(10) unsigned NOT NULL DEFAULT '4294967295' COMMENT 'item_option_data tblidx',
+  `option_random_id` smallint(5) unsigned NOT NULL DEFAULT '65535' COMMENT 'item_enchant tblidx',
+  `option_random_val` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `option_random_id_2` smallint(5) unsigned NOT NULL DEFAULT '65535',
+  `option_random_val_2` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `option_random_id_3` smallint(5) unsigned NOT NULL DEFAULT '65535',
+  `option_random_val_3` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `option_random_id_4` smallint(5) unsigned NOT NULL DEFAULT '65535',
+  `option_random_val_4` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `option_random_id_5` smallint(5) unsigned NOT NULL DEFAULT '65535',
+  `option_random_val_5` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `option_random_id_6` smallint(5) unsigned NOT NULL DEFAULT '65535',
+  `option_random_val_6` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `option_random_id_7` smallint(5) unsigned NOT NULL DEFAULT '65535',
+  `option_random_val_7` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `option_random_id_8` smallint(5) unsigned NOT NULL DEFAULT '65535',
+  `option_random_val_8` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `use_start_time` bigint(15) unsigned NOT NULL DEFAULT '0' COMMENT 'max duration time (3600 = 60 minutes)',
+  `use_end_time` bigint(15) unsigned NOT NULL DEFAULT '0' COMMENT 'current duration time (3600 = 60 minutes)',
+  `restrict_state` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `duration_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `account_id` int(10) unsigned DEFAULT '0',
+  `guild_id` int(10) unsigned DEFAULT '0',
+  PRIMARY KEY (`id`,`char_id`,`place`,`pos`),
   UNIQUE KEY `id` (`id`) USING BTREE,
-  KEY `owner_id_idx` (`owner_id`) USING BTREE,
+  KEY `char_id_idx` (`char_id`) USING BTREE,
   KEY `item_vnum_index` (`tblidx`) USING BTREE,
-  KEY `owner_id` (`owner_id`,`place`,`pos`) USING BTREE,
-  KEY `owner_id_2` (`owner_id`,`place`) USING BTREE,
-  KEY `AccountID` (`AccountID`) USING BTREE,
-  KEY `GuildID` (`GuildID`) USING BTREE
+  KEY `char_id` (`char_id`,`place`,`pos`) USING BTREE,
+  KEY `char_id_2` (`char_id`,`place`) USING BTREE,
+  KEY `account_id` (`account_id`) USING BTREE,
+  KEY `guild_id` (`guild_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -323,12 +323,12 @@ CREATE TABLE `items` (
 -- ----------------------------
 DROP TABLE IF EXISTS `items_cd`;
 CREATE TABLE `items_cd` (
-  `CharID` int(10) unsigned NOT NULL,
-  `GroupIndex` tinyint(2) unsigned NOT NULL DEFAULT '0',
-  `CoolTime` int(10) unsigned NOT NULL DEFAULT '0',
-  `TimeRemaining` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`GroupIndex`,`CharID`),
-  UNIQUE KEY `CharID` (`CharID`,`GroupIndex`) USING BTREE
+  `char_id` int(10) unsigned NOT NULL,
+  `group_index` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `cool_time` int(10) unsigned NOT NULL DEFAULT '0',
+  `time_remaining` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`group_index`,`char_id`),
+  UNIQUE KEY `char_id` (`char_id`,`group_index`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -337,21 +337,21 @@ CREATE TABLE `items_cd` (
 DROP TABLE IF EXISTS `mail`;
 CREATE TABLE `mail` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `CharID` int(10) unsigned NOT NULL,
-  `SenderType` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `MailType` tinyint(1) unsigned NOT NULL DEFAULT '1',
-  `TextSize` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `Text` varchar(127) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `Zenny` int(10) unsigned NOT NULL DEFAULT '0',
-  `itemId` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `TargetName` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
-  `FromName` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
-  `IsAccept` tinyint(1) NOT NULL DEFAULT '0',
-  `IsLock` tinyint(1) NOT NULL DEFAULT '0',
-  `IsRead` tinyint(1) NOT NULL DEFAULT '0',
-  `CreateTime` bigint(20) unsigned DEFAULT NULL,
-  `EndTime` bigint(20) unsigned DEFAULT NULL,
-  `RemainDay` tinyint(2) unsigned NOT NULL DEFAULT '1',
+  `char_id` int(10) unsigned NOT NULL,
+  `sender_type` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `mail_type` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `text_size` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `text` varchar(127) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `zenny` int(10) unsigned NOT NULL DEFAULT '0',
+  `item_id` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `target_name` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `from_name` varchar(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `is_accept` tinyint(1) NOT NULL DEFAULT '0',
+  `is_lock` tinyint(1) NOT NULL DEFAULT '0',
+  `is_read` tinyint(1) NOT NULL DEFAULT '0',
+  `create_time` bigint(20) unsigned DEFAULT NULL,
+  `end_time` bigint(20) unsigned DEFAULT NULL,
+  `remain_day` tinyint(2) unsigned NOT NULL DEFAULT '1',
   `year` int(4) unsigned NOT NULL,
   `month` tinyint(2) unsigned NOT NULL,
   `day` tinyint(2) unsigned NOT NULL,
@@ -359,9 +359,9 @@ CREATE TABLE `mail` (
   `minute` tinyint(2) unsigned NOT NULL,
   `second` tinyint(2) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id` (`id`,`CharID`) USING BTREE,
+  UNIQUE KEY `id` (`id`,`char_id`) USING BTREE,
   UNIQUE KEY `id_2` (`id`) USING BTREE,
-  KEY `CharID` (`CharID`) USING BTREE
+  KEY `char_id` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -369,19 +369,19 @@ CREATE TABLE `mail` (
 -- ----------------------------
 DROP TABLE IF EXISTS `mascots`;
 CREATE TABLE `mascots` (
-  `CharID` int(15) unsigned NOT NULL,
-  `SlotID` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT 'index',
-  `MascotTblidx` int(10) unsigned NOT NULL,
-  `CurVP` int(10) unsigned NOT NULL DEFAULT '100',
-  `MaxVP` int(10) unsigned NOT NULL DEFAULT '100',
-  `CurExp` int(10) unsigned NOT NULL DEFAULT '0',
-  `skillTblidx0` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `skillTblidx1` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `skillTblidx2` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  `skillTblidx3` int(10) unsigned NOT NULL DEFAULT '4294967295',
-  PRIMARY KEY (`CharID`,`SlotID`),
-  UNIQUE KEY `CharID` (`CharID`,`SlotID`) USING BTREE,
-  KEY `CharID_2` (`CharID`) USING BTREE
+  `char_id` int(15) unsigned NOT NULL,
+  `slot_id` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT 'index',
+  `mascot_tblidx` int(10) unsigned NOT NULL,
+  `cur_vp` int(10) unsigned NOT NULL DEFAULT '100',
+  `max_vp` int(10) unsigned NOT NULL DEFAULT '100',
+  `cur_exp` int(10) unsigned NOT NULL DEFAULT '0',
+  `skill_tblidx_0` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `skill_tblidx_1` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `skill_tblidx_2` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  `skill_tblidx_3` int(10) unsigned NOT NULL DEFAULT '4294967295',
+  PRIMARY KEY (`char_id`,`slot_id`),
+  UNIQUE KEY `char_id` (`char_id`,`slot_id`) USING BTREE,
+  KEY `char_id_2` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -389,11 +389,11 @@ CREATE TABLE `mascots` (
 -- ----------------------------
 DROP TABLE IF EXISTS `portals`;
 CREATE TABLE `portals` (
-  `CharID` int(10) unsigned NOT NULL,
-  `Point` tinyint(3) unsigned NOT NULL,
-  PRIMARY KEY (`CharID`,`Point`),
-  UNIQUE KEY `CharID_2` (`CharID`,`Point`) USING BTREE,
-  KEY `CharID` (`CharID`) USING BTREE
+  `char_id` int(10) unsigned NOT NULL,
+  `point` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`char_id`,`point`),
+  UNIQUE KEY `char_id_2` (`char_id`,`point`) USING BTREE,
+  KEY `char_id` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -401,11 +401,11 @@ CREATE TABLE `portals` (
 -- ----------------------------
 DROP TABLE IF EXISTS `questitems`;
 CREATE TABLE `questitems` (
-  `CharID` int(10) unsigned NOT NULL,
+  `char_id` int(10) unsigned NOT NULL,
   `tblidx` int(10) unsigned NOT NULL,
   `amount` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `pos` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  KEY `CharID_2` (`CharID`) USING BTREE
+  KEY `char_id_2` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -413,26 +413,26 @@ CREATE TABLE `questitems` (
 -- ----------------------------
 DROP TABLE IF EXISTS `quests`;
 CREATE TABLE `quests` (
-  `CharID` int(10) unsigned NOT NULL,
-  `QuestID` int(10) unsigned NOT NULL,
-  `tcQuestInfo` tinyint(3) unsigned NOT NULL DEFAULT '1',
-  `taQuestInfo` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `tgExcCGroup` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `tcPreId` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `tcCurId` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `tcId` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `taId` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `evtUserData` int(10) unsigned NOT NULL DEFAULT '0',
-  `evtUserData2` int(10) unsigned NOT NULL DEFAULT '0',
-  `evtUserData3` int(10) unsigned NOT NULL DEFAULT '0',
-  `evtUserData4` int(10) unsigned NOT NULL DEFAULT '0',
-  `tcTimeInfo` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `taTimeInfo` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `TimeLeft` int(10) unsigned NOT NULL DEFAULT '0',
-  `QState` smallint(5) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`CharID`,`QuestID`),
-  UNIQUE KEY `CharID_2` (`CharID`,`QuestID`) USING BTREE,
-  KEY `CharID` (`CharID`) USING BTREE
+  `char_id` int(10) unsigned NOT NULL,
+  `quest_id` int(10) unsigned NOT NULL,
+  `tc_quest_info` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `ta_quest_info` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `tg_exc_c_group` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `tc_pre_id` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `tc_cur_id` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `tc_id` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `ta_id` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `evt_user_data` int(10) unsigned NOT NULL DEFAULT '0',
+  `evt_user_data_2` int(10) unsigned NOT NULL DEFAULT '0',
+  `evt_user_data_3` int(10) unsigned NOT NULL DEFAULT '0',
+  `evt_user_data_4` int(10) unsigned NOT NULL DEFAULT '0',
+  `tc_time_info` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `ta_time_info` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `time_left` int(10) unsigned NOT NULL DEFAULT '0',
+  `q_state` smallint(5) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`char_id`,`quest_id`),
+  UNIQUE KEY `char_id_2` (`char_id`,`quest_id`) USING BTREE,
+  KEY `char_id` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -440,14 +440,14 @@ CREATE TABLE `quests` (
 -- ----------------------------
 DROP TABLE IF EXISTS `quickslot`;
 CREATE TABLE `quickslot` (
-  `CharID` int(10) unsigned NOT NULL DEFAULT '0',
-  `Tblidx` int(10) unsigned NOT NULL DEFAULT '0',
-  `Slot` int(10) unsigned NOT NULL DEFAULT '0',
-  `Type` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `Item` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'item unique id',
-  PRIMARY KEY (`CharID`,`Slot`),
-  UNIQUE KEY `CharID` (`CharID`,`Slot`) USING BTREE,
-  KEY `CharID_2` (`CharID`) USING BTREE
+  `char_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `tblidx` int(10) unsigned NOT NULL DEFAULT '0',
+  `slot` int(10) unsigned NOT NULL DEFAULT '0',
+  `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `item_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'item unique id',
+  PRIMARY KEY (`char_id`,`slot`),
+  UNIQUE KEY `char_id` (`char_id`,`slot`) USING BTREE,
+  KEY `char_id_2` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -455,22 +455,22 @@ CREATE TABLE `quickslot` (
 -- ----------------------------
 DROP TABLE IF EXISTS `quick_teleport`;
 CREATE TABLE `quick_teleport` (
-  `CharID` int(10) unsigned NOT NULL,
-  `SlotNum` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `WorldTblidx` int(10) unsigned NOT NULL,
-  `LocX` float(11,6) NOT NULL,
-  `LocY` float(11,6) NOT NULL,
-  `LocZ` float(11,6) NOT NULL,
-  `MapNameTblidx` int(10) unsigned NOT NULL,
+  `char_id` int(10) unsigned NOT NULL,
+  `slot_num` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `world_tblidx` int(10) unsigned NOT NULL,
+  `loc_x` float(11,6) NOT NULL,
+  `loc_y` float(11,6) NOT NULL,
+  `loc_z` float(11,6) NOT NULL,
+  `map_name_tblidx` int(10) unsigned NOT NULL,
   `day` tinyint(2) unsigned NOT NULL,
   `hour` tinyint(2) unsigned NOT NULL,
   `minute` tinyint(2) unsigned NOT NULL,
   `month` tinyint(2) unsigned NOT NULL,
   `second` tinyint(2) unsigned NOT NULL,
   `year` int(4) unsigned NOT NULL,
-  PRIMARY KEY (`CharID`,`SlotNum`),
-  UNIQUE KEY `CharID` (`CharID`,`SlotNum`) USING BTREE,
-  KEY `CharID_2` (`CharID`) USING BTREE
+  PRIMARY KEY (`char_id`,`slot_num`),
+  UNIQUE KEY `char_id` (`char_id`,`slot_num`) USING BTREE,
+  KEY `char_id_2` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -478,17 +478,17 @@ CREATE TABLE `quick_teleport` (
 -- ----------------------------
 DROP TABLE IF EXISTS `rank_battle`;
 CREATE TABLE `rank_battle` (
-  `CharID` int(10) unsigned NOT NULL,
-  `Win` int(10) unsigned NOT NULL DEFAULT '0',
-  `Draw` int(10) unsigned NOT NULL DEFAULT '0',
-  `Lose` int(10) unsigned NOT NULL DEFAULT '0',
-  `StraightKOWin` int(10) unsigned NOT NULL DEFAULT '0',
-  `MaxStraightKOWin` int(10) unsigned NOT NULL DEFAULT '0',
-  `MaxStraightWin` int(10) unsigned NOT NULL DEFAULT '0',
-  `StraightWin` int(10) unsigned NOT NULL DEFAULT '0',
-  `Points` float(10,0) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`CharID`),
-  UNIQUE KEY `CharID` (`CharID`) USING BTREE
+  `char_id` int(10) unsigned NOT NULL,
+  `win` int(10) unsigned NOT NULL DEFAULT '0',
+  `draw` int(10) unsigned NOT NULL DEFAULT '0',
+  `lose` int(10) unsigned NOT NULL DEFAULT '0',
+  `straight_ko_win` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_straight_ko_win` int(10) unsigned NOT NULL DEFAULT '0',
+  `max_straight_win` int(10) unsigned NOT NULL DEFAULT '0',
+  `straight_win` int(10) unsigned NOT NULL DEFAULT '0',
+  `points` float(10,0) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`char_id`),
+  UNIQUE KEY `char_id` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -497,15 +497,15 @@ CREATE TABLE `rank_battle` (
 DROP TABLE IF EXISTS `skills`;
 CREATE TABLE `skills` (
   `skill_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `owner_id` int(10) unsigned NOT NULL,
-  `RpBonusAuto` tinyint(1) NOT NULL DEFAULT '0',
-  `RpBonusType` tinyint(3) unsigned NOT NULL DEFAULT '255',
-  `SlotID` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'skillIndex',
-  `TimeRemaining` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Skill CD Time',
-  `Exp` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`owner_id`,`SlotID`),
-  UNIQUE KEY `owner_id` (`owner_id`,`SlotID`) USING BTREE,
-  KEY `owner_id_2` (`owner_id`) USING BTREE
+  `char_id` int(10) unsigned NOT NULL,
+  `rp_bonus_auto` tinyint(1) NOT NULL DEFAULT '0',
+  `rp_bonus_type` tinyint(3) unsigned NOT NULL DEFAULT '255',
+  `slot_id` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'skillIndex',
+  `time_remaining` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Skill CD Time',
+  `exp` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`char_id`,`slot_id`),
+  UNIQUE KEY `char_id` (`char_id`,`slot_id`) USING BTREE,
+  KEY `char_id_2` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -513,11 +513,11 @@ CREATE TABLE `skills` (
 -- ----------------------------
 DROP TABLE IF EXISTS `titles`;
 CREATE TABLE `titles` (
-  `CharID` int(10) unsigned NOT NULL,
-  `TitleTblidx` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`CharID`,`TitleTblidx`),
-  UNIQUE KEY `CharID_2` (`CharID`,`TitleTblidx`) USING BTREE,
-  KEY `CharID` (`CharID`) USING BTREE
+  `char_id` int(10) unsigned NOT NULL,
+  `title_tblidx` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`char_id`,`title_tblidx`),
+  UNIQUE KEY `char_id_2` (`char_id`,`title_tblidx`) USING BTREE,
+  KEY `char_id` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -525,9 +525,9 @@ CREATE TABLE `titles` (
 -- ----------------------------
 DROP TABLE IF EXISTS `warfog`;
 CREATE TABLE `warfog` (
-  `CharID` int(10) unsigned NOT NULL,
-  `WarFog` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`CharID`,`WarFog`),
-  UNIQUE KEY `CharID_2` (`CharID`,`WarFog`) USING BTREE,
-  KEY `CharID` (`CharID`) USING BTREE
+  `char_id` int(10) unsigned NOT NULL,
+  `war_fog` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`char_id`,`war_fog`),
+  UNIQUE KEY `char_id_2` (`char_id`,`war_fog`) USING BTREE,
+  KEY `char_id` (`char_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
