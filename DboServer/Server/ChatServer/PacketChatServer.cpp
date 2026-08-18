@@ -1483,6 +1483,13 @@ void CClientSession::RecvHlsSlotMachineExtractReq(CNtlPacket * pPacket)
 	res->wResultCode = CHAT_SUCCESS;
 	res->wMachineIndex = req->wMachineIndex;
 
+	// holds sSLOT_MACHINE*/sHLS_SLOT_ITEM* pointers into g_pHlsSlotMachine's internal maps
+	// for the whole extract sequence below; Init() (called on this same machine emptying
+	// out or on a top prize win) deletes and rebuilds those maps, so a concurrent extract
+	// on another IOCP worker thread must not be allowed to run while this one is still
+	// dereferencing pointers obtained before its own Init() call
+	CNtlLock lock(g_pHlsSlotMachine->GetMutex());
+
 	sSLOT_MACHINE* pSlotMachine = (sSLOT_MACHINE*)g_pHlsSlotMachine->GetSlotMachine(req->wMachineIndex);
 	if (pSlotMachine)
 	{
@@ -1587,19 +1594,46 @@ void CClientSession::RecvHlsSlotMachineExtractReq(CNtlPacket * pPacket)
 
 							return;
 						}
-						else res->wResultCode = WAGUWAGUMACHINE_FAIL;
+						else
+						{
+							res->wResultCode = WAGUWAGUMACHINE_FAIL;
+							printf("[HlsSlotMachine] extract FAIL: machine %u type %u had capsules but GetSlotItems returned empty (all remaining items may have wCountLeft <= 0)\n",
+								req->wMachineIndex, byMachineType);
+						}
 					}
-					else res->wResultCode = WAGUWAGUMACHINE_NOT_ENOUGH_COIN;
+					else
+					{
+						res->wResultCode = WAGUWAGUMACHINE_NOT_ENOUGH_COIN;
+						printf("[HlsSlotMachine] extract NOT_ENOUGH_COIN: machine %u type %u player has %u coin(s), needs %u (byCoin=%u * count=%u)\n",
+							req->wMachineIndex, byMachineType, dwPlayerCoin, DWORD(pSlotMachine->pTbldat->byCoin * req->byExtractCount),
+							pSlotMachine->pTbldat->byCoin, req->byExtractCount);
+					}
 				}
-				else res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_QNTT;
+				else
+				{
+					res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_QNTT;
+					printf("[HlsSlotMachine] extract NOT_EXIST_QNTT: machine %u type %u wCurrentCapsule=%u < byExtractCount=%u\n",
+						req->wMachineIndex, byMachineType, pSlotMachine->wCurrentCapsule, req->byExtractCount);
+				}
 			}
-			else res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_QNTT;
+			else
+			{
+				res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_QNTT;
+				printf("[HlsSlotMachine] extract NOT_EXIST_QNTT: machine %u type %u byExtractCount=%u exceeds max %u\n",
+					req->wMachineIndex, byMachineType, req->byExtractCount, DBO_MAX_HLS_SLOT_MACHINES_MAX_ITEMS);
+			}
 		}
-		else res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_MACHINE;
+		else
+		{
+			res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_MACHINE;
+			printf("[HlsSlotMachine] extract NOT_EXIST_MACHINE: machine %u has byType=%u (expected WAGUWAGU=%u or EVENT=%u)\n",
+				req->wMachineIndex, pSlotMachine->pTbldat->byType, HLS_MACHINE_TYPE_WAGUWAGU, HLS_MACHINE_TYPE_EVENT);
+		}
 	}
 	else
 	{
 		res->wResultCode = WAGUWAGUMACHINE_NOT_EXIST_MACHINE;
+		printf("[HlsSlotMachine] extract NOT_EXIST_MACHINE: machine index %u not found in g_pHlsSlotMachine\n", req->wMachineIndex);
 		g_pHlsSlotMachine->DebugDumpSlotMachines(req->wMachineIndex);
 	}
 
