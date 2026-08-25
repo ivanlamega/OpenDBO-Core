@@ -1201,9 +1201,7 @@ D3D9SetPresentParameters(const D3DDISPLAYMODE *mode,
     Present.MultiSampleType = D3DMULTISAMPLE_NONE;
     Present.MultiSampleQuality = 0;
 
-    /* Force 8x MSAA: the original gate (SelectedMultisamplingLevels > 1)
-       is false when AA is disabled in config (level 1), so MSAA was
-       never applied. Always attempt 8x, falling back to NONMASKABLE. */
+    /* Apply multisampling only when enabled in the configuration. */
     if (SelectedMultisamplingLevels > 1)
     {
         RwUInt32 maxQualityLevels = 0;
